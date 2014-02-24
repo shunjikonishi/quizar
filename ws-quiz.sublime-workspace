@@ -1,0 +1,402 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"pa",
+				"patternMsg"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "docs/About.md",
+			"settings":
+			{
+				"buffer_size": 477,
+				"line_ending": "Windows",
+				"name": "# セミナー／勉強会向けアプリ"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 127.0,
+		"selected_items":
+		[
+			[
+				"indent",
+				"Indentation: Convert to Tabs"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"About"
+			],
+			[
+				"Packa",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 512.0
+	},
+	"console":
+	{
+		"height": 146.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"view.options().set(\"translateTabsToSpaces\", true)",
+			"view.option.set(\"translateTabsToSpaces\", true)",
+			"view.options.set(\"translateTabsToSpaces\", true)",
+			"view",
+			"view.options().set(\"translateTabsToSpaces\", true)",
+			"exit",
+			"git status",
+			"ls",
+			"dir"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/FLECT/src/ws-quiz/app/views/main.scala.html",
+		"/C/FLECT/src/ws-quiz/public/stylesheets/main.css",
+		"/C/FLECT/src/ws-button/app/assets/javascripts/makeRoomTop.js",
+		"/C/FLECT/src/ws-button/app/controllers/MakeRoom.scala",
+		"/C/FLECT/src/ws-button/app/views/edit.scala.html",
+		"/C/FLECT/src/ws-button/app/assets/javascripts/editroom.js",
+		"/C/FLECT/src/ws-button/app/models/VoteRoom.scala",
+		"/C/FLECT/src/ws-button/app/models/RoomSetting.scala",
+		"/C/FLECT/src/ws-button/app/models/RoomManager.scala",
+		"/C/FLECT/src/ws-button/app/assets/javascripts/voteroom.js",
+		"/C/FLECT/src/ws-button/app/views/room.scala.html",
+		"/C/FLECT/src/ws-button/app/views/main.scala.html",
+		"/C/FLECT/src/ws-button/app/views/top.scala.html",
+		"/C/FLECT/src/ws-button/target/scala-2.10/cache/ws-button/compile/play_instrumentation",
+		"/C/FLECT/src/ws-button/target/scala-2.10/classes/public/javascripts/ext/datetimepicker/bootstrap-datetimepicker.min.css",
+		"/C/FLECT/src/ws-button/system.properties",
+		"/C/FLECT/src/ws-button/public/javascripts/ext/datetimepicker/js/moment.min.js",
+		"/C/FLECT/src/ws-button/conf/application.conf",
+		"/C/FLECT/src/ws-button/conf/routes",
+		"/C/FLECT/download/scala-redis/src/main/scala/com/redis/Operations.scala",
+		"/C/FLECT/download/scala-redis/src/main/scala/com/redis/NodeOperations.scala",
+		"/C/FLECT/src/ws-button/app/redis/src/flect/redis/Operations.scala",
+		"/C/FLECT/src/ws-button/public/stylesheets/main.css",
+		"/C/FLECT/src/ws-button/target/scala-2.10/classes/public/javascripts/makeRoomTop.min.js",
+		"/C/FLECT/src/ws-button/target/scala-2.10/resource_managed/main/public/javascripts/makeRoomTop.js",
+		"/C/FLECT/src/ws-button/target/streams/runtime/internalDependencyClasspath/$global/export",
+		"/C/FLECT/src/ws-button/target/streams/$global/ivyConfiguration/$global/out",
+		"/C/FLECT/src/ws-button/target/scala-2.10/src_managed/main/routes_routing.scala",
+		"/C/FLECT/src/ws-button/target/streams/$global/update/$global/inputs",
+		"/C/FLECT/src/ws-button/target/scala-2.10/classes/public/javascripts/makeRoomTop.js",
+		"/C/FLECT/src/ws-button/project/target/resolution-cache/reports/default-ws-button-build-scala-tool.xml",
+		"/C/FLECT/src/ws-button/target/streams/$global/$global/$global/out",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/Default/Default (Windows).sublime-keymap",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/HTML.sublime-settings",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/Scala.sublime-settings",
+		"/C/FLECT/src/ws-button/README.md",
+		"/C/FLECT/src/ws-button/app/redis/src/flect/redis/RedisService.scala",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/Default (Windows).sublime-keymap",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/OpenFolderInExplorer.py",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/Package Control/Package Control.sublime-settings",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/JSON.sublime-settings",
+		"/C/FLECT/src/ws-button/app/assets/javascripts/ext/pattern-input/pattern-input.css",
+		"/C/FLECT/src/ws-button/public/javascripts/ext/pattern-lock/_script/patternlock.js",
+		"/C/FLECT/src/ws-button/public/javascripts/ext/pattern-lock/_style/patternlock.css",
+		"/C/FLECT/download/scala-redis/src/main/scala/com/redis/StringOperations.scala",
+		"/C/Tools/play-2.2.1/framework/src/play-json/src/main/scala/play/api/libs/json/JsResult.scala",
+		"/C/Tools/play-2.2.1/framework/src/play-json/src/main/scala/play/api/libs/json/Json.scala",
+		"/C/FLECT/download/scala-redis/src/main/scala/com/redis/HashOperations.scala",
+		"/C/FLECT/download/scala-redis/src/main/scala/com/redis/Serialization.scala",
+		"/C/FLECT/download/PatternLock/PatternLock/_script/patternlock.js",
+		"/C/FLECT/download/PatternLock/PatternLock/_style/patternlock.css",
+		"/C/FLECT/src/sbim-web/db/evolutions/1.sql",
+		"/C/FLECT/src/sbim-web/app/batch/recalc/sql.yml",
+		"/C/FLECT/src/sbim-web/app/batch/recalc/RecalcJob.java",
+		"/C/FLECT/src/sbim-web/app/batch/recalc/SQL.java",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/Default.sublime-theme",
+		"/C/FLECT/src/ws-button/app/controllers/Application.scala",
+		"/C/FLECT/src/ws-button/app/redis/src/flect/redis/Room.scala",
+		"/C/FLECT/src/ws-button/app/redis/src/flect/redis/PubSubChannel.scala",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Program Files/Sublime Text 3/changelog.txt",
+		"/C/Users/k-shunji/Downloads/Package Control.sublime-package"
+	],
+	"find":
+	{
+		"height": 28.0
+	},
+	"find_in_files":
+	{
+		"height": 96.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"長押しで編集",
+			"pass",
+			"redirect",
+			"(\n",
+			"#",
+			"*",
+			"\\*",
+			"del",
+			"enter",
+			"  ",
+			"autoSubmit",
+			"canView",
+			"Js",
+			"JsObject",
+			"Concurrent",
+			"Done",
+			"Iteratee",
+			"Future",
+			"Akka",
+			"Timeout",
+			"MyRedisService",
+			"settings",
+			"json",
+			"settings",
+			"Format",
+			"implicit",
+			"fromJson",
+			"json",
+			"###",
+			"unsetLatest",
+			"con",
+			"INDEX",
+			"},\n",
+			"pair",
+			"ctrl+shift+;",
+			"ctrl+;",
+			"[",
+			"},\n",
+			"find_under_prev",
+			"ctrl+e",
+			"eol",
+			"bookmark",
+			"eol",
+			"with",
+			"Iteratee"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"\\t",
+			"***"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "docs/About.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 477,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								477,
+								477
+							]
+						],
+						"settings":
+						{
+							"auto_name": "# セミナー／勉強会向けアプリ",
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 28.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "ws-quiz.sublime-project",
+	"replace":
+	{
+		"height": 52.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"edit.",
+				"app\\views\\edit.scala.html"
+			],
+			[
+				"makeroom.sca",
+				"app\\controllers\\MakeRoom.scala"
+			],
+			[
+				"maker",
+				"app\\assets\\javascripts\\makeRoomTop.js"
+			],
+			[
+				"top",
+				"app\\views\\top.scala.html"
+			],
+			[
+				"makeroomtop",
+				"app\\assets\\javascripts\\makeRoomTop.js"
+			],
+			[
+				"top.",
+				"app\\views\\top.scala.html"
+			],
+			[
+				"route",
+				"conf\\routes"
+			],
+			[
+				"operations",
+				"app\\redis\\src\\flect\\redis\\Operations.scala"
+			],
+			[
+				"roomma",
+				"app\\models\\RoomManager.scala"
+			],
+			[
+				"roommana",
+				"app\\models\\RoomManager.scala"
+			],
+			[
+				"voteroom.s",
+				"app\\models\\VoteRoom.scala"
+			],
+			[
+				"makeroom",
+				"app\\controllers\\MakeRoom.scala"
+			],
+			[
+				"makjs",
+				"C:\\FLECT\\src\\ws-button\\app\\assets\\javascripts\\makeRoomTop.js"
+			],
+			[
+				"top.s",
+				"C:\\FLECT\\src\\ws-button\\app\\views\\top.scala.html"
+			],
+			[
+				"makeroomto",
+				"C:\\FLECT\\src\\ws-button\\app\\assets\\javascripts\\makeRoomTop.js"
+			],
+			[
+				"makeroom.sc",
+				"C:\\FLECT\\src\\ws-button\\app\\controllers\\MakeRoom.scala"
+			],
+			[
+				"v",
+				"C:\\FLECT\\src\\ws-button\\app\\assets\\javascripts\\voteroom.js"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 217.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
