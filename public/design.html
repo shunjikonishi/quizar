@@ -16,23 +16,48 @@
 <style>
 #sidemenu { float:left;}
 #content { padding-top: 60px;}
+.navbar button {
+  position: relative;
+  padding: 9px 10px;
+  margin-top: 8px;
+  margin-right: 15px;
+  margin-bottom: 8px;
+  background-color: transparent;
+  background-image: none;
+  border: 1px solid #ddd;;
+  border-radius: 1px;
+}
+.room-icons {
+	display: inline;
+}
 </style>
 </head>
 <body>
 <div id="header" class="navbar navbar-default navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header">
-			<button id="sidemenu" type="button" class="navbar-toggle">
+			<button id="sidemenu" type="button">
 				<i class="fa fa-bars"></i>
 			</button>
 			<a class="navbar-brand sidemenu-collapse" href="#">@title</a>
+			<div class="room-icons">
+				<button type="button">
+					<i class="fa fa-question-circle"></i>
+				</button>
+				<button type="button">
+					<i class="fa fa-star"></i>
+				</button>
+				<button type="button">
+					<i class="fa fa-comment"></i>
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
 <div id="sidr">
 	<ul>
 		<li><a href="#home"><i class="fa fa-home"></i> ホーム</a></li>
-		<li><a href="#make-room"ルームの作成</a></li>
+		<li><a href="#make-room">ルームの作成</a></li>
 		<li>ルームメニュー
 			<ul>
 				<li><a href="#question">問題</a></li>
@@ -153,7 +178,49 @@
 	</div>
 	<!-- make-room -->
 	<div id="make-room">
-		make-room
+		<h1>ルームの作成</h1>
+		<div>
+			<form role="form">
+				<div class="form-group">
+					<label for="roomName">ルーム名</label>
+					<input id="roomName" class="form-control"/>
+				</div>
+				<div class="form-group">
+					<label for="roomTag">タグ</label>
+					<input id="roomTag" class="form-control"/>
+				</div>
+				<div class="form-group">
+					<label for="roomDescription">説明</label>
+					<textarea id="roomName" class="form-control"></textarea>
+				</div>
+				<button type="button" class="btn btn-default" id="btn-make-room">作成</button>
+			</form>
+		</div>
+		<div id="room-admin">
+			<h2>管理者</h2>
+			<p>TwitterIDを指定して管理者を追加できます。</p>
+			<ul class="list-admin">
+				<li>
+					<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">
+					<span> i556 </span>
+					<i class="fa fa-minus-circle fa-2x"></i>
+				</li>
+				<li>
+					<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">
+					<span> i556 </span>
+					<i class="fa fa-minus-circle fa-2x"></i>
+				</li>
+				<li>
+					<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">
+					<span> i556 </span>
+					<i class="fa fa-minus-circle fa-2x"></i>
+				</li>
+				<li>
+					<input type="text"/>
+					<i class="fa fa-plus-circle fa-2x"></i>
+				</li>
+			</ul>
+		</div>
 	</div>
 	<!-- question -->
 	<div id="question">
@@ -243,7 +310,7 @@
 				</table>
 			</div>
 			<div id="ranking-event" class="tab-pane">
-				<table class="table table-hover">
+				<table class="table table-hover" id="tbl-ranking-event">
 					<thead>
 						<tr>
 							<th>日時</th>
@@ -351,6 +418,138 @@
 			</div>
 		</div>
 	</div>
+	<!-- ranking-past -->
+	<div id="ranking-past">
+		<h1>第○回 ランキング</h1>
+		<div>
+			<button class="backToRanking btn">戻る</button>
+		</div>
+		<div>
+			<table class="table table-hover" id="tbl-ranking-past">
+				<thead>
+					<tr>
+						<th>順位</th>
+						<th>名前</th>
+						<th>正答数</th>
+						<th>タイム</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>1</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test1</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>2</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test2</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>3</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test3</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>4</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test4</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>5</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test5</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>6</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test6</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>7</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test7</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>8</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test8</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>9</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test9</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+					<tr>
+						<td>10</td>
+						<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"> test10</td>
+						<td>13</td>
+						<td>22.14</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<!-- ranking-person -->
+	<div id="ranking-person">
+		<h1><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_bigger.jpeg"> i556</h1>
+		<div>
+			<button class="backToRanking btn">戻る</button>
+		</div>
+		<div>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>日時</th>
+						<th>正答数</th>
+						<th>タイム</th>
+						<th>順位</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>2014/02/14</td>
+						<td>13</td>
+						<td>22.14</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>2014/02/15</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+					</tr>
+					<tr>
+						<td>2014/02/16</td>
+						<td>13</td>
+						<td>22.14</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>2014/02/17</td>
+						<td>13</td>
+						<td>22.14</td>
+						<td>3</td>
+					</tr>
+					<tr>
+						<td>2014/02/18</td>
+						<td>13</td>
+						<td>22.14</td>
+						<td>3</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 	<!-- tweet -->
 	<div id="tweet">
 		tweet
@@ -358,10 +557,6 @@
 	<!-- make-question -->
 	<div id="make-question">
 		make-question
-	</div>
-	<!-- edit-room -->
-	<div id="edit-room">
-		edit-event
 	</div>
 	<!-- edit-event -->
 	<div id="edit-event">

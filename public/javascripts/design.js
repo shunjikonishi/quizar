@@ -28,6 +28,23 @@ $(function() {
 		}, 100);
 		sorted = true;
 	}
+	function showContent(id, dir) {
+		if (id == "#make-room") {
+			$("#room-admin").hide();
+			$("#btn-make-room").text("作成");
+		} else if (id == "#edit-room") {
+			$("#room-admin").show();
+			$("#btn-make-room").text("変更");
+			id = "#make-room";
+		}
+		dir = dir || "right";
+		$("#content > div").hide();
+		$(id).show("slide", { "direction" : dir}, 750, function() {
+			if (id == "#ranking") {
+				randomSortRanking();
+			}
+		});
+	}
 	$("#sidemenu").sidr({
 		"onOpen" : function() {
 			$("#header").css("left", "260px").find(".sidemenu-collapse").hide();
@@ -46,21 +63,26 @@ $(function() {
 		"preventDefaultEvents": false
 	})
 	$("#content > div").hide();
-	$("#content > div:first-child").show();
+	//$("#content > div:first-child").show();
+	$("#make-room").show();
 	$("#sidr a").click(function() {
 		var id = $(this).attr("href");
-		$("#content > div").hide();
 		$.sidr("close", function() {
-			$(id).show("slide", { "direction" : "right"}, 750, function() {
-				if (id == "#ranking") {
-					randomSortRanking();
-				}
-			});
+			showContent(id);
 		});
 	})
 	$("#tab-ranking a").on("shown.bs.tab", function(e) {
 		if ($(e.target).attr("href") == "#ranking-current") {
 			randomSortRanking();
 		}
+	});
+	$("#tbl-ranking-event tbody tr").click(function() {
+		showContent("#ranking-past");
+	})
+	$("#tbl-ranking-current tbody tr").click(function() {
+		showContent("#ranking-person");
+	})
+	$(".backToRanking").click(function() {
+		showContent("#ranking", "left");
 	})
 })

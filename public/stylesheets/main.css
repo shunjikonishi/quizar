@@ -1,2 +1,8 @@
 .btn-facebook { background-color: #2980b9; color: #ffffff;}
 .btn-twitter { background-color: #55acee; color: #ffffff;}
+
+.list-admin li { list-style: none; padding-bottom: 10px;}
+.list-admin li span { display: inline-block; width: 200px;}
+.list-admin li input { width: 228px;}
+.list-admin .fa-minus-circle { color: red;}
+.list-admin .fa-plus-circle { color: green;}
