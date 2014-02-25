@@ -120,7 +120,7 @@ $(function() {
 	})
 	$("#content > div").hide();
 	//$("#content > div:first-child").show();
-	$("#question").show();
+	$("#home").show();
 	$("#sidr a").click(function() {
 		var id = $(this).attr("href");
 		headerControl(id);
