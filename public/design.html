@@ -14,43 +14,28 @@
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" type="text/javascript"></script>
 <style>
-#sidemenu { float:left;}
-#content { padding-top: 60px;}
-.navbar button {
-  position: relative;
-  padding: 9px 10px;
-  margin-top: 8px;
-  margin-right: 15px;
-  margin-bottom: 8px;
-  background-color: transparent;
-  background-image: none;
-  border: 1px solid #ddd;;
-  border-radius: 1px;
-}
-.room-icons {
-	display: inline;
-}
 </style>
 </head>
 <body>
-<div id="header" class="navbar navbar-default navbar-fixed-top">
-	<div class="container">
-		<div class="navbar-header">
-			<button id="sidemenu" type="button">
-				<i class="fa fa-bars"></i>
+<div id="header" class="fixed-header">
+	<button id="sidemenu" type="button">
+		<i class="fa fa-bars fa-lg"></i>
+	</button>
+	<button id="sidehelp" type="button">
+		<i class="fa fa-question-circle fa-lg"></i>
+	</button>
+	<div class="header-center">
+		<div id="title">@title</div>
+		<div id="room-icons" style="display:none;">
+			<button type="button" id="btn-question">
+				<i class="fa fa-check-circle fa-lg"></i>
 			</button>
-			<a class="navbar-brand sidemenu-collapse" href="#">@title</a>
-			<div class="room-icons">
-				<button type="button">
-					<i class="fa fa-question-circle"></i>
-				</button>
-				<button type="button">
-					<i class="fa fa-star"></i>
-				</button>
-				<button type="button">
-					<i class="fa fa-comment"></i>
-				</button>
-			</div>
+			<button type="button" id="btn-ranking">
+				<i class="fa fa-star fa-lg"></i>
+			</button>
+			<button type="button" id="btn-tweet">
+				<i class="fa fa-comment fa-lg"></i>
+			</button>
 		</div>
 	</div>
 </div>
@@ -62,7 +47,7 @@
 			<ul>
 				<li><a href="#question">問題</a></li>
 				<li><a href="#ranking">ランキング</a></li>
-				<li><a href="#tweet">ツィート</a></li>
+				<li><a href="#tweet">チャット</a></li>
 				<li><a href="#make-question">問題の投稿</a></li>
 			</ul>
 		</li>
@@ -74,6 +59,7 @@
 				<li><a href="#publish-question">出題</a></li>
 			</ul>
 		</li>
+		<li><a href="#help">ヘルプ</a></li>
 	</ul>
 </div>
 <div id="content" class="container">
@@ -224,7 +210,29 @@
 	</div>
 	<!-- question -->
 	<div id="question">
-		question
+		<h1>問題</h1>
+		<div class="progress">
+			<div id="progress" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+				<span class="sr-only">20% Complete</span>
+			</div>
+		</div>
+		<p id="question-text">
+		</p>
+		<div>
+			<button class="btn btn-info btn-question">選択肢 １</button>
+		</div>
+		<div>
+			<button class="btn btn-info btn-question">選択肢 2</button>
+		</div>
+		<div>
+			<button class="btn btn-info btn-question">選択肢 3</button>
+		</div>
+		<div>
+			<button class="btn btn-info btn-question">選択肢 4</button>
+		</div>
+		<div>
+			<button class="btn btn-info btn-question">選択肢 5</button>
+		</div>
 	</div>
 	<!-- ranking -->
 	<div id="ranking">
@@ -552,11 +560,89 @@
 	</div>
 	<!-- tweet -->
 	<div id="tweet">
-		tweet
+		<h1>チャット</h1>
+		<div>
+			<form role="form">
+				<div class="checkbox">
+					<label>
+						<input type="checkbox"> Twitterにも投稿
+					</label>
+				</div>
+				<div class="form-group">
+					<textarea id="tweetText" class="form-control"></textarea>
+				</div>
+				<button type="button" class="btn btn-default">つぶやく</button>
+			</form>
+		</div>
+		<hr>
+		<table class="table table-striped">
+			<tbody>
+				<tr>
+					<td>
+						<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg" style="float:left;">
+						<span>aaa</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg" style="float:right;">
+						<span>bbb</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg" style="float:left;">
+						<span>ccc</span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg" style="float:right;">
+						<span>ddd</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 	<!-- make-question -->
 	<div id="make-question">
-		make-question
+		<h1>問題の作成</h1>
+		<div>
+			<form role="form">
+				<div class="form-group">
+					<label>問題文</label>
+					<textarea class="form-control"></textarea>
+				</div>
+				<div class="form-group">
+					<label>選択肢(改行区切りで5つまで)</label>
+					<textarea class="form-control"></textarea>
+				</div>
+				<p>※ 選択肢の順序は出題時にシャッフルされます。</p>
+				<div class="form-group">
+					<label>正解</label>
+					<select class="form-control">
+						<option>先頭行</option>
+						<option>一番多かった回答</option>
+						<option>一番少なかった回答</option>
+						<option>正解なし</option>
+					</select>
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox"> ランキングに含める
+					</label>
+				</div>
+				<div class="form-group">
+					<label>制限時間</label>
+					<select class="form-control">
+						<option>10秒</option>
+						<option>1分</option>
+						<option>手動</option>
+					</select>
+				</div>
+				<button type="button" class="btn btn-default">追加</button>
+			</form>
+		</div>
 	</div>
 	<!-- edit-event -->
 	<div id="edit-event">
@@ -565,6 +651,15 @@
 	<!-- publish-question -->
 	<div id="publish-question">
 		publish-question
+	</div>
+	<!-- publish-question -->
+	<div id="help">
+		<h1>ヘルプ</h1>
+		<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+		<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+		<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+		<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+		<p>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
 	</div>
 </div>
 
