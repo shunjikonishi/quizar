@@ -69,6 +69,16 @@ $(function() {
 		setTimeout(doProgress, 100);
 		$text.show("blind", { "direction" : "left"}, 1000);
 	}
+	function showQuestion(id) {
+		$("#animation").show();
+		setTimeout(function() {
+			$("#animation").hide();
+			setTimeout(function() {
+				$(id).show();
+				progress("ソチオリンピックで金メダルを取ったのは羽生結弦ですが、銀メダルを取ったレジェンドと言えば？");
+			}, 100);
+		}, 500);
+	}
 	function showContent(id, dir) {
 		headerControl(id);
 		if (id == "#make-room") {
@@ -81,13 +91,15 @@ $(function() {
 		}
 		dir = dir || "right";
 		$("#content > div").hide();
-		$(id).show("slide", { "direction" : dir}, 750, function() {
-			if (id == "#ranking") {
-				randomSortRanking();
-			} else if (id == "#question") {
-				progress("ソチオリンピックで金メダルを取ったのは羽生結弦ですが、銀メダルを取ったレジェンドと言えば？");
-			}
-		});
+		if (id == "#question") {
+			showQuestion(id);
+		} else {
+			$(id).show("slide", { "direction" : dir}, 750, function() {
+				if (id == "#ranking") {
+					randomSortRanking();
+				}
+			});
+		}
 	}
 	$("#sidemenu").sidr({
 		"onOpen" : function() {

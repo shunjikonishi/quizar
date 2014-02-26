@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"rando",
+				"randomSortRanking"
+			],
+			[
 				"pa",
 				"patternMsg"
 			]
@@ -15,32 +19,24 @@
 			"file": "docs/About.md",
 			"settings":
 			{
-				"buffer_size": 477,
+				"buffer_size": 493,
 				"line_ending": "Windows",
 				"name": "# セミナー／勉強会向けアプリ"
-			}
-		},
-		{
-			"file": "ws-quiz.sublime-project",
-			"settings":
-			{
-				"buffer_size": 73,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/FLECT/src/ws-button/app/views/main.scala.html",
-			"settings":
-			{
-				"buffer_size": 764,
-				"line_ending": "Unix"
 			}
 		},
 		{
 			"file": "public/design.html",
 			"settings":
 			{
-				"buffer_size": 2240,
+				"buffer_size": 19056,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "public/stylesheets/main.css",
+			"settings":
+			{
+				"buffer_size": 1156,
 				"line_ending": "Windows"
 			}
 		},
@@ -48,42 +44,42 @@
 			"file": "public/javascripts/design.js",
 			"settings":
 			{
-				"buffer_size": 415,
+				"buffer_size": 3487,
 				"line_ending": "Windows",
 				"name": "$(function() {"
 			}
 		},
 		{
-			"file": "/C/FLECT/download/jQuery/sidr-package-1.2.1/sidr-package-1.2.1/stylesheets/jquery.sidr.dark.css",
+			"file": "/C/FLECT/download/jQuery/animatedtablesorter-0.2.2/animatedtablesorter-0.2.2/tsort.js",
 			"settings":
 			{
-				"buffer_size": 3493,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/FLECT/download/jQuery/sidr-package-1.2.1/sidr-package-1.2.1/component.json",
-			"settings":
-			{
-				"buffer_size": 583,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/C/FLECT/src/ws-button/app/views/edit.scala.html",
-			"settings":
-			{
-				"buffer_size": 6097,
-				"line_ending": "Unix"
+				"buffer_size": 14701,
+				"line_ending": "Windows"
 			}
 		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 127.0,
+		"height": 219.0,
 		"selected_items":
 		[
+			[
+				"Recent",
+				"RecentActiveFiles: recent_active_files"
+			],
+			[
+				"Package",
+				"Package Control: Install Package"
+			],
+			[
+				"pa",
+				"Package Control: Install Package"
+			],
+			[
+				"pack",
+				"Package Control: Install Package"
+			],
 			[
 				"indent",
 				"Indentation: Convert to Tabs"
@@ -101,7 +97,7 @@
 				"Package Control: Install Package"
 			]
 		],
-		"width": 512.0
+		"width": 416.0
 	},
 	"console":
 	{
@@ -131,18 +127,28 @@
 	},
 	"file_history":
 	[
+		"/C/FLECT/src/ws-quiz/project/target/resolution-cache/reports/default-ws-quiz-build-test-internal.xml",
+		"/C/FLECT/src/ws-quiz/project/target/resolution-cache/reports/default-ws-quiz-build-compile-internal.xml",
+		"/C/FLECT/src/ws-quiz/target/streams/compile/externalDependencyClasspath/$global/export",
+		"/C/FLECT/src/ws-quiz/target/streams/compile/compile/$global/export",
+		"/C/FLECT/src/ws-quiz/project/target/resolution-cache/reports/default-ws-quiz-build-test.xml",
+		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/HTML.sublime-settings",
+		"/C/FLECT/src/ws-button/app/views/edit.scala.html",
+		"/C/FLECT/download/jQuery/sidr-package-1.2.1/sidr-package-1.2.1/component.json",
+		"/C/FLECT/download/jQuery/sidr-package-1.2.1/sidr-package-1.2.1/stylesheets/jquery.sidr.dark.css",
+		"/C/FLECT/download/font-awesome-4.0.3/font-awesome-4.0.3/css/font-awesome.css",
+		"/C/FLECT/download/font-awesome-4.0.3/font-awesome-4.0.3/less/bordered-pulled.less",
+		"/C/FLECT/src/ws-button/app/views/main.scala.html",
 		"/C/FLECT/src/ws-quiz/app/views/main.scala.html",
 		"/C/FLECT/src/ws-quiz/public/stylesheets/main.css",
 		"/C/FLECT/src/ws-button/app/assets/javascripts/makeRoomTop.js",
 		"/C/FLECT/src/ws-button/app/controllers/MakeRoom.scala",
-		"/C/FLECT/src/ws-button/app/views/edit.scala.html",
 		"/C/FLECT/src/ws-button/app/assets/javascripts/editroom.js",
 		"/C/FLECT/src/ws-button/app/models/VoteRoom.scala",
 		"/C/FLECT/src/ws-button/app/models/RoomSetting.scala",
 		"/C/FLECT/src/ws-button/app/models/RoomManager.scala",
 		"/C/FLECT/src/ws-button/app/assets/javascripts/voteroom.js",
 		"/C/FLECT/src/ws-button/app/views/room.scala.html",
-		"/C/FLECT/src/ws-button/app/views/main.scala.html",
 		"/C/FLECT/src/ws-button/app/views/top.scala.html",
 		"/C/FLECT/src/ws-button/target/scala-2.10/cache/ws-button/compile/play_instrumentation",
 		"/C/FLECT/src/ws-button/target/scala-2.10/classes/public/javascripts/ext/datetimepicker/bootstrap-datetimepicker.min.css",
@@ -164,7 +170,6 @@
 		"/C/FLECT/src/ws-button/project/target/resolution-cache/reports/default-ws-button-build-scala-tool.xml",
 		"/C/FLECT/src/ws-button/target/streams/$global/$global/$global/out",
 		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/Default/Default (Windows).sublime-keymap",
-		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/HTML.sublime-settings",
 		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
 		"/C/Users/k-shunji/AppData/Roaming/Sublime Text 3/Packages/User/Scala.sublime-settings",
 		"/C/FLECT/src/ws-button/README.md",
@@ -197,7 +202,7 @@
 	],
 	"find":
 	{
-		"height": 28.0
+		"height": 36.0
 	},
 	"find_in_files":
 	{
@@ -212,6 +217,18 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"|",
+			"tbl-ranking-current",
+			"tab-rankin",
+			"ranking-current",
+			"sorting_history",
+			"click",
+			"animating",
+			"enter",
+			"animating",
+			"question",
+			"th",
+			"facebook",
 			"長押しで編集",
 			"pass",
 			"redirect",
@@ -264,6 +281,12 @@
 		"regex": false,
 		"replace_history":
 		[
+			"publish-question",
+			"edit-event",
+			"edit-room",
+			"make-question",
+			"tweet",
+			"ranking",
 			"\\t",
 			"***"
 		],
@@ -285,151 +308,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 477,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								393,
-								393
-							]
-						],
-						"settings":
-						{
-							"auto_name": "# セミナー／勉強会向けアプリ",
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "ws-quiz.sublime-project",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 73,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								73,
-								73
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "/C/FLECT/src/ws-button/app/views/main.scala.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 764,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								62,
-								62
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "public/design.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2240,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2041,
-								2041
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 199.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "public/javascripts/design.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 415,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								371,
-								371
-							]
-						],
-						"settings":
-						{
-							"auto_name": "$(function() {",
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "/C/FLECT/download/jQuery/sidr-package-1.2.1/sidr-package-1.2.1/stylesheets/jquery.sidr.dark.css",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3493,
+						"buffer_size": 493,
 						"regions":
 						{
 						},
@@ -442,61 +321,31 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/CSS/CSS.tmLanguage",
-							"word_wrap": true
+							"auto_name": "# セミナー／勉強会向けアプリ",
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 120.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/C/FLECT/download/jQuery/sidr-package-1.2.1/sidr-package-1.2.1/component.json",
+					"buffer": 1,
+					"file": "public/design.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 583,
+						"buffer_size": 19056,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								486,
-								486
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "/C/FLECT/src/ws-button/app/views/edit.scala.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6097,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								604,
-								693
+								6754,
+								6754
 							]
 						],
 						"settings":
@@ -508,7 +357,93 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "public/stylesheets/main.css",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1156,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								743,
+								743
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/CSS/CSS.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 259.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "public/javascripts/design.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3487,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2922,
+								2922
+							]
+						],
+						"settings":
+						{
+							"auto_name": "$(function() {",
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1959.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "/C/FLECT/download/jQuery/animatedtablesorter-0.2.2/animatedtablesorter-0.2.2/tsort.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 14701,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								13815,
+								13816
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 7325.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				}
 			]
@@ -552,7 +487,7 @@
 	"project": "ws-quiz.sublime-project",
 	"replace":
 	{
-		"height": 52.0
+		"height": 66.0
 	},
 	"save_all_on_build": true,
 	"select_file":
