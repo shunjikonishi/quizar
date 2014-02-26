@@ -139,8 +139,7 @@ $(function() {
 		},
 		"swipeRight": function() {
 			$.sidr('open');
-		},
-		"preventDefaultEvents": false
+		}
 	})
 	$("#content > div").hide();
 	//$("#content > div:first-child").show();
@@ -166,7 +165,7 @@ $(function() {
 		backTo = "#ranking";
 		showContent("#ranking-person");
 	})
-	$("#tbl-event").click(function() {
+	$("#tbl-event tbody tr").click(function() {
 		backTo = "#edit-event";
 		showContent("#ranking-past");
 	})
@@ -189,8 +188,7 @@ $(function() {
 		"swipeRight": function(e) {
 			$("#btn-question-left").click();
 			e.stopImmediatePropagation();
-		},
-		"preventDefaultEvents": false
+		}
 	})
 	$("#tbl-question-current, #tbl-question-past").find("tbody tr").click(function() {
 		showContent("#edit-question");
