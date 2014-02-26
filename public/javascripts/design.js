@@ -88,6 +88,15 @@ $(function() {
 			$("#room-admin").show();
 			$("#btn-make-room").text("変更");
 			id = "#make-room";
+		} else if (id == "#make-question") {
+			$("#make-question").find("h1").text("問題の作成");
+			$("#make-question-add").show();
+			$("#make-question-edit").hide();
+		} else if (id == "#edit-question") {
+			$("#make-question").find("h1").text("問題の編集");
+			$("#make-question-add").hide();
+			$("#make-question-edit").show();
+			id = "#make-question";
 		}
 		dir = dir || "right";
 		$("#content > div").hide();
@@ -100,6 +109,9 @@ $(function() {
 				}
 			});
 		}
+	}
+	function showQuestionList(id, dir) {
+		$(id).hide().show("slide", { "direction" : dir}, 750).css("display", "");
 	}
 	$("#sidemenu").sidr({
 		"onOpen" : function() {
@@ -122,7 +134,7 @@ $(function() {
 		showContent("#tweet");
 	})
 	$("#content").swipe({
-		"swipeLeft": function() {
+		"swipeLeft": function(e) {
 			$.sidr('close');
 		},
 		"swipeRight": function() {
@@ -145,13 +157,45 @@ $(function() {
 			randomSortRanking();
 		}
 	});
+	var backTo = null;
 	$("#tbl-ranking-event tbody tr").click(function() {
+		backTo = "#ranking";
 		showContent("#ranking-past");
 	})
 	$("#tbl-ranking-current tbody tr").click(function() {
+		backTo = "#ranking";
 		showContent("#ranking-person");
 	})
-	$(".backToRanking").click(function() {
-		showContent("#ranking", "left");
+	$("#tbl-event").click(function() {
+		backTo = "#edit-event";
+		showContent("#ranking-past");
 	})
+	$(".backToRanking").click(function() {
+		showContent(backTo, "left");
+	})
+	$("#btn-question-left").click(function() {
+		var id = $("#publish-question").find(".tab-pane.active").attr("id");
+		showQuestionList("#" + id, "left");
+	})
+	$("#btn-question-right").click(function() {
+		var id = $("#publish-question").find(".tab-pane.active").attr("id");
+		showQuestionList("#" + id, "right");
+	})
+	$("#tbl-question-current, #tbl-question-past").swipe({
+		"swipeLeft": function(e) {
+			$("#btn-question-right").click();
+			e.stopImmediatePropagation();
+		},
+		"swipeRight": function(e) {
+			$("#btn-question-left").click();
+			e.stopImmediatePropagation();
+		},
+		"preventDefaultEvents": false
+	})
+	$("#tbl-question-current, #tbl-question-past").find("tbody tr").click(function() {
+		showContent("#edit-question");
+	});
+	$("#btn-publish-question").click(function() {
+		showContent("#question");
+	});
 })

@@ -175,6 +175,11 @@
 					<label for="roomTag">タグ</label>
 					<input id="roomTag" class="form-control"/>
 				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox"> 参加者の問題投稿を許可
+					</label>
+				</div>
 				<div class="form-group">
 					<label for="roomDescription">説明</label>
 					<textarea id="roomName" class="form-control"></textarea>
@@ -643,17 +648,225 @@
 						<option>手動</option>
 					</select>
 				</div>
-				<button type="button" class="btn btn-default">追加</button>
+				<div id="make-question-add">
+					<button type="button" class="btn btn-default">追加</button>
+				</div>
+				<div id="make-question-edit">
+					<button type="button" class="btn btn-default">保存</button>
+					<button id="btn-publish-question" type="button" class="btn btn-primary">出題</button>
+				</div>
 			</form>
 		</div>
 	</div>
 	<!-- edit-event -->
 	<div id="edit-event">
-		edit-event
+		<h1>イベント管理</h1>
+		<div>
+			<form role="form">
+				<div class="form-group">
+					<label>タイトル</label>
+					<input class="form-control">
+				</div>
+				<div class="form-group">
+					<label>予定日</label>
+					<input class="form-control" type="date">
+				</div>
+				<div class="form-group">
+					<label>開始時間</label>
+					<input class="form-control" type="time">
+				</div>
+				<div class="form-group">
+					<label>パスコード</label>
+					<input class="form-control">
+				</div>
+				<div class="form-group">
+					<label>説明</label>
+					<textarea class="form-control"></textarea>
+				</div>
+			</form>
+				<div>
+					<button class="btn btn-primary">イベント開始</button>
+					<button class="btn btn-primary">変更を保存</button>
+				</div>
+		</div>
+		<h2>終了したイベント</h2>
+		<table class="table table-hover" id="tbl-event">
+			<thead>
+				<tr>
+					<th>タイトル</th>
+					<th>日時</th>
+					<th>参加者</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>ほげほげ</td>
+					<td>2014-02-14 19:00</td>
+					<td>13人</td>
+				</tr>
+				<tr>
+					<td>ほげほげ</td>
+					<td>2014-02-14 19:00</td>
+					<td>13人</td>
+				</tr>
+				<tr>
+					<td>ほげほげ</td>
+					<td>2014-02-14 19:00</td>
+					<td>13人</td>
+				</tr>
+				<tr>
+					<td>ほげほげ</td>
+					<td>2014-02-14 19:00</td>
+					<td>13人</td>
+				</tr>
+				<tr>
+					<td>ほげほげ</td>
+					<td>2014-02-14 19:00</td>
+					<td>13人</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 	<!-- publish-question -->
 	<div id="publish-question">
-		publish-question
+		<h1>出題</h1>
+		<ul class="nav nav-tabs" id="tab-ranking">
+			<li class="active"><a href="#question-current" data-toggle="tab">ストック</a></li>
+			<li><a href="#question-past" data-toggle="tab">出題済み</a></li>
+		</ul>
+		<div>
+			<div style="float:left;">
+				<button class="btn" id="btn-question-left">
+					<i class="fa fa-chevron-circle-left fa-lg"></i>
+				</button>
+			</div>
+			<div style="display:inline-block; width: 280px;padding-left:10px;padding-top:5px;">
+				<i class="fa fa-search fa-lg"></i>
+				<input type="text">
+			</div>
+			<div style="float:right;">
+				<button class="btn" id="btn-question-right">
+					<i class="fa fa-chevron-circle-right fa-lg"></i>
+				</button>
+			</div>
+		</div>
+		<div class="tab-content">
+			<div id="question-current" class="tab-pane active">
+				<table class="table table-hover" id="tbl-question-current">
+					<thead>
+						<tr>
+							<th>出題者</th>
+							<th>問題</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div id="question-past" class="tab-pane">
+				<table class="table table-hover" id="tbl-question-past">
+					<thead>
+						<tr>
+							<th>出題者</th>
+							<th>問題</th>
+							<th>正答数</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+						<tr>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+							<td>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</td>
+							<td>10人</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 	<!-- publish-question -->
 	<div id="help">
