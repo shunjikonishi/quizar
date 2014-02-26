@@ -1,4 +1,5 @@
 $(function() {
+	var SUPPORTS_TOUCH = 'ontouchstart' in window;
 	var sorted = false;
 	function randomSortRanking() {
 		if (sorted) {
@@ -139,6 +140,11 @@ $(function() {
 		},
 		"swipeRight": function() {
 			$.sidr('open');
+		},
+		"tap": function (event, target) {
+			if (SUPPORTS_TOUCH) {
+				$(target).click();
+			}
 		}
 	})
 	$("#content > div").hide();
