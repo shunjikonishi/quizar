@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" media="screen" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-<link rel="stylesheet" media="screen" href="stylesheets/main.css">
+<link rel="stylesheet" media="screen" href="stylesheets/design.css">
 <link rel="stylesheet" media="screen" href="javascripts/ext/sidr/stylesheets/jquery.sidr.light.css">
 <link rel="stylesheet" media="screen" href="javascripts/ext/animatedtablesorter/style.css">
 <link rel="shortcut icon" type="image/png" href="images/favicon.png">
@@ -17,15 +17,15 @@
 </style>
 </head>
 <body>
-<div id="header" class="fixed-header">
-	<button id="sidemenu" type="button">
+<div id="toolbar" class="toolbar">
+	<button id="sidemenu" class="pull-left" type="button">
 		<i class="fa fa-bars fa-lg"></i>
 	</button>
-	<button id="sidehelp" type="button">
+	<button id="sidehelp" class="pull-right" type="button">
 		<i class="fa fa-question-circle fa-lg"></i>
 	</button>
-	<div class="header-center">
-		<div id="title">@title</div>
+	<div class="toolbar-content">
+		<div id="title" class="toolbar-title">@title</div>
 		<div id="room-icons" style="display:none;">
 			<button type="button" id="btn-question">
 				<i class="fa fa-check-circle fa-lg"></i>
@@ -674,6 +674,14 @@
 				<div class="form-group">
 					<label>開始時間</label>
 					<input class="form-control" type="time">
+				</div>
+				<div class="form-group">
+					<label>定員</label>
+					<select class="form-control">
+						<option>20人</option>
+						<option>50人</option>
+						<option>100人</option>
+					</select>
 				</div>
 				<div class="form-group">
 					<label>パスコード</label>

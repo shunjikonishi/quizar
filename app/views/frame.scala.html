@@ -1,0 +1,65 @@
+@(title: String, json: String)(content: Html)(implicit lang: Lang)
+
+@main(title) {
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/ext/sidr/stylesheets/jquery.sidr.light.css")">
+<div id="toolbar" class="toolbar">
+	<button id="btn-menu" class="pull-left" type="button">
+		<i class="fa fa-bars fa-lg"></i>
+	</button>
+	<button class="pull-right" type="button">
+		<i class="fa fa-question-circle fa-lg"></i>
+	</button>
+	<div class="toolbar-content">
+		<div id="title" class="toolbar-title">@title</div>
+		<div id="room-icons" style="display:none;">
+			<button type="button" id="btn-question">
+				<i class="fa fa-check-circle fa-lg"></i>
+			</button>
+			<button type="button" id="btn-ranking">
+				<i class="fa fa-star fa-lg"></i>
+			</button>
+			<button type="button" id="btn-tweet">
+				<i class="fa fa-comment fa-lg"></i>
+			</button>
+		</div>
+	</div>
+</div>
+<div id="content" class="container">
+	@content
+</div>
+<div id="sidr" style="display:none;">
+	<ul>
+		<li><a href="#home"><i class="fa fa-home"></i> ホーム</a></li>
+		<li><a href="#make-room">ルームの作成</a></li>
+		<li>ルームメニュー
+			<ul>
+				<li><a href="#question">問題</a></li>
+				<li><a href="#ranking">ランキング</a></li>
+				<li><a href="#tweet">チャット</a></li>
+				<li><a href="#make-question">問題の投稿</a></li>
+			</ul>
+		</li>
+		<li>ルーム管理
+			<ul>
+				<li><a href="#edit-room">ルームの編集</a></li>
+				<li><a href="#edit-event">イベントの編集</a></li>
+				<li><a href="#make-question">問題の作成</a></li>
+				<li><a href="#publish-question">出題</a></li>
+			</ul>
+		</li>
+		<li><a href="#help">ヘルプ</a></li>
+	</ul>
+</div>
+<script src="@routes.Assets.at("javascripts/ext/sidr/jquery.sidr.min.js")"></script>
+<script src="@routes.Assets.at("javascripts/ext/touchSwipe/jquery.touchSwipe.js")"></script>
+<script src="@routes.Assets.at("javascripts/ext/animatedtablesorter/tsort.min.js")"></script>
+<script src="@routes.I18N.messages(lang.language)"></script>
+<script src="@routes.Assets.at("javascripts/ws-quiz.js")"></script>
+<script>
+var app;
+$(function() {
+	var params = @Html(json);
+	app = new flect.QuizApp(params);
+});
+</script>
+}

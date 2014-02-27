@@ -7,10 +7,8 @@
 .list-admin .fa-minus-circle { color: red;}
 .list-admin .fa-plus-circle { color: green;}
 
-#sidemenu { float:left;}
-#sidehelp { float:right;}
 #content { padding-top: 60px;}
-.fixed-header {
+.toolbar {
   position: fixed;
   right: 0;
   left: 0;
@@ -22,7 +20,7 @@
   border-radius: 0;
   width: 100%;
 }
-.fixed-header button {
+.toolbar button {
   position: relative;
   padding: 9px 10px;
   margin: 8px 10px;
@@ -31,22 +29,21 @@
   border: 1px solid #ddd;;
   border-radius: 4px;
 }
-#title {
-  float: left;
-  height: 50px;
-  padding: 15px 15px;
-  font-size: 18px;
-  line-height: 20px;
-	display: inline;
-	margin: 0 auto;
-}
-#room-icons {
-	display: inline;
-}
-.header-center {
+
+.toolbar-content {
 	margin-left: auto;
 	margin-right: auto;
 	width: 280px;
+}
+
+.toolbar-title {
+	font-size: 18px;
+	padding-top: 10px;
+	font-weight: bold;
+}
+
+.toolbar-content div {
+	display: inline-block;
 }
 
 .btn-question {
@@ -73,4 +70,4 @@
 }
 #question-number {
 	font-size: 72px;
-}
+}f

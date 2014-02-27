@@ -116,10 +116,10 @@ $(function() {
 	}
 	$("#sidemenu").sidr({
 		"onOpen" : function() {
-			$("#header").css("left", "260px").find(".header-center").hide();
+			$("#toolbar").css("left", "260px").find(".header-center").hide();
 		},
 		"onClose" : function() {
-			$("#header").css("left", "0px").find(".header-center").show();
+			$("#toolbar").css("left", "0px").find(".header-center").show();
 		}
 	});
 	$("#sidehelp").click(function() {
