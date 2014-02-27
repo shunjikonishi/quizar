@@ -1,13 +1,14 @@
-@(title: String, json: String)(implicit lang: Lang)
+@(title: String, twitterUrl: String, json: String)(implicit lang: Lang)
 
 @frame(title, json) {
 	<div class="app-home" id="home">
 		<h1>@title</h1>
 		<div>
-			<button class="btn btn-twitter">
+			<p>@twitterUrl</p>
+			<a class="btn btn-twitter" href="@twitterUrl">
 				<i class="fa fa-twitter fa-2x"></i>
 				Twitterでログイン
-			</button>
+			</a>
 			<button class="btn btn-facebook">
 				<i class="fa fa-facebook fa-2x"></i>
 				Facebookでログイン
