@@ -19,10 +19,3 @@ case class QuizEvent(
 	description: Option[String]
 )
 
-case class User(
-	id: Long,
-	name: String,
-	twitterId: Option[String],
-	facebookId: Option[String],
-	imageUrl: String
-)

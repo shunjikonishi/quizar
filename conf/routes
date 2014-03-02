@@ -4,8 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /i18n/setlang                     controllers.I18N.setLang(lang)
-GET     /i18n/:lang/messages.js           controllers.I18N.messages(lang)
+GET     /i18n/setlang               controllers.I18N.setLang(lang)
+GET     /i18n/:lang/messages.js     controllers.I18N.messages(lang)
+
+GET     /signin/twitter             controllers.Application.signinTwitter(oauth_token, oauth_verifier)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
