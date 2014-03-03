@@ -1,18 +1,26 @@
-@(title: String, twitterUrl: String, json: String)(implicit lang: Lang)
+@(title: String, userInfo: Option[UserInfo], twitterUrl: String, json: String)(implicit lang: Lang)
+@import models.SessionInfo
 
-@frame(title, json) {
+@frame(title, userInfo, json) {
 	<div class="app-home" id="home">
 		<h1>@title</h1>
+		<div id="test1">test1: </div>
+		<div id="test2">test2: </div>
 		<div>
-			<p>@twitterUrl</p>
-			<a class="btn btn-twitter" href="@twitterUrl">
-				<i class="fa fa-twitter fa-2x"></i>
-				Twitterでログイン
-			</a>
-			<button class="btn btn-facebook">
-				<i class="fa fa-facebook fa-2x"></i>
-				Facebookでログイン
-			</button>
+			@if(userInfo.isEmpty) {
+				<div>
+					<a class="btn btn-twitter" href="@twitterUrl">
+						<i class="fa fa-twitter fa-2x"></i>
+						Twitterでログイン
+					</a>
+				</div>
+				<div>
+					<button class="btn btn-facebook">
+						<i class="fa fa-facebook fa-2x"></i>
+						Facebookでログイン
+					</button>
+				</div>
+			}
 		</div>
 		<div>
 			<h2>イベント</h2>

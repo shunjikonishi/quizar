@@ -24,5 +24,10 @@ $(function() {
 				}
 			}
 		})
+		var item = sessionStorage.getItem("test");
+		$("#test1").append(item);
+		sessionStorage.setItem("test", "hoge: " + new Date());
+		item = sessionStorage.getItem("test");
+		$("#test2").append(item);
 	}
 });

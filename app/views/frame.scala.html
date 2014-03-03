@@ -1,4 +1,4 @@
-@(title: String, json: String)(content: Html)(implicit lang: Lang)
+@(title: String, userInfo: Option[UserInfo], json: String)(content: Html)(implicit lang: Lang)
 
 @main(title) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/ext/sidr/stylesheets/jquery.sidr.light.css")">
@@ -6,9 +6,23 @@
 	<button id="btn-menu" class="pull-left" type="button">
 		<i class="fa fa-bars fa-lg"></i>
 	</button>
-	<button class="pull-right" type="button">
-		<i class="fa fa-question-circle fa-lg"></i>
-	</button>
+	@userInfo.map { user => 
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				<img src="@user.imageUrl"/>
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a href="#">@user.name</a></li>
+				<li class="divider"></li>
+				<li><a href="/signout">Sign out</a></li>
+			</ul>
+		</div>	
+	}.getOrElse {
+		<button class="pull-right" type="button">
+			<i class="fa fa-question-circle fa-lg"></i>
+		</button>
+	}
 	<div class="toolbar-content">
 		<div id="title" class="toolbar-title">@title</div>
 		<div id="room-icons" style="display:none;">
