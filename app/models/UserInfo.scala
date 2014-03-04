@@ -9,7 +9,7 @@ case class UserInfo(id: Int, name: String, imageUrl: String) {
     Json.toJson(this)(UserInfo.format).toString
   } 
 }
-case class SessionInfo(user: UserInfo, twitterToken: Option[String], twitterSecret: Option[String]) {
+case class SessionInfo(user: Option[UserInfo], twitterToken: Option[String], twitterSecret: Option[String]) {
   def toJson = {
     Json.toJson(this)(SessionInfo.format).toString
   } 

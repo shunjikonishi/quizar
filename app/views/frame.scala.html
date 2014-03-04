@@ -15,13 +15,20 @@
 			<ul class="dropdown-menu" role="menu">
 				<li><a href="#">@user.name</a></li>
 				<li class="divider"></li>
-				<li><a href="/signout">Sign out</a></li>
+				<li><a href="/signout"><i class="fa fa-sign-out"></i> @Messages("signout")</a></li>
 			</ul>
-		</div>	
+		</div>
 	}.getOrElse {
-		<button class="pull-right" type="button">
-			<i class="fa fa-question-circle fa-lg"></i>
-		</button>
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				<i class="fa fa-sign-in"></i> @Messages("signin")</a>
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+				<li><a href="@TwitterManager.authorizationUrl"><i class="fa fa-twitter"></i> Twitter</a></li>
+				<li><a href="#"><i class="fa fa-facebook"></i> Facebook</a></li>
+			</ul>
+		</div>
 	}
 	<div class="toolbar-content">
 		<div id="title" class="toolbar-title">@title</div>
@@ -68,6 +75,7 @@
 <script src="@routes.Assets.at("javascripts/ext/touchSwipe/jquery.touchSwipe.js")"></script>
 <script src="@routes.Assets.at("javascripts/ext/animatedtablesorter/tsort.min.js")"></script>
 <script src="@routes.I18N.messages(lang.language)"></script>
+<script src="@routes.Assets.at("javascripts/flect.connection.js")"></script>
 <script src="@routes.Assets.at("javascripts/ws-quiz.js")"></script>
 <script>
 var app;

@@ -1,4 +1,4 @@
-@(title: String, userInfo: Option[UserInfo], twitterUrl: String, json: String)(implicit lang: Lang)
+@(title: String, userInfo: Option[UserInfo], json: String)(implicit lang: Lang)
 @import models.SessionInfo
 
 @frame(title, userInfo, json) {
@@ -9,7 +9,7 @@
 		<div>
 			@if(userInfo.isEmpty) {
 				<div>
-					<a class="btn btn-twitter" href="@twitterUrl">
+					<a class="btn btn-twitter" href="@TwitterManager.authorizationUrl">
 						<i class="fa fa-twitter fa-2x"></i>
 						Twitterでログイン
 					</a>

@@ -16,13 +16,12 @@ object Application extends Controller {
   def index = Action { implicit request =>
     val sm = SessionManager
     val title = Messages("application.title")
-    val twitterUrl = TwitterManager.authorizationUrl
     val sessionId = session.get("sessionId")
     val sessionInfo = sessionId.flatMap { sessionId =>
       val sm = SessionManager
       sm.getSessionInfo(sessionId)
     }
-    Ok(views.html.index(title, sessionInfo.map(_.user), twitterUrl, "{}")).withSession(
+    Ok(views.html.index(title, sessionInfo.map(_.user), "{}")).withSession(
       "sessionId" -> sessionId.getOrElse(UUID.randomUUID().toString())
     )
   }

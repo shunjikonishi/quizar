@@ -1,2 +1,10 @@
 application.title=Meet up!
 application.title[ja]=勉強会！
+
+signin=Sign in
+signin[ja]=サインイン
+
+signout=Sign out
+signout[ja]=サインアウト
+
+
