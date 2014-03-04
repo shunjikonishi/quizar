@@ -1,13 +1,13 @@
-@(title: String, userInfo: Option[UserInfo], json: String)(implicit lang: Lang)
-@import models.SessionInfo
+@(sessionInfo: SessionInfo, json: String)(implicit lang: Lang)
 
-@frame(title, userInfo, json) {
+@frame(sessionInfo.user, sessionInfo.room, json) {
 	<div class="app-home" id="home">
-		<h1>@title</h1>
+		<h1>@Messages("application.title")</h1>
 		<div id="test1">test1: </div>
 		<div id="test2">test2: </div>
+		<div><button id="test3">test</button></div>
 		<div>
-			@if(userInfo.isEmpty) {
+			@if(sessionInfo.user.isEmpty) {
 				<div>
 					<a class="btn btn-twitter" href="@TwitterManager.authorizationUrl">
 						<i class="fa fa-twitter fa-2x"></i>

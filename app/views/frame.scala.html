@@ -1,6 +1,6 @@
-@(title: String, userInfo: Option[UserInfo], json: String)(content: Html)(implicit lang: Lang)
+@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], json: String)(content: Html)(implicit lang: Lang)
 
-@main(title) {
+@main(Messages("application.title")) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/ext/sidr/stylesheets/jquery.sidr.light.css")">
 <div id="toolbar" class="toolbar">
 	<button id="btn-menu" class="pull-left" type="button">
@@ -31,7 +31,7 @@
 		</div>
 	}
 	<div class="toolbar-content">
-		<div id="title" class="toolbar-title">@title</div>
+		<div id="title" class="toolbar-title">@Messages("application.title")</div>
 		<div id="room-icons" style="display:none;">
 			<button type="button" id="btn-question">
 				<i class="fa fa-check-circle fa-lg"></i>
@@ -50,25 +50,33 @@
 </div>
 <div id="sidr" style="display:none;">
 	<ul>
-		<li><a href="#home"><i class="fa fa-home"></i> ホーム</a></li>
-		<li><a href="#make-room">ルームの作成</a></li>
-		<li>ルームメニュー
-			<ul>
-				<li><a href="#question">問題</a></li>
-				<li><a href="#ranking">ランキング</a></li>
-				<li><a href="#tweet">チャット</a></li>
-				<li><a href="#make-question">問題の投稿</a></li>
-			</ul>
-		</li>
-		<li>ルーム管理
-			<ul>
-				<li><a href="#edit-room">ルームの編集</a></li>
-				<li><a href="#edit-event">イベントの編集</a></li>
-				<li><a href="#make-question">問題の作成</a></li>
-				<li><a href="#publish-question">出題</a></li>
-			</ul>
-		</li>
-		<li><a href="#help">ヘルプ</a></li>
+		<li><a href="#home"><i class="fa fa-home"></i> @Messages("home")</a></li>
+		@userInfo.map { user =>
+			<li><a href="#make-room">@Messages("makeRoom")</a></li>
+		}
+		@roomInfo.map { room =>
+			<li>@Messages("roomMenu")
+				<ul>
+					<li><a href="#question">@Messages("questions")</a></li>
+					<li><a href="#ranking">@Messages("ranking")</a></li>
+					<li><a href="#chat">@Messages("chat")</a></li>
+					@userInfo.filterNot(room.isAdmin(_)).map { user =>
+						<li><a href="#post-question">@Messages("postQuestion")</a></li>
+					}
+				</ul>
+			</li>
+			@userInfo.filter(room.isAdmin(_)).map { user =>
+				<li>@Messages("manageRoom")
+					<ul>
+						<li><a href="#edit-room">@Messages("editRoom")</a></li>
+						<li><a href="#edit-event">@Messages("editEvent")</a></li>
+						<li><a href="#make-question">@Messages("makeQuestion")</a></li>
+						<li><a href="#publish-question">@Messages("publishQuestion")</a></li>
+					</ul>
+				</li>
+			}
+		}
+		<li><a href="#help"><i class="fa fa-question-circle"></i> @Messages("help")</a></li>
 	</ul>
 </div>
 <script src="@routes.Assets.at("javascripts/ext/sidr/jquery.sidr.min.js")"></script>

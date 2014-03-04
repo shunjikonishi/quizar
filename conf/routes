@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
-GET     /test                       controllers.Application.index
+GET     /ws                         controllers.Application.ws
 GET     /i18n/setlang               controllers.I18N.setLang(lang)
 GET     /i18n/:lang/messages.js     controllers.I18N.messages(lang)
 

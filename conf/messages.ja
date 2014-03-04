@@ -1,3 +1,16 @@
 application.title=勉強会！
+chat=チャット
+editEvent=イベントの編集
+editRoom=ルームの編集
+help=ヘルプ
+home=ホーム
+makeQuestion=問題の作成
+makeRoom=ルームの作成
+manageRoom=ルーム管理
+postQuestion=問題の投稿
+publishQuestion=出題
+questions=問題
+ranking=ランキング
+roomMenu=ルームメニュー
 signin=サインイン
 signout=サインアウト

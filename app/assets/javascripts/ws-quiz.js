@@ -24,10 +24,25 @@ $(function() {
 				}
 			}
 		})
+		var con = new flect.connection(params.uri);
+
+		if (params.uri)
+
+
+
 		var item = sessionStorage.getItem("test");
 		$("#test1").append(item);
 		sessionStorage.setItem("test", "hoge: " + new Date());
 		item = sessionStorage.getItem("test");
 		$("#test2").append(item);
+		$("#test3").click(function() {
+			con.request({
+				"command" : "echo",
+				"data" : "hoge",
+				"success" : function(data) {
+					console.log(data);
+				}
+			})
+		})
 	}
 });

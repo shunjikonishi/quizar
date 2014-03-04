@@ -18,6 +18,8 @@ class UserManager {
     }.map(User(u.resultName)).single.apply()
   }
 
+  def getUserById(id: Int) = User.find(id).getOrElse(throw new IllegalArgumentException())
+
   def getUserByTwitter(tu: TwitterUser): User = {
     val now = new DateTime()
     findByTwitterId(tu.getId).map { u =>

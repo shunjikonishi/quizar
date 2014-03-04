@@ -1,3 +1,16 @@
 application.title=Meet up!
+chat=Chat
+editEvent=Edit event
+editRoom=Edit room
+help=Help
+home=Home
+makeQuestion=Make question
+makeRoom=Make room
+manageRoom=Room management
+postQuestion=Post question
+publishQuestion=Publish question
+questions=Questions
+ranking=Ranking
+roomMenu=Room menu
 signin=Sign in
 signout=Sign out

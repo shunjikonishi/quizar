@@ -8,15 +8,15 @@ class SessionManager(redis: RedisService) {
 
   private def key(sessionId: String) = "session-" + sessionId
 
-  def getSessionInfo(sessionId: String): Option[SessionInfo] = {
-    redis.get(key(sessionId)).map(SessionInfo.fromJson(_))
+  def get(sessionId: String): SessionInfo = {
+    redis.get(key(sessionId)).map(SessionInfo.fromJson(_)).getOrElse(SessionInfo.create(sessionId))
   }
 
-  def setSessionInfo(sessionId: String, info: SessionInfo) = {
+  def set(sessionId: String, info: SessionInfo) = {
     redis.setex(key(sessionId), SEC_DAY, info.toJson)
   }
 
-  def removeSessionInfo(sessionId: String) = {
+  def remove(sessionId: String) = {
     redis.del(key(sessionId))
   }
 }

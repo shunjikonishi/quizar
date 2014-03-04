@@ -7,4 +7,43 @@ signin[ja]=サインイン
 signout=Sign out
 signout[ja]=サインアウト
 
+home=Home
+home[ja]=ホーム
+
+makeRoom=Make room
+makeRoom[ja]=ルームの作成
+
+roomMenu=Room menu
+roomMenu[ja]=ルームメニュー
+
+questions=Questions
+questions[ja]=問題
+
+ranking=Ranking
+ranking[ja]=ランキング
+
+chat=Chat
+chat[ja]=チャット
+
+postQuestion=Post question
+postQuestion[ja]=問題の投稿
+
+manageRoom=Room management
+manageRoom[ja]=ルーム管理
+
+editRoom=Edit room
+editRoom[ja]=ルームの編集
+
+editEvent=Edit event
+editEvent[ja]=イベントの編集
+
+makeQuestion=Make question
+makeQuestion[ja]=問題の作成
+
+publishQuestion=Publish question
+publishQuestion[ja]=出題
+
+help=Help
+help[ja]=ヘルプ
+
 
