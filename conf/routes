@@ -8,6 +8,8 @@ GET     /ws                         controllers.Application.ws
 GET     /i18n/setlang               controllers.I18N.setLang(lang)
 GET     /i18n/:lang/messages.js     controllers.I18N.messages(lang)
 
+POST    /ajax/:name                 controllers.Ajax.command(name)
+
 GET     /signin/twitter             controllers.Application.signinTwitter(oauth_token, oauth_verifier)
 GET     /signout                    controllers.Application.signout
 

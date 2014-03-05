@@ -12,6 +12,7 @@ case class QuizRoom(
   userQuiz: Boolean, 
   description: Option[String] = None, 
   owner: Int, 
+  adminUsers: Option[String] = None, 
   created: DateTime, 
   updated: DateTime) {
 
@@ -26,7 +27,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
 
   override val tableName = "quiz_room"
 
-  override val columns = Seq("id", "name", "tags", "hashtag", "user_quiz", "description", "owner", "created", "updated")
+  override val columns = Seq("id", "name", "tags", "hashtag", "user_quiz", "description", "owner", "admin_users", "created", "updated")
 
   def apply(qr: ResultName[QuizRoom])(rs: WrappedResultSet): QuizRoom = new QuizRoom(
     id = rs.int(qr.id),
@@ -36,6 +37,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
     userQuiz = rs.boolean(qr.userQuiz),
     description = rs.stringOpt(qr.description),
     owner = rs.int(qr.owner),
+    adminUsers = rs.stringOpt(qr.adminUsers),
     created = rs.timestamp(qr.created).toDateTime,
     updated = rs.timestamp(qr.updated).toDateTime
   )
@@ -77,6 +79,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
     userQuiz: Boolean,
     description: Option[String] = None,
     owner: Int,
+    adminUsers: Option[String] = None,
     created: DateTime,
     updated: DateTime)(implicit session: DBSession = autoSession): QuizRoom = {
     val generatedKey = withSQL {
@@ -87,6 +90,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
         column.userQuiz,
         column.description,
         column.owner,
+        column.adminUsers,
         column.created,
         column.updated
       ).values(
@@ -96,6 +100,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
         userQuiz,
         description,
         owner,
+        adminUsers,
         created,
         updated
       )
@@ -109,6 +114,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
       userQuiz = userQuiz,
       description = description,
       owner = owner,
+      adminUsers = adminUsers,
       created = created,
       updated = updated)
   }
@@ -123,6 +129,7 @@ object QuizRoom extends SQLSyntaxSupport[QuizRoom] {
         column.userQuiz -> entity.userQuiz,
         column.description -> entity.description,
         column.owner -> entity.owner,
+        column.adminUsers -> entity.adminUsers,
         column.created -> entity.created,
         column.updated -> entity.updated
       ).where.eq(column.id, entity.id)

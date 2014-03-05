@@ -1,111 +1,103 @@
-@(sessionInfo: SessionInfo, json: String)(implicit lang: Lang)
-
-@frame(sessionInfo.user, sessionInfo.room, json) {
-	<div class="app-home" id="home">
-		<h1>@Messages("application.title")</h1>
-		<div id="test1">test1: </div>
-		<div id="test2">test2: </div>
-		<div><button id="test3">test</button></div>
-		<div>
-			@if(sessionInfo.user.isEmpty) {
-				<div>
-					<a class="btn btn-twitter" href="@TwitterManager.authorizationUrl">
-						<i class="fa fa-twitter fa-2x"></i>
-						Twitterでログイン
-					</a>
-				</div>
-				<div>
-					<button class="btn btn-facebook">
-						<i class="fa fa-facebook fa-2x"></i>
-						Facebookでログイン
-					</button>
-				</div>
-			}
-		</div>
-		<div>
-			<h2>イベント</h2>
-			<ul class="nav nav-tabs">
-				<li class="active"><a href="#event-future" data-toggle="tab">近日開催</a></li>
-				<li><a href="#event-past" data-toggle="tab">終了</a></li>
-			</ul>
-			<div class="tab-content">
-				<div id="event-future" class="tab-pane active">
-					<table class="table table-hover">
-						<thead>
-							<tr>
-								<th>日時</th>
-								<th>タイトル</th>
-								<th>定員</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td>20名</td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td>20名</td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td>20名</td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td>20名</td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td>20名</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div id="event-past" class="tab-pane">
-					<table class="table table-hover">
-						<thead>
-							<tr>
-								<th>日時</th>
-								<th>タイトル</th>
-								<th>トップ</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
-							</tr>
-							<tr>
-								<td>2014/03/01 19:00</td>
-								<td>Heroku meetup #12</td>
-								<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div class="app-home" id="home">
+	<h1>@Messages("application.title")</h1>
+	<div>
+		@if(sessionInfo.user.isEmpty) {
+			<div>
+				<a class="btn btn-twitter" href="@TwitterManager.authorizationUrl">
+					<i class="fa fa-twitter fa-2x"></i>
+					Twitterでログイン
+				</a>
+				<button class="btn btn-facebook" style="margin-left:10px;">
+					<i class="fa fa-facebook fa-2x"></i>
+					Facebookでログイン
+				</button>
+			</div>
+		}
+	</div>
+	<div>
+		<h2>イベント</h2>
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#event-future" data-toggle="tab">近日開催</a></li>
+			<li><a href="#event-past" data-toggle="tab">終了</a></li>
+		</ul>
+		<div class="tab-content">
+			<div id="event-future" class="tab-pane active">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>日時</th>
+							<th>タイトル</th>
+							<th>定員</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td>20名</td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td>20名</td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td>20名</td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td>20名</td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td>20名</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div id="event-past" class="tab-pane">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>日時</th>
+							<th>タイトル</th>
+							<th>トップ</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+						</tr>
+						<tr>
+							<td>2014/03/01 19:00</td>
+							<td>Heroku meetup #12</td>
+							<td><img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg"></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
-}
+</div>

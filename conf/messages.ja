@@ -1,5 +1,6 @@
 application.title=勉強会！
 chat=チャット
+debug=デバッグ
 editEvent=イベントの編集
 editRoom=ルームの編集
 help=ヘルプ
@@ -14,3 +15,5 @@ ranking=ランキング
 roomMenu=ルームメニュー
 signin=サインイン
 signout=サインアウト
+ui.create=作成
+ui.update=更新

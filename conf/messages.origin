@@ -43,7 +43,15 @@ makeQuestion[ja]=問題の作成
 publishQuestion=Publish question
 publishQuestion[ja]=出題
 
+debug=Debug
+debug[ja]=デバッグ
+
 help=Help
 help[ja]=ヘルプ
 
+ui.create=Create
+ui.create[ja]=作成
+
+ui.update=Update
+ui.update[ja]=更新
 

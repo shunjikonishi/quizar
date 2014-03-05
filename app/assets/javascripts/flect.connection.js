@@ -7,11 +7,12 @@ $(function() {
 	/**
 	 * settings
 	 * - onOpen(event)
-	 * - onMessage(event, startTime)
 	 * - onClose(event)
+	 * - onRequest(command, data)
+	 * - onMessage(data, startTime)
 	 * - onError(msg)
 	 */
-	flect.connection = function(wsUri, settings) {
+	flect.Connection = function(wsUri, debug) {
 		function useAjax() {
 			if (arguments.length == 0) {
 				return ajaxPrefix;
@@ -25,6 +26,9 @@ $(function() {
 			return self;
 		}
 		function request(params) {
+			if (settings.onRequest) {
+				settings.onRequest(params.command, params.data);
+			}
 			if (ajaxPrefix) {
 				ajaxRequest(params)
 			} else {
@@ -33,7 +37,12 @@ $(function() {
 			return self;
 		}
 		function ajaxRequest(params) {
-			var url = params.url ? params.url : ajaxPrefix;
+			debug.log("ajax", params.command);
+			var startTime = new Date().getTime(),
+				id = ++requestId,
+				url = params.url ? params.url : ajaxPrefix,
+				orgSuccess = params.success;
+
 			if (params.command) {
 				if (!endsWith(url, "/")) {
 					url += "/";
@@ -41,17 +50,44 @@ $(function() {
 				url += params.command;
 				delete params.command;
 			}
+			url += "?id=" + id;
 			if (params.log) {
-				url += "?log=" + params.log;
+				url += "&log=" + params.log;
 				delete params.log;
 			}
+			params.url = url;
 			if (!params.type) {
 				params.type = "POST";
+			}
+			if (params.data) {
+				var data = JSON.stringify(params.data);
+				params.data = {
+					"data" : data
+				}
+			}
+			params.success = function(data) {
+				if (settings.onMessage) {
+					settings.onMessage(data, startTime);
+				}
+				if (data.type == "error") {
+					if (settings.onError) {
+						settings.onError(data.data);
+					}
+					return;
+				}
+				var func = orgSuccess;
+				if (!func) {
+					func = listeners[params.command];
+				}
+				if (func) {
+					func(data.data)
+				}
 			}
 			$.ajax(params);
 		}
 		//command, log, data, success
 		function websocketRequest(params) {
+			debug.log("ws", params.command);
 			var startTime = new Date().getTime(),
 				id = ++requestId;
 			times[id] = startTime;
@@ -77,6 +113,11 @@ $(function() {
 			return self;
 		}
 		function onOpen(event) {
+			opened = true;
+			for (var i=0; i<readyFuncs.length; i++) {
+				readyFuncs[i]();
+			}
+			readyFuncs = null;
 			if (settings.onOpen) {
 				settings.onOpen(event);
 			}
@@ -89,7 +130,7 @@ $(function() {
 				delete times[data.id];
 			}
 			if (settings.onMessage) {
-				settings.onMessage(event, startTime, data);
+				settings.onMessage(data, startTime);
 			}
 			if (data.type == "error") {
 				if (settings.onError) {
@@ -104,11 +145,7 @@ $(function() {
 				func = listeners[data.command];
 			}
 			if (func) {
-				var funcData = data.data;
-				if (data.type == "json") {
-					funcData = JSON.parse(funcData);
-				}
-				func(funcData);
+				func(data.data);
 			}
 		}
 		function onClose(event) {
@@ -118,18 +155,25 @@ $(function() {
 		}
 		function polling(interval, params) {
 			return setInterval(function() {
-				request(params);
+				request($.extend(true, {}, params));
 			}, interval);
 		}
+		function ready(func) {
+			if (opened) {
+				func();
+			} else {
+				readyFuncs.push(func);
+			}
+		}
 		var self = this,
+			settings = {},
 			requestId = 0,
 			times = {},
 			listeners = {},
 			ajaxPrefix = null,
-			socket = new WebSocket(wsUri);
-		if (!settings) {
-			settings = {};
-		}
+			readyFuncs = [],
+			opened = false,
+			socket = new WebSocket(wsUri)
 
 		socket.onopen = onOpen;
 		socket.onmessage = onMessage;
@@ -140,7 +184,13 @@ $(function() {
 			"request" : request,
 			"addEventListener" : addEventListener,
 			"removeEventListener" : removeEventListener,
-			"polling" : polling
+			"polling" : polling,
+			"ready" : ready,
+			"onOpen" : function(func) { settings.onOpen = func; return this},
+			"onClose" : function(func) { settings.onClose = func; return this},
+			"onRequest" : function(func) { settings.onRequest = func; return this},
+			"onMessage" : function(func) { settings.onMessage = func; return this},
+			"onError" : function(func) { settings.onError = func; return this}
 		})
 	}
 });

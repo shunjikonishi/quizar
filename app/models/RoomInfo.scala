@@ -10,10 +10,18 @@ case class RoomInfo(
     hashTag: Option[String],
     userQuiz: Boolean, 
     description: Option[String], 
-    owner: Int
+    owner: Int,
+    adminUsers: Option[String]
   ) {
 
-  def isAdmin(user: UserInfo) = user.id == owner
+  def isAdmin(user: UserInfo) = {
+    user.id == owner || adminUserList.exists(_ == user.id)
+  }
+
+  def adminUserList: List[Int] = {
+    val list = adminUsers.map(_.split(",").toList).getOrElse(Nil)
+    list.map(_.toInt)
+  }
 
   def toJson = {
     Json.toJson(this)(RoomInfo.format).toString
@@ -30,7 +38,8 @@ object RoomInfo {
     hashTag = room.hashtag,
     userQuiz = room.userQuiz,
     description = room.description,
-    owner = room.owner
+    owner = room.owner,
+    adminUsers = room.adminUsers
   )
 
   def fromJson(str: String) = Json.fromJson[RoomInfo](Json.parse(str)).get

@@ -1,0 +1,51 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="make-room">
+	<h1>ルームの作成</h1>
+	<div>
+		<form role="form">
+			<div class="form-group">
+				<label for="roomName">ルーム名</label>
+				<input id="roomName" class="form-control"/>
+			</div>
+			<div class="form-group">
+				<label for="roomTag">タグ</label>
+				<input id="roomTag" class="form-control"/>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input type="checkbox"> 参加者の問題投稿を許可
+				</label>
+			</div>
+			<div class="form-group">
+				<label for="roomDescription">説明</label>
+				<textarea id="roomName" class="form-control"></textarea>
+			</div>
+			<button type="button" class="btn btn-default" id="btn-make-room">作成</button>
+		</form>
+	</div>
+	<div id="room-admin">
+		<h2>管理者</h2>
+		<p>TwitterIDを指定して管理者を追加できます。</p>
+		<ul class="list-admin">
+			<li>
+				<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">
+				<span> i556 </span>
+				<i class="fa fa-minus-circle fa-2x"></i>
+			</li>
+			<li>
+				<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">
+				<span> i556 </span>
+				<i class="fa fa-minus-circle fa-2x"></i>
+			</li>
+			<li>
+				<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">
+				<span> i556 </span>
+				<i class="fa fa-minus-circle fa-2x"></i>
+			</li>
+			<li>
+				@@<input type="text"/>
+				<i class="fa fa-plus-circle fa-2x"></i>
+			</li>
+		</ul>
+	</div>
+</div>

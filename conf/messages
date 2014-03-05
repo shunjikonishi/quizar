@@ -1,5 +1,6 @@
 application.title=Meet up!
 chat=Chat
+debug=Debug
 editEvent=Edit event
 editRoom=Edit room
 help=Help
@@ -14,3 +15,5 @@ ranking=Ranking
 roomMenu=Room menu
 signin=Sign in
 signout=Sign out
+ui.create=Create
+ui.update=Update

@@ -1,5 +1,7 @@
 package controllers
 
+import play.api.Play
+import play.api.Play.current
 import play.api.mvc.Controller
 import play.api.mvc.Action
 import play.api.mvc.RequestHeader
@@ -11,26 +13,35 @@ import models.UserManager
 import models.SessionManager
 import models.SessionInfo
 import models.RoomManager
-import flect.websocket.CommandHandler
+import models.QuizRoomEngine
+import models.TemplateManager
+import flect.websocket.CommandInvoker
 
 import java.util.UUID
 
 object Application extends Controller {
 
-  private def createParams(implicit request: RequestHeader) = {
-    val wsUri = routes.Application.ws().webSocketURL()
+  private def createParams(request: RequestHeader, sessionInfo: SessionInfo) = {
+    val wsUri = routes.Application.ws().webSocketURL()(request)
+    val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
+    val (userId, username) = sessionInfo.user.map(u => (u.id, u.name)).getOrElse((0, ""))
     s"""{
+      "devMode" : ${Play.isDev},
+      "debug" : ${debug},
+      "userId" : ${userId},
+      "username" : "${username}",
       "uri" : "${wsUri}"
     }"""
   }
 
-  def index = Action { implicit request =>
+  def index() = Action { implicit request =>
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
     val sessionInfo = sm.get(sessionId).copy(room=None)
+    val tm = TemplateManager(sessionInfo)
     sm.set(sessionId, sessionInfo)
 
-    Ok(views.html.index(sessionInfo, createParams(request))).withSession(
+    Ok(views.html.frame(sessionInfo.user, sessionInfo.room, createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
       "sessionId" -> sessionId
     )
   }
@@ -40,8 +51,9 @@ object Application extends Controller {
       val sm = SessionManager
       val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
       val sessionInfo = sm.get(sessionId).copy(room=Some(room))
+      val tm = TemplateManager(sessionInfo)
       sm.set(sessionId, sessionInfo)
-      Ok(views.html.index(sessionInfo, createParams(request))).withSession(
+      Ok(views.html.frame(sessionInfo.user, sessionInfo.room, createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)
@@ -49,12 +61,10 @@ object Application extends Controller {
   
   def ws = WebSocket.using[String] { implicit request =>
     //ToDo check origin
-    val handler = new CommandHandler()
-    val sessionId = session.get("sessionId").foreach { s =>
-      handler.addHandler("echo") { command =>
-        command.text(command.data.as[String] + " " + new java.util.Date().toString)
-      }
-    }
+    val sm = SessionManager
+    val handler = session.get("sessionId").map { sessionId =>
+      new QuizRoomEngine(sm.get(sessionId))
+    }.getOrElse(new CommandInvoker())
     (handler.in, handler.out)
   }
 
