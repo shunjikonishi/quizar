@@ -11,6 +11,7 @@ class TemplateManager(session: SessionInfo) extends CommandHandler {
     name match {
       case "home" => views.html.index(session)
       case "make-room" => views.html.makeRoom(session)
+      case "event" => views.html.event(session)
       case "debug" => views.html.debug(session)
       case _ => Html("NotFound")
     }

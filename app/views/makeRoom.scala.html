@@ -1,31 +1,35 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="make-room">
-	<h1>ルームの作成</h1>
+	<h1>@Messages("makeRoom")</h1>
 	<div>
 		<form role="form">
 			<div class="form-group">
-				<label for="roomName">ルーム名</label>
-				<input id="roomName" class="form-control"/>
+				<label for="room-name">@Messages("roomName")</label>
+				<input id="room-name" class="form-control"/>
 			</div>
 			<div class="form-group">
-				<label for="roomTag">タグ</label>
-				<input id="roomTag" class="form-control"/>
+				<label for="room-tags">@Messages("tags")</label>
+				<input id="room-tags" class="form-control"/>
+			</div>
+			<div class="form-group">
+				<label for="room-hashtag">@Messages("hashtag")</label>
+				<input id="room-hashtag" class="form-control"/>
 			</div>
 			<div class="checkbox">
 				<label>
-					<input type="checkbox"> 参加者の問題投稿を許可
+					<input id="room-user-quiz" type="checkbox"> @Messages("allowUserQuestion")
 				</label>
 			</div>
 			<div class="form-group">
-				<label for="roomDescription">説明</label>
-				<textarea id="roomName" class="form-control"></textarea>
+				<label for="room-description">@Messages("description")</label>
+				<textarea id="room-description" class="form-control"></textarea>
 			</div>
-			<button type="button" class="btn btn-default" id="btn-make-room">作成</button>
+			<button type="button" class="btn btn-default" id="btn-make-room">@Messages("ui.create")</button>
 		</form>
 	</div>
 	<div id="room-admin">
-		<h2>管理者</h2>
-		<p>TwitterIDを指定して管理者を追加できます。</p>
+		<h2>@Messages("administrator")</h2>
+		<p>@Messages("addAdministrator")</p>
 		<ul class="list-admin">
 			<li>
 				<img src="https://pbs.twimg.com/profile_images/426010078131400704/1W-l1xCk_mini.jpeg">

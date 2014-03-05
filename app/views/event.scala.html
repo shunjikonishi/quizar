@@ -1,0 +1,77 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="edit-event">
+	<h1>イベント管理</h1>
+	<div>
+		<form role="form">
+			<div class="form-group">
+				<label>タイトル</label>
+				<input class="form-control">
+			</div>
+			<div class="form-group">
+				<label>予定日</label>
+				<input class="form-control" type="date">
+			</div>
+			<div class="form-group">
+				<label>開始時間</label>
+				<input class="form-control" type="time">
+			</div>
+			<div class="form-group">
+				<label>定員</label>
+				<select class="form-control">
+					<option>20人</option>
+					<option>50人</option>
+					<option>100人</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>パスコード</label>
+				<input class="form-control">
+			</div>
+			<div class="form-group">
+				<label>説明</label>
+				<textarea class="form-control"></textarea>
+			</div>
+		</form>
+			<div>
+				<button class="btn btn-primary">イベント開始</button>
+				<button class="btn btn-primary">変更を保存</button>
+			</div>
+	</div>
+	<h2>終了したイベント</h2>
+	<table class="table table-hover" id="tbl-event">
+		<thead>
+			<tr>
+				<th>タイトル</th>
+				<th>日時</th>
+				<th>参加者</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>ほげほげ</td>
+				<td>2014-02-14 19:00</td>
+				<td>13人</td>
+			</tr>
+			<tr>
+				<td>ほげほげ</td>
+				<td>2014-02-14 19:00</td>
+				<td>13人</td>
+			</tr>
+			<tr>
+				<td>ほげほげ</td>
+				<td>2014-02-14 19:00</td>
+				<td>13人</td>
+			</tr>
+			<tr>
+				<td>ほげほげ</td>
+				<td>2014-02-14 19:00</td>
+				<td>13人</td>
+			</tr>
+			<tr>
+				<td>ほげほげ</td>
+				<td>2014-02-14 19:00</td>
+				<td>13人</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

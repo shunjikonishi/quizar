@@ -38,12 +38,12 @@ $(function() {
 			if (cnt > MAX_LOG) {
 				$tbody.find("tr:first").remove();
 			}
-			var $tr = $("<tr><td></td><td></td><td class='pull-right'></td></tr>"),
+			var $tr = $("<tr><td></td><td></td><td><div class='pull-right'></div></td></tr>"),
 				$td = $tr.find("td");
 			$($td.get(0)).text(type);
 			$($td.get(1)).text(value);
 			if (time) {
-				$($td.get(2)).text(time);
+				$($td.get(2)).find("div").text(time);
 			}
 			$tbody.append($tr);
 		}
@@ -103,6 +103,7 @@ $(function() {
 					debug.setImpl(new PageDebugger($("#debug")));
 					$btnDebug.find("a").click(function() {
 						showStatic("debug");
+						return false;
 					});
 					con.onRequest(function(command, data) {
 						var value = command + ", " + JSON.stringify(data);

@@ -55,3 +55,23 @@ ui.create[ja]=作成
 ui.update=Update
 ui.update[ja]=更新
 
+roomName=Room name
+roomName[ja]=ルーム名
+
+tags=Tags
+tags[ja]=タグ
+
+hashtag=Hashtag
+hashtag[ja]=ハッシュタグ
+
+allowUserQuestion=Allow user question
+allowUserQuestion[ja]=参加者の問題投稿を許可
+
+description=Description
+description[ja]=説明
+
+administrator=Administrator
+administrator[ja]=管理者
+
+addAdministrator=You can add other administrator by specifying the TwitterID
+addAdministrator[ja]=TwitterIDを指定して管理者を追加できます。
