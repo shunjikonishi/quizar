@@ -26,7 +26,4 @@ object Ajax extends Controller {
     }.getOrElse(BadRequest)
   }
 
-  private def convertData(map: Map[String, Seq[String]]) = {
-
-  }
 }

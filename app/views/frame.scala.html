@@ -32,18 +32,21 @@
 		</div>
 	}
 	<div class="toolbar-content">
-		<div id="title" class="toolbar-title">@Messages("application.title")</div>
-		<div id="room-icons" style="display:none;">
-			<button type="button" id="btn-question">
-				<i class="fa fa-check-circle fa-lg"></i>
-			</button>
-			<button type="button" id="btn-ranking">
-				<i class="fa fa-star fa-lg"></i>
-			</button>
-			<button type="button" id="btn-tweet">
-				<i class="fa fa-comment fa-lg"></i>
-			</button>
-		</div>
+		@roomInfo.map { room =>
+			<div id="room-icons">
+				<button type="button" id="btn-question">
+					<i class="fa fa-check-circle fa-lg"></i>
+				</button>
+				<button type="button" id="btn-ranking">
+					<i class="fa fa-star fa-lg"></i>
+				</button>
+				<button type="button" id="btn-chat">
+					<i class="fa fa-comment fa-lg"></i>
+				</button>
+			</div>
+		}.getOrElse {
+			<div id="title" class="toolbar-title">@Messages("application.title")</div>
+		}
 	</div>
 </div>
 <div id="content" class="container">

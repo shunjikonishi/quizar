@@ -1,0 +1,25 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="chat">
+	<h1>@Messages("chat")</h1>
+	@sessionInfo.user.map { u =>
+		<div>
+			<form role="form">
+				<div class="form-group">
+					<textarea id="chat-text" class="form-control"></textarea>
+				</div>
+				<div id="chat-text-len">140</div>
+				<div class="checkbox">
+					<label>
+						<input id="chat-twitter" type="checkbox"> @Messages("postTwitter")
+					</label>
+				</div>
+			</form>
+			<button id="btn-tweet" type="button" class="btn btn-default">@Messages("tweet")</button>
+		</div>
+		<hr>
+	}
+	<table class="table table-striped">
+		<tbody>
+		</tbody>
+	</table>
+</div>

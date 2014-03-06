@@ -1,6 +1,6 @@
 package models
 
-import play.api.libs.json._
+import play.api.libs.json.JsNull
 import models.entities.QuizRoom
 import org.joda.time.DateTime
 
@@ -30,14 +30,36 @@ class RoomManager {
     RoomInfo.create(entity)
   }
 
-  val createCommand = new CommandHandler() {
-    def handle(command: Command): CommandResponse = {
-      val room = create(RoomInfo.fromJson(command.data))
-      val data = JsObject(Seq(
-          ("id", JsNumber(room.id))
-        ))
-      command.json(data)
-    }
+  def update(room: RoomInfo): Boolean = {
+    QuizRoom.find(room.id).map { entity =>
+      entity.copy(
+        name=room.name,
+        tags=room.tags,
+        hashtag=room.hashtag,
+        userQuiz=room.userQuiz,
+        description=room.description,
+        adminUsers=room.adminUsers,
+        updated= new DateTime()
+      ).save();
+      true;
+    }.getOrElse(false)
+  }
+
+  val createCommand = CommandHandler { command =>
+    val room = create(RoomInfo.fromJson(command.data))
+    command.json(room.toJsObject)
+  }
+
+  val updateCommand = CommandHandler { command =>
+    update(RoomInfo.fromJson(command.data))
+    command.text("OK")
+  }
+
+  val getCommand = CommandHandler { command =>
+    val id = (command.data \ "id").as[Int]
+    val room = getRoomInfo(id)
+    val data = room.map(_.toJsObject).getOrElse(JsNull)
+    command.json(data)
   }
 }
 

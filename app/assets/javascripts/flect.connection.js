@@ -165,6 +165,12 @@ $(function() {
 				readyFuncs.push(func);
 			}
 		}
+		function close() {
+			if (opened) {
+				socket.close();
+				opened = false;
+			}
+		}
 		var self = this,
 			settings = {},
 			requestId = 0,
@@ -186,6 +192,7 @@ $(function() {
 			"removeEventListener" : removeEventListener,
 			"polling" : polling,
 			"ready" : ready,
+			"close" : close,
 			"onOpen" : function(func) { settings.onOpen = func; return this},
 			"onClose" : function(func) { settings.onClose = func; return this},
 			"onRequest" : function(func) { settings.onRequest = func; return this},

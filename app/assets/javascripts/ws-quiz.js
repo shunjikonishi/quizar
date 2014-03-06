@@ -15,35 +15,103 @@ $(function() {
 			"show" : show
 		})
 	}
-	function MakeRoom(con, messageDialog) {
-		function getParamName($input) {
+	function Chat($el, userId, con) {
+		var MAX_LOG = 20;
+		function tweet(msg, withTwitter) {
+			if (userId) {
+				con.request({
+					"command" : "tweet",
+					"data" : {
+						"userId" : userId,
+						"msg" : msg,
+						"twitter" : withTwitter
+					}
+				})
+			}
+		}
+		function append(data) {
+			if (cnt > MAX_LOG) {
+				$tbody.find("tr:last").remove();
+			}
+			var clazz = cnt % 2 == 0 ? "chat-left" : "chat-right",
+				$tr = $("<tr style='display:none;'><td><div></div></div></td></tr>"),
+				$div = $tr.find("div"),
+				$span = $("<span/>"),
+				$img = $("<img/>");
+			$div.addClass(clazz);
+			$span.text(data.msg);
+			$img.attr("src", data.img);
+			if (clazz == "chat-left") {
+				$div.append($img);
+				$div.append($span);
+			} else {
+				$div.append($span);
+				$div.append($img);
+			}
+			$tbody.prepend($tr)
+			$tr.show("slow");
+			cnt++;
+		}
+		var cnt = 0,
+			$text = $("#chat-text"),
+			$twitter = $("#chat-twitter"),
+			$len = $("#chat-text-len"),
+			$tbody = $el.find("table tbody");
+		if (userId) {
+			$("#btn-tweet").click(function() {
+				var msg = $text.val(),
+					withTwitter = $twitter.is(":checked");
+				if (msg.length == 0 || msg.length > 140) {
+					return;
+				}
+				$text.val("");
+				tweet(msg, withTwitter);
+			});
+			$text.keyup(function() {
+				var len = 140 - $text.val().length;
+				if (len <= 0) {
+					$len.addClass("error");
+				} else {
+					$len.removeClass("error");
+				}
+				$len.text(len);
+			})
+		}
+		$.extend(this, {
+			"append" : append,
+			"tweet" : tweet
+		})
+	}
+	function MakeRoom(userId, con, messageDialog) {
+		function getParameterName($input) {
 			return $input.attr("id").substring(5);
 		}
 		function update() {
-			messageDialog.show("Update end");
-			/*
 			if (validator && validator.form()) {
-				var data = editRoom || { "id" : -1};
+				var data = editRoom || {
+					"id" : -1, 
+					"owner" : userId
+				};
 				$form.find(":input").each(function() {
 					var $input = $(this),
 						name = getParameterName($input);
 					if ($input.is(":checkbox")) {
-						data[name] = $iniput.is(":checked");
-					} else {
+						data[name] = $input.is(":checked");
+					} else if ($input.val()) {
 						data[name] = $input.val();
 					}
 				})
 				if (editRoom) {
 					con.request({
-						"command" : "update-room",
-						"data" : data
+						"command" : "updateRoom",
+						"data" : data,
 						"success" : function(data) {
-							messageDialog.show("Updated");
+							messageDialog.show(MSG.successUpdate);
 						}
 					})
 				} else {
 					con.request({
-						"command" : "make-room",
+						"command" : "makeRoom",
 						"data" : data,
 						"success" : function(data) {
 							if (data.id) {
@@ -54,13 +122,12 @@ $(function() {
 					})
 				}
 			}
-			*/
 		}
 		function init($el) {
-			if (roomId) {
+			if (roomId && !editRoom) {
 				con.request({
 					"command" : "getRoom",
-					"data" : { "id" : roomid},
+					"data" : { "id" : roomId},
 					"success" : function(data) {
 						editRoom = data;
 						init($el);
@@ -157,6 +224,7 @@ $(function() {
 				$($td.get(2)).find("div").text(time);
 			}
 			$tbody.append($tr);
+			cnt++;
 		}
 		var $tbody = $el.find("table tbody"),
 			cnt = 0;
@@ -171,103 +239,121 @@ $(function() {
 				$("#" + id).show("slide", { "direction" : "right"}, 750);
 			});
 		}
-		$("#btn-menu").sidr({
-			"onOpen" : function() {
-				$("#toolbar").css("left", "260px").find(".header-center").hide();
-			},
-			"onClose" : function() {
-				$("#toolbar").css("left", "0px").find(".header-center").show();
-			}
-		});
-		$("#content").swipe({
-			"swipeLeft": function(e) {
-				$.sidr('close');
-			},
-			"swipeRight": function() {
-				$.sidr('open');
-			},
-			"tap": function (event, target) {
-				if (SUPPORTS_TOUCH) {
-					$(target).click();
-				}
-			}
-		})
-		var debug = new DebuggerWrapper(),
-			msgDialog = new MessageDialog($("#msg-dialog")),
-			con = new flect.Connection(params.uri, debug),
-			makeRoom = new MakeRoom(con, msgDialog),
-			templateManager = new flect.TemplateManager(con, $("#content-dynamic")),
-			$content = $("#content");
-
-		if (params.devMode) {
+		function init() {
 			if (window.sessionStorage) {
 				sessionStorage.clear();
 			}
-		}
-		con.polling(25000, {
-			"command" : "noop",
-			"log" : "user=" + (params.username ? params.username : "(Anonymous)")
-		})
-		if (params.debug) {
-			var $btnDebug = $("#btn-debug").show();
-			con.ready(function() {
-				templateManager.loadTemplate("debug", function(data) {
-					$content.append(data);
-					debug.setImpl(new PageDebugger($("#debug")));
-					$btnDebug.find("a").click(function() {
-						showStatic("debug");
-						return false;
-					});
-					con.onRequest(function(command, data) {
-						var value = command + ", " + JSON.stringify(data);
-						debug.log("send", value, "");
-					}).onMessage(function(data, startTime) {
-						var now = new Date().getTime();
-						debug.log("receive", JSON.stringify(data), now - startTime);
-					})
-					$("#chk-use-ajax").click(function() {
-						var useAjax = $(this).is(":checked");
-						if (useAjax) {
-							con.useAjax("/ajax");
-						} else {
-							con.useAjax(false);
-						}
-					}).bootstrapSwitch();
-				});
-			});
-		}
-		$("#sidr a.dynamic").click(function() {
-			var id = $(this).attr("href").substring(1),
-				params = $.extend({
-					"name" : id
-				}, TemplateLogic[id]);;
-			$.sidr("close", function() {
-				$content.children("div").hide();
-				templateManager.show(params);
-			});
-			return false;
-		})
-		var TemplateLogic = {
-			"make-room" : {
-				"beforeShow" : function($el) {
-					makeRoom.clear();
-					makeRoom.init($el);
-				},
-				"afterHide" : function($el) {
-					makeRoom.clear();
-				}
-			},
-			"edit-room" : {
-				"name" : "make-room",
-				"beforeShow" : function($el) {
-					makeRoom.clear();
-					makeRoom.edit(params.roomId);
-					makeRoom.init($el)
-				},
-				"afterHide" : function($el) {
-					makeRoom.clear();
-				}
+
+			debug = new DebuggerWrapper();
+			msgDialog = new MessageDialog($("#msg-dialog"));
+			con = new flect.Connection(params.uri, debug);
+			makeRoom = new MakeRoom(params.userId, con, msgDialog);
+			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
+			$content = $("#content");
+			if (params.roomId) {
+				var $chat = $("#chat");
+				$content.append($chat);
+				chat = new Chat($chat, params.userId, con);
+				con.addEventListener("chat", chat.append)
 			}
-		};
+
+			$("#btn-menu").sidr({
+				"onOpen" : function() {
+					$("#toolbar").css("left", "260px").find(".header-center").hide();
+				},
+				"onClose" : function() {
+					$("#toolbar").css("left", "0px").find(".header-center").show();
+				}
+			});
+			$("#content").swipe({
+				"swipeLeft": function(e) {
+					$.sidr('close');
+				},
+				"swipeRight": function() {
+					$.sidr('open');
+				},
+				"tap": function (event, target) {
+					if (SUPPORTS_TOUCH) {
+						$(target).click();
+					}
+				}
+			})
+			con.polling(25000, {
+				"command" : "noop",
+				"log" : "user=" + (params.username ? params.username : "(Anonymous)")
+			})
+			if (params.debug) {
+				var $btnDebug = $("#btn-debug").show();
+				con.ready(function() {
+					templateManager.loadTemplate("debug", function(data) {
+						$content.append(data);
+						debug.setImpl(new PageDebugger($("#debug")));
+						$btnDebug.find("a").click(function() {
+							showStatic("debug");
+							return false;
+						});
+						con.onRequest(function(command, data) {
+							var value = command;
+							if (data) {
+								value += ", " + JSON.stringify(data);
+							}
+							debug.log("send", value);
+						}).onMessage(function(data, startTime) {
+							var now = new Date().getTime();
+							debug.log("receive", JSON.stringify(data), now - startTime);
+						})
+						$("#chk-use-ajax").click(function() {
+							var useAjax = $(this).is(":checked");
+							if (useAjax) {
+								con.useAjax("/ajax");
+							} else {
+								con.useAjax(false);
+							}
+						}).bootstrapSwitch();
+					});
+				});
+			}
+			$("#sidr a.dynamic").click(function() {
+				var id = $(this).attr("href").substring(1),
+					params = $.extend({
+						"name" : id
+					}, TemplateLogic[id]);;
+				$.sidr("close", function() {
+					$content.children("div").hide();
+					templateManager.show(params);
+				});
+				return false;
+			})
+			var TemplateLogic = {
+				"make-room" : {
+					"beforeShow" : function($el) {
+						makeRoom.clear();
+						makeRoom.init($el);
+					},
+					"afterHide" : function($el) {
+						makeRoom.clear();
+					}
+				},
+				"edit-room" : {
+					"name" : "make-room",
+					"beforeShow" : function($el) {
+						makeRoom.clear();
+						makeRoom.edit(params.roomId);
+						makeRoom.init($el)
+					},
+					"afterHide" : function($el) {
+						makeRoom.clear();
+					}
+				}
+			};
+		}
+		var debug,
+			msgDialog,
+			con,
+			makeRoom,
+			templateManager,
+			chat,
+			$content;
+		init();
 	}
 });

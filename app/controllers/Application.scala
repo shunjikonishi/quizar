@@ -59,7 +59,7 @@ object Application extends Controller {
       val sessionInfo = sm.get(sessionId).copy(roomId=Some(room.id))
       val tm = TemplateManager(sessionInfo)
       sm.set(sessionId, sessionInfo)
-      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
+      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo))(tm.getTemplate("chat"))).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)

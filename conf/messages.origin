@@ -55,6 +55,9 @@ ui.create[ja]=作成
 ui.update=Update
 ui.update[ja]=更新
 
+ui.successUpdate=Update succeed
+ui.successUpdate[ja]=更新に成功しました
+
 roomName=Room name
 roomName[ja]=ルーム名
 
@@ -75,3 +78,12 @@ administrator[ja]=管理者
 
 addAdministrator=You can add other administrator by specifying the TwitterID
 addAdministrator[ja]=TwitterIDを指定して管理者を追加できます。
+
+chat=Chat
+chat[ja]=チャット
+
+postTwitter=Post to twitter
+postTwitter[ja]=Twitterにも投稿
+
+tweet=Tweet
+tweet[ja]=つぶやく
