@@ -27,7 +27,9 @@
 			</button>
 			<ul class="dropdown-menu" role="menu">
 				<li><a href="@TwitterManager.authorizationUrl"><i class="fa fa-twitter"></i> Twitter</a></li>
+@*
 				<li><a href="#"><i class="fa fa-facebook"></i> Facebook</a></li>
+*@
 			</ul>
 		</div>
 	}
@@ -40,7 +42,7 @@
 				<button type="button" id="btn-ranking">
 					<i class="fa fa-star fa-lg"></i>
 				</button>
-				<button type="button" id="btn-chat">
+				<button type="button" id="btn-chat" class="menu-chat">
 					<i class="fa fa-comment fa-lg"></i>
 				</button>
 			</div>
@@ -65,7 +67,7 @@
 				<ul>
 					<li><a href="#question" class="dynamic">@Messages("questions")</a></li>
 					<li><a href="#ranking" class="dynamic">@Messages("ranking")</a></li>
-					<li><a href="#chat">@Messages("chat")</a></li>
+					<li><a href="#chat" class="menu-chat">@Messages("chat")</a></li>
 					@userInfo.filterNot(room.isAdmin(_)).map { user =>
 						<li><a href="#post-question" class="dynamic">@Messages("postQuestion")</a></li>
 					}

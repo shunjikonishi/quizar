@@ -233,11 +233,19 @@ $(function() {
 		})
 	}
 	flect.QuizApp = function(params) {
-		function showStatic(id) {
-			$.sidr("close", function() {
-				$content.children("div").hide();
-				$("#" + id).show("slide", { "direction" : "right"}, 750);
-			});
+		function showStatic(id, sidr) {
+			function doShowStatic() {
+				if (!$el.is(":visible")) {
+					$content.children("div").hide();
+					$el.show("slide", { "direction" : "right"}, 750);
+				}
+			}
+			var $el = $("#" + id);
+			if (sidr) {
+				$.sidr("close", doShowStatic);
+			} else {
+				doShowStatic();
+			}
 		}
 		function init() {
 			if (window.sessionStorage) {
@@ -255,6 +263,10 @@ $(function() {
 				$content.append($chat);
 				chat = new Chat($chat, params.userId, con);
 				con.addEventListener("chat", chat.append)
+				$(".menu-chat").click(function() {
+					showStatic("chat", $(this).parents("#sidr").length > 0);
+					return false;
+				});
 			}
 
 			$("#btn-menu").sidr({
@@ -289,7 +301,7 @@ $(function() {
 						$content.append(data);
 						debug.setImpl(new PageDebugger($("#debug")));
 						$btnDebug.find("a").click(function() {
-							showStatic("debug");
+							showStatic("debug", true);
 							return false;
 						});
 						con.onRequest(function(command, data) {

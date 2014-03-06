@@ -7,9 +7,17 @@ import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
 import flect.websocket.CommandResponse
+import flect.redis.Room
+import flect.redis.RedisService
 
-class RoomManager {
+class RoomManager(redis: RedisService) extends flect.redis.RoomManager[Room](redis) {
 
+  override protected def createRoom(name: String) = new Room(name, redis)
+  override protected def terminate() = {
+    super.terminate()
+    redis.close
+  }
+  
   def getRoomInfo(id: Int): Option[RoomInfo] = {
     QuizRoom.find(id).map(RoomInfo.create(_))
   }
@@ -63,4 +71,4 @@ class RoomManager {
   }
 }
 
-object RoomManager extends RoomManager
+object RoomManager extends RoomManager(MyRedisService)
