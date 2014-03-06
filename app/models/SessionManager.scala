@@ -1,5 +1,6 @@
 package models
 
+import play.api.i18n.Lang
 import flect.redis.RedisService
 
 class SessionManager(redis: RedisService) {
@@ -8,8 +9,8 @@ class SessionManager(redis: RedisService) {
 
   private def key(sessionId: String) = "session-" + sessionId
 
-  def get(sessionId: String): SessionInfo = {
-    redis.get(key(sessionId)).map(SessionInfo.fromJson(_)).getOrElse(SessionInfo.create(sessionId))
+  def get(sessionId: String)(implicit lang: Lang): SessionInfo = {
+    redis.get(key(sessionId)).map(SessionInfo.fromJson(_)).getOrElse(SessionInfo.create(sessionId, lang.language))
   }
 
   def set(sessionId: String, info: SessionInfo) = {

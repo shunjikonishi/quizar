@@ -43,19 +43,34 @@ $(function() {
 			})
 		}
 		function showTemplate(template, params) {
-			$el.empty().hide();
-			$el.html(template);
-			if (params.before) {
-				params.before($el);
+			if (beforeHide) {
+				beforeHide($el);
 			}
-			var dir = params.direction || "right";
-			$el.show("slide", { "direction" : dir}, 750, function() {
-				if (params.after) {
-					params.after($el);
-				}
-			});
+			$el.hide();
+			if (afterHide) {
+				afterHide($el);
+			}
+			$el.empty();
+			
+			$el.html(template);
+			if (params.beforeShow) {
+				params.beforeShow($el);
+			}
+			beforeHide = params.beforeHide;
+			afterHide = params.afterHide;
+
+			setTimeout(function() {
+				var dir = params.direction || "right";
+				$el.show("slide", { "direction" : dir}, 750, function() {
+					if (params.afterShow) {
+						params.afterShow($el);
+					}
+				});
+			}, 0);
 		}
-		var storage = window.sessionStorage ? window.sessionStorage : new MemoryStorage();
+		var storage = window.sessionStorage ? window.sessionStorage : new MemoryStorage(),
+			beforeHide = null,
+			afterHide = null;
 		$.extend(this, {
 			"show" : show,
 			"loadTemplate" : loadTemplate

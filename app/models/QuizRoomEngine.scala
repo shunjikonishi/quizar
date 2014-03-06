@@ -9,5 +9,6 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
   private def init() = {
     addHandler("template", TemplateManager(session))
     addHandler("noop") { c => None}
+    addHandler("makeRoom", RoomManager.createCommand)
   }
 }

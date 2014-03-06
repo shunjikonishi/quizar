@@ -2,7 +2,7 @@
 <div id="make-room">
 	<h1>@Messages("makeRoom")</h1>
 	<div>
-		<form role="form">
+		<form role="form" id="make-room-form">
 			<div class="form-group">
 				<label for="room-name">@Messages("roomName")</label>
 				<input id="room-name" class="form-control"/>
@@ -17,7 +17,7 @@
 			</div>
 			<div class="checkbox">
 				<label>
-					<input id="room-user-quiz" type="checkbox"> @Messages("allowUserQuestion")
+					<input id="room-userQuiz" type="checkbox"> @Messages("allowUserQuestion")
 				</label>
 			</div>
 			<div class="form-group">

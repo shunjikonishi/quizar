@@ -39,3 +39,46 @@
 }
 
 #content { padding-top: 60px;}
+
+.error { color: red;}
+
+#msg-dialog {
+	animation-name: "msg";
+	animation-duration: 3s;
+	animation-timing-function: ease;
+	animation-delay: 0;
+	animation-iteration-count: 1;
+	animation-direction: alternate;
+	-webkit-animation-name: "msg";
+	-webkit-animation-duration: 3s;
+	-webkit-animation-timing-function: ease;
+	-webkit-animation-delay: 0;
+	-webkit-animation-iteration-count: 1;
+	-webkit-animation-direction: alternate;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -140px;
+	margin-top: -25px;
+	height: 50px; 
+	width: 280px;
+	border: solid 1;
+	background-color: #ddd;
+}
+@keyframes msg {
+  0%   { opacity:0; }
+  50%  { opacity:1; }
+  100%   { opacity:0; }
+}
+
+@-webkit-keyframes msg {
+  0%   { opacity:0; }
+  50%  { opacity:1; }
+  100%   { opacity:0; }
+}
+
+#msg-dialog span {
+	display: block;
+	text-align: center;
+	margin: 10px auto;
+}

@@ -4,6 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /room/:id                   controllers.Application.room(id: Int)
 GET     /ws                         controllers.Application.ws
 GET     /i18n/setlang               controllers.I18N.setLang(lang)
 GET     /i18n/:lang/messages.js     controllers.I18N.messages(lang)

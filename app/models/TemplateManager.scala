@@ -1,11 +1,14 @@
 package models
 
+import play.api.i18n.Lang
 import play.api.templates.Html
 
 import flect.websocket.Command
 import flect.websocket.CommandHandler
 
 class TemplateManager(session: SessionInfo) extends CommandHandler {
+
+  implicit val lang = Lang(session.lang)
 
   def getTemplate(name: String): Html = {
     name match {

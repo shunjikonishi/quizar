@@ -25,11 +25,16 @@ object Application extends Controller {
     val wsUri = routes.Application.ws().webSocketURL()(request)
     val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
     val (userId, username) = sessionInfo.user.map(u => (u.id, u.name)).getOrElse((0, ""))
+    val roomId = sessionInfo.roomId.getOrElse(0)
+    val userEventId = sessionInfo.userEventId.getOrElse(0)
+
     s"""{
       "devMode" : ${Play.isDev},
       "debug" : ${debug},
       "userId" : ${userId},
       "username" : "${username}",
+      "roomId" : ${roomId},
+      "userEventId" : ${userEventId},
       "uri" : "${wsUri}"
     }"""
   }
@@ -37,11 +42,11 @@ object Application extends Controller {
   def index() = Action { implicit request =>
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
-    val sessionInfo = sm.get(sessionId).copy(room=None)
+    val sessionInfo = sm.get(sessionId).copy(roomId=None, userEventId=None)
     val tm = TemplateManager(sessionInfo)
     sm.set(sessionId, sessionInfo)
 
-    Ok(views.html.frame(sessionInfo.user, sessionInfo.room, createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
+    Ok(views.html.frame(sessionInfo.user, None, createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
       "sessionId" -> sessionId
     )
   }
@@ -50,10 +55,11 @@ object Application extends Controller {
     RoomManager.getRoomInfo(id).map { room =>
       val sm = SessionManager
       val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
-      val sessionInfo = sm.get(sessionId).copy(room=Some(room))
+      //ToDo userEventId
+      val sessionInfo = sm.get(sessionId).copy(roomId=Some(room.id))
       val tm = TemplateManager(sessionInfo)
       sm.set(sessionId, sessionInfo)
-      Ok(views.html.frame(sessionInfo.user, sessionInfo.room, createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
+      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)
@@ -79,7 +85,7 @@ object Application extends Controller {
       val sessionInfo = sm.get(sessionId).login(user, twitter.getOAuthAccessToken)
       sm.set(sessionId, sessionInfo)
 
-      val path = sessionInfo.room.map("/room/" + _.id).getOrElse("/")
+      val path = sessionInfo.roomId.map("/room/" + _).getOrElse("/")
       Redirect(path)
     }.getOrElse(BadRequest)
   }

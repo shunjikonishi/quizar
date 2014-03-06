@@ -1,13 +1,14 @@
 package models
 
 import play.api.libs.json.Json
+import play.api.libs.json.JsValue
 import models.entities.QuizRoom
 
 case class RoomInfo(
     id: Int, 
     name: String,
     tags: Option[String], 
-    hashTag: Option[String],
+    hashtag: Option[String],
     userQuiz: Boolean, 
     description: Option[String], 
     owner: Int,
@@ -35,13 +36,14 @@ object RoomInfo {
     id = room.id,
     name = room.name,
     tags = room.tags,
-    hashTag = room.hashtag,
+    hashtag = room.hashtag,
     userQuiz = room.userQuiz,
     description = room.description,
     owner = room.owner,
     adminUsers = room.adminUsers
   )
 
+  def fromJson(json: JsValue) = Json.fromJson[RoomInfo](json).get
   def fromJson(str: String) = Json.fromJson[RoomInfo](Json.parse(str)).get
 }
 
