@@ -1,0 +1,52 @@
+<div id="edit-question">
+	<h1>@Messages("questions")</h1>
+	<ul class="nav nav-tabs" id="edit-question-tab">
+		<li class="active"><a href="#edit-question-current" data-toggle="tab">@Messages("stock")</a></li>
+		<li><a href="#edit-question-published" data-toggle="tab">@Messages("published")</a></li>
+	</ul>
+	<div>
+		<div style="float:left;">
+			<button class="btn" id="edit-question-left">
+				<i class="fa fa-chevron-circle-left fa-lg"></i>
+			</button>
+		</div>
+		<div style="display:inline-block; width: 240px;padding-left:10px;padding-top:5px;">
+			<i class="fa fa-search fa-lg"></i>
+			<input type="text">
+			<button id="edit-question-new">@Messages("new")</button>
+		</div>
+		<div style="float:right;">
+			<button class="btn" id="edit-question-right">
+				<i class="fa fa-chevron-circle-right fa-lg"></i>
+			</button>
+		</div>
+	</div>
+	<div class="tab-content">
+		<div id="edit-question-current" class="tab-pane active">
+			<table class="table table-hover table-striped">
+				<thead>
+					<tr>
+						<th>@Messages("questionFrom")</th>
+						<th>@Messages("question")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			<div id="edit-question-current-none" style="display:none;">@Messages("noQuestions")</div>
+		</div>
+		<div id="edit-question-published" class="tab-pane">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>@Messages("questionFrom")</th>
+						<th>@Messages("question")</th>
+						<th>@Messages("answerer")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

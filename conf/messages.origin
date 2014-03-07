@@ -19,6 +19,9 @@ roomMenu[ja]=ルームメニュー
 questions=Questions
 questions[ja]=問題
 
+question=Question
+question[ja]=問題
+
 ranking=Ranking
 ranking[ja]=ランキング
 
@@ -37,7 +40,7 @@ editRoom[ja]=ルームの編集
 editEvent=Edit event
 editEvent[ja]=イベントの編集
 
-editQuestion=Edit and publish question
+editQuestion=Edit and publish questions
 editQuestion[ja]=問題の編集／出題
 
 debug=Debug
@@ -93,3 +96,18 @@ loginWithTwitter[ja]=Twitterでログイン
 
 loginRequiredToChat=If you want to chat, you should sign in.
 loginRequiredToChat[ja]=チャットに参加するためにはログインする必要があります
+
+stock=Stock
+stock[ja]=ストック
+
+published=Published
+published[ja]=出題済み
+
+questionFrom=From
+questionFrom[ja]=出題者
+
+new=New
+new[ja]=作成
+
+answerer=Panel
+answerer[ja]=解答者
