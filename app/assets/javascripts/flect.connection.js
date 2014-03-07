@@ -12,7 +12,7 @@ $(function() {
 	 * - onMessage(data, startTime)
 	 * - onError(msg)
 	 */
-	flect.Connection = function(wsUri, debug) {
+	flect.Connection = function(wsUri, logger) {
 		function useAjax() {
 			if (arguments.length == 0) {
 				return ajaxPrefix;
@@ -37,7 +37,7 @@ $(function() {
 			return self;
 		}
 		function ajaxRequest(params) {
-			debug.log("ajax", params.command);
+			logger.log("ajax", params.command);
 			var startTime = new Date().getTime(),
 				id = ++requestId,
 				url = params.url ? params.url : ajaxPrefix,
@@ -69,6 +69,9 @@ $(function() {
 				if (settings.onMessage) {
 					settings.onMessage(data, startTime);
 				}
+				if (!data) {
+					return;
+				}
 				if (data.type == "error") {
 					if (settings.onError) {
 						settings.onError(data.data);
@@ -87,7 +90,7 @@ $(function() {
 		}
 		//command, log, data, success
 		function websocketRequest(params) {
-			debug.log("ws", params.command);
+			logger.log("ws", params.command);
 			var startTime = new Date().getTime(),
 				id = ++requestId;
 			times[id] = startTime;
@@ -146,6 +149,8 @@ $(function() {
 			}
 			if (func) {
 				func(data.data);
+			} else {
+				logger.log("UnknownMessage", event.data)
 			}
 		}
 		function onClose(event) {

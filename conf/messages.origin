@@ -37,11 +37,8 @@ editRoom[ja]=ルームの編集
 editEvent=Edit event
 editEvent[ja]=イベントの編集
 
-makeQuestion=Make question
-makeQuestion[ja]=問題の作成
-
-publishQuestion=Publish question
-publishQuestion[ja]=出題
+editQuestion=Edit and publish question
+editQuestion[ja]=問題の編集／出題
 
 debug=Debug
 debug[ja]=デバッグ
@@ -87,3 +84,12 @@ postTwitter[ja]=Twitterにも投稿
 
 tweet=Tweet
 tweet[ja]=つぶやく
+
+html.roomMember=<span id="room-member">0</span> people in this room.
+html.roomMember[ja]=<span id="room-member">0</span>人がこの部屋にいます
+
+loginWithTwitter=Sign in with twitter
+loginWithTwitter[ja]=Twitterでログイン
+
+loginRequiredToChat=If you want to chat, you should sign in.
+loginRequiredToChat[ja]=チャットに参加するためにはログインする必要があります

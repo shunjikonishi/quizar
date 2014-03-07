@@ -4,12 +4,17 @@ $(function() {
 	var SUPPORTS_TOUCH = 'ontouchstart' in window;
 
 	function MessageDialog($el) {
-		function show(msg) {
+		function show(msg, second) {
+			second = second || 3;
+			$el.css({
+				"animation-duration" : second + "s",
+				"-webkit-animation-duration" : second + "s"
+			})
 			$el.find("span").text(msg);
 			$el.show();
 			setTimeout(function() {
 				$el.hide();
-			}, 3000);
+			}, second * 1000);
 		}
 		$.extend(this, {
 			"show" : show
@@ -27,6 +32,13 @@ $(function() {
 						"twitter" : withTwitter
 					}
 				})
+			}
+		}
+		function member(data) {
+			if (arguments.length == 0) {
+				return $member.text();
+			} else {
+				$member.text(data);
 			}
 		}
 		function append(data) {
@@ -56,7 +68,8 @@ $(function() {
 			$text = $("#chat-text"),
 			$twitter = $("#chat-twitter"),
 			$len = $("#chat-text-len"),
-			$tbody = $el.find("table tbody");
+			$tbody = $el.find("table tbody"),
+			$member = $("#room-member");
 		if (userId) {
 			$("#btn-tweet").click(function() {
 				var msg = $text.val(),
@@ -78,6 +91,7 @@ $(function() {
 			})
 		}
 		$.extend(this, {
+			"member" : member,
 			"append" : append,
 			"tweet" : tweet
 		})
@@ -210,7 +224,7 @@ $(function() {
 			"setImpl" : setImpl
 		})
 	}
-	function PageDebugger($el) {
+	function PageDebugger($el, con, messageDialog) {
 		var MAX_LOG = 10;
 		function log(type, value, time) {
 			if (cnt > MAX_LOG) {
@@ -228,6 +242,29 @@ $(function() {
 		}
 		var $tbody = $el.find("table tbody"),
 			cnt = 0;
+		con.onRequest(function(command, data) {
+			var value = command;
+			if (data) {
+				value += ", " + JSON.stringify(data);
+			}
+			log("send", value);
+		}).onMessage(function(data, startTime) {
+			var now = new Date().getTime();
+			log("receive", JSON.stringify(data), now - startTime);
+		})
+		$("#chk-use-ajax").bootstrapSwitch().on("switchChange", function() {
+			var useAjax = $(this).is(":checked");
+			if (useAjax) {
+				con.useAjax("/ajax");
+			} else {
+				con.useAjax(false);
+			}
+		});
+		$("#btn-debug-msg").click(function() {
+			var msg = $("#debug-msg").val(),
+				sec = $("#debug-msg-sec").val();
+			messageDialog.show(msg, sec);
+		});
 		$.extend(this, {
 			"log" : log
 		})
@@ -258,15 +295,31 @@ $(function() {
 			makeRoom = new MakeRoom(params.userId, con, msgDialog);
 			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 			$content = $("#content");
+
+			if (params.debug) {
+				debug.setImpl(new PageDebugger($("#debug"), con, msgDialog));
+				$("#btn-debug").click(function() {
+					showStatic("debug", true);
+					return false;
+				})
+			}
+			
 			if (params.roomId) {
 				var $chat = $("#chat");
-				$content.append($chat);
 				chat = new Chat($chat, params.userId, con);
-				con.addEventListener("chat", chat.append)
 				$(".menu-chat").click(function() {
 					showStatic("chat", $(this).parents("#sidr").length > 0);
 					return false;
 				});
+				con.addEventListener("chat", chat.append);
+				con.addEventListener("member", chat.member);
+				con.ready(function() {
+					if (chat.member() == 0) {
+						con.request({
+							"command" : "member"
+						})
+					}
+				})
 			}
 
 			$("#btn-menu").sidr({
@@ -294,37 +347,6 @@ $(function() {
 				"command" : "noop",
 				"log" : "user=" + (params.username ? params.username : "(Anonymous)")
 			})
-			if (params.debug) {
-				var $btnDebug = $("#btn-debug").show();
-				con.ready(function() {
-					templateManager.loadTemplate("debug", function(data) {
-						$content.append(data);
-						debug.setImpl(new PageDebugger($("#debug")));
-						$btnDebug.find("a").click(function() {
-							showStatic("debug", true);
-							return false;
-						});
-						con.onRequest(function(command, data) {
-							var value = command;
-							if (data) {
-								value += ", " + JSON.stringify(data);
-							}
-							debug.log("send", value);
-						}).onMessage(function(data, startTime) {
-							var now = new Date().getTime();
-							debug.log("receive", JSON.stringify(data), now - startTime);
-						})
-						$("#chk-use-ajax").click(function() {
-							var useAjax = $(this).is(":checked");
-							if (useAjax) {
-								con.useAjax("/ajax");
-							} else {
-								con.useAjax(false);
-							}
-						}).bootstrapSwitch();
-					});
-				});
-			}
 			$("#sidr a.dynamic").click(function() {
 				var id = $(this).attr("href").substring(1),
 					params = $.extend({

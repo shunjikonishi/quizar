@@ -7,6 +7,7 @@ import play.api.mvc.Action
 import play.api.mvc.RequestHeader
 import play.api.mvc.WebSocket
 import play.api.i18n.Messages
+import play.api.templates.Html
 
 import models.TwitterManager
 import models.UserManager
@@ -29,7 +30,6 @@ object Application extends Controller {
     val userEventId = sessionInfo.userEventId.getOrElse(0)
 
     s"""{
-      "devMode" : ${Play.isDev},
       "debug" : ${debug},
       "userId" : ${userId},
       "username" : "${username}",
@@ -43,12 +43,15 @@ object Application extends Controller {
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
     val sessionInfo = sm.get(sessionId).copy(roomId=None, userEventId=None)
-    val tm = TemplateManager(sessionInfo)
     sm.set(sessionId, sessionInfo)
 
-    Ok(views.html.frame(sessionInfo.user, None, createParams(request, sessionInfo))(tm.getTemplate("home"))).withSession(
-      "sessionId" -> sessionId
-    )
+    val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
+    val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
+
+    Ok(views.html.frame(sessionInfo.user, None, createParams(request, sessionInfo), twitterUrl, debug)
+      (views.html.index(sessionInfo, twitterUrl))).withSession(
+        "sessionId" -> sessionId
+      )
   }
 
   def room(id: Int) = Action { implicit request =>
@@ -57,9 +60,11 @@ object Application extends Controller {
       val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
       //ToDo userEventId
       val sessionInfo = sm.get(sessionId).copy(roomId=Some(room.id))
-      val tm = TemplateManager(sessionInfo)
       sm.set(sessionId, sessionInfo)
-      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo))(tm.getTemplate("chat"))).withSession(
+      val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
+      val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
+
+      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo), twitterUrl, debug)(Html.empty)).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)
@@ -95,6 +100,15 @@ object Application extends Controller {
       val sm = SessionManager
       session.get("sessionId").foreach(sm.remove(_))
       Redirect("/")
+  }
+
+  def clearAllSessions = Action {
+    if (Play.isDev) {
+        SessionManager.clearAll
+        Ok("OK")
+      } else {
+        Ok("Can not clear all sessions in prod mode")
+      }
   }
 
 }

@@ -10,7 +10,7 @@ class SessionManager(redis: RedisService) {
   private def key(sessionId: String) = "session-" + sessionId
 
   def get(sessionId: String)(implicit lang: Lang): SessionInfo = {
-    redis.get(key(sessionId)).map(SessionInfo.fromJson(_)).getOrElse(SessionInfo.create(sessionId, lang.language))
+    redis.get(key(sessionId)).map(SessionInfo.fromJson(_)).getOrElse(SessionInfo(sessionId, lang.language))
   }
 
   def set(sessionId: String, info: SessionInfo) = {
@@ -19,6 +19,14 @@ class SessionManager(redis: RedisService) {
 
   def remove(sessionId: String) = {
     redis.del(key(sessionId))
+  }
+
+  def clearAll = {
+    val keys = redis.keys("session-*")
+    println(keys)
+    keys.getOrElse(Nil).foreach {
+      _.foreach(redis.del(_))
+    }
   }
 }
 

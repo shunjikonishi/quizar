@@ -1,7 +1,11 @@
-@(sessionInfo: SessionInfo)(implicit lang: Lang)
+@(userInfo: Option[UserInfo], twitterUrl: String)(implicit lang: Lang)
 <div id="chat">
 	<h1>@Messages("chat")</h1>
-	@sessionInfo.user.map { u =>
+	<div>
+		<p class="pull-right">@Html(Messages("html.roomMember"))</p>
+		<div class="clearfix"></div>
+	</div>
+	@userInfo.map { u =>
 		<div>
 			<form role="form">
 				<div class="form-group">
@@ -10,14 +14,22 @@
 				<div id="chat-text-len">140</div>
 				<div class="checkbox">
 					<label>
-						<input id="chat-twitter" type="checkbox"> @Messages("postTwitter")
+						<input id="chat-twitter" type="checkbox" checked="checked"> @Messages("postTwitter")
 					</label>
 				</div>
 			</form>
 			<button id="btn-tweet" type="button" class="btn btn-default">@Messages("tweet")</button>
 		</div>
-		<hr>
+	}.getOrElse {
+		<div>
+			<p>@Messages("loginRequiredToChat")</p>
+			<a class="btn btn-twitter" href="@twitterUrl">
+				<i class="fa fa-twitter fa-2x"></i>
+				@Messages("loginWithTwitter")
+			</a>
+		</div>
 	}
+	<hr>
 	<table class="table table-striped">
 		<tbody>
 		</tbody>

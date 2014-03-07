@@ -1,4 +1,4 @@
-@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], json: String)(content: Html)(implicit lang: Lang)
+@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], json: String, twitterUrl: String, debug: Boolean)(content: Html)(implicit lang: Lang)
 
 @main(Messages("application.title")) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/ext/sidr/stylesheets/jquery.sidr.light.css")">
@@ -26,7 +26,7 @@
 				<span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu" role="menu">
-				<li><a href="@TwitterManager.authorizationUrl"><i class="fa fa-twitter"></i> Twitter</a></li>
+				<li><a href="@twitterUrl"><i class="fa fa-twitter"></i> Twitter</a></li>
 @*
 				<li><a href="#"><i class="fa fa-facebook"></i> Facebook</a></li>
 *@
@@ -55,6 +55,12 @@
 	<div id="content-dynamic">
 		@content
 	</div>
+	@roomInfo.map { room =>
+		@views.html.chat(userInfo, twitterUrl)
+	}
+	@if(debug) {
+		@views.html.debug()
+	}
 </div>
 <div id="sidr" style="display:none;">
 	<ul>
@@ -78,13 +84,14 @@
 					<ul>
 						<li><a href="#edit-room" class="dynamic">@Messages("editRoom")</a></li>
 						<li><a href="#event" class="dynamic">@Messages("editEvent")</a></li>
-						<li><a href="#make-question" class="dynamic">@Messages("makeQuestion")</a></li>
-						<li><a href="#publish-question" class="dynamic">@Messages("publishQuestion")</a></li>
+						<li><a href="#make-question" class="dynamic">@Messages("editQuestion")</a></li>
 					</ul>
 				</li>
 			}
 		}
-		<li id="btn-debug" style="display:none;"><a href="#debug"><i class="fa fa-bug"></i> @Messages("debug")</a></li>
+		@if(debug) {
+			<li><a href="#debug" id="btn-debug"><i class="fa fa-bug"></i> @Messages("debug")</a></li>
+		}
 		<li><a href="#help"><i class="fa fa-question-circle" class="dynamic"></i> @Messages("help")</a></li>
 	</ul>
 </div>

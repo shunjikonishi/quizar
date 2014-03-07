@@ -3,6 +3,7 @@ package models
 import twitter4j.TwitterFactory
 import twitter4j.Twitter
 import twitter4j.auth.RequestToken
+import twitter4j.auth.AccessToken
 
 class TwitterManager(apiKey: String, secret: String) {
 
@@ -23,6 +24,13 @@ class TwitterManager(apiKey: String, secret: String) {
     val twitter = createTwitter
     val requestToken = new RequestToken(token, secret)
     val accessToken = twitter.getOAuthAccessToken(requestToken, verifier)
+    twitter
+  }
+
+  def fromAccessToken(token: String, secret: String): Twitter = {
+    val twitter = createTwitter
+    val accessToken = new AccessToken(token, secret)
+    twitter.setOAuthAccessToken(accessToken)
     twitter
   }
 }

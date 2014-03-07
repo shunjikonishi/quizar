@@ -1,8 +1,12 @@
 package models
 
 import play.api.libs.json.JsNull
-import models.entities.QuizRoom
+import play.api.libs.iteratee.Iteratee
+import play.api.libs.iteratee.Enumerator
+import scala.concurrent.Future
 import org.joda.time.DateTime
+
+import models.entities.QuizRoom
 
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -10,14 +14,17 @@ import flect.websocket.CommandResponse
 import flect.redis.Room
 import flect.redis.RedisService
 
-class RoomManager(redis: RedisService) extends flect.redis.RoomManager[Room](redis) {
+class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom](redis) {
 
-  override protected def createRoom(name: String) = new Room(name, redis)
   override protected def terminate() = {
     super.terminate()
     redis.close
   }
   
+  override protected def createRoom(name: String) = new RedisRoom(name.substring(5).toInt, redis)
+  def getRoom(id: Int): RedisRoom = getRoom("room." + id)
+  def join(id: Int): Future[(Iteratee[String,_], Enumerator[String])] = join("room." + id)
+
   def getRoomInfo(id: Int): Option[RoomInfo] = {
     QuizRoom.find(id).map(RoomInfo.create(_))
   }

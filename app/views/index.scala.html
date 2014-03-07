@@ -1,11 +1,11 @@
-@(sessionInfo: SessionInfo)(implicit lang: Lang)
+@(sessionInfo: SessionInfo, twitterUrl: String)(implicit lang: Lang)
 <div class="app-home" id="home">
 	<div>
 		@if(sessionInfo.user.isEmpty) {
 			<div>
-				<a class="btn btn-twitter" href="@TwitterManager.authorizationUrl">
+				<a class="btn btn-twitter" href="@twitterUrl">
 					<i class="fa fa-twitter fa-2x"></i>
-					Twitterでログイン
+					@Messages("loginWithTwitter")
 				</a>
 @*
 				<button class="btn btn-facebook" style="margin-left:10px;">

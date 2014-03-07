@@ -1,9 +1,22 @@
-@(sessionInfo: SessionInfo)(implicit lang: Lang)
+@()(implicit lang: Lang)
 <div id="debug" style="display:none;">
 	<h1>Debugger</h1>
 	<h2>Change protocol(Use ajax)</h2>
 	<div>
 		<input type="checkbox" id="chk-use-ajax"/>
+	</div>
+	<h2>MessageTest</h2>
+	<div>
+		<div>
+			<p>Message</p>
+			<textarea id="debug-msg">Test</textarea>
+		</div>
+		<div>
+			<p>Second</p>
+			<input id="debug-msg-sec" value="3">
+		</div>
+		<br>
+		<button class="button" id ="btn-debug-msg">Show</button>
 	</div>
 	<h2>Logs</h2>
 	<table class="table">

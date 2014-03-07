@@ -12,11 +12,11 @@ class TemplateManager(session: SessionInfo) extends CommandHandler {
 
   def getTemplate(name: String): Html = {
     name match {
-      case "home" => views.html.index(session)
+      case "home" => 
+        val twitterUrl = session.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
+        views.html.index(session, twitterUrl)
       case "make-room" => views.html.makeRoom(session)
-      case "chat" => views.html.chat(session)
       case "event" => views.html.event(session)
-      case "debug" => views.html.debug(session)
       case _ => Html("NotFound")
     }
   }

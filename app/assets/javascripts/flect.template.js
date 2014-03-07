@@ -35,7 +35,7 @@ $(function() {
 		function loadTemplate(name, success) {
 			con.request({
 				"command" : "template",
-				"log" : "name=" + name,
+				"log" : name,
 				"data" : {
 					"name" : name
 				},
