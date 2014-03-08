@@ -15,3 +15,5 @@ dist
 /.settings
 *.sublime-*
 properties.bat
+env.sh
+
