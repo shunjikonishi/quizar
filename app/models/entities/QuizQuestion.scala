@@ -14,6 +14,9 @@ case class QuizQuestion(
   tags: Option[String] = None, 
   description: Option[String] = None, 
   relatedUrl: Option[String] = None, 
+  publishCount: Int, 
+  correctCount: Int, 
+  wrongCount: Int, 
   created: DateTime, 
   updated: DateTime) {
 
@@ -28,7 +31,7 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
 
   override val tableName = "quiz_question"
 
-  override val columns = Seq("id", "room_id", "created_by", "question", "answers", "answer_type", "tags", "description", "related_url", "created", "updated")
+  override val columns = Seq("id", "room_id", "created_by", "question", "answers", "answer_type", "tags", "description", "related_url", "publish_count", "correct_count", "wrong_count", "created", "updated")
 
   def apply(qq: ResultName[QuizQuestion])(rs: WrappedResultSet): QuizQuestion = new QuizQuestion(
     id = rs.int(qq.id),
@@ -40,6 +43,9 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
     tags = rs.stringOpt(qq.tags),
     description = rs.stringOpt(qq.description),
     relatedUrl = rs.stringOpt(qq.relatedUrl),
+    publishCount = rs.int(qq.publishCount),
+    correctCount = rs.int(qq.correctCount),
+    wrongCount = rs.int(qq.wrongCount),
     created = rs.timestamp(qq.created).toDateTime,
     updated = rs.timestamp(qq.updated).toDateTime
   )
@@ -83,6 +89,9 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
     tags: Option[String] = None,
     description: Option[String] = None,
     relatedUrl: Option[String] = None,
+    publishCount: Int,
+    correctCount: Int,
+    wrongCount: Int,
     created: DateTime,
     updated: DateTime)(implicit session: DBSession = autoSession): QuizQuestion = {
     val generatedKey = withSQL {
@@ -95,6 +104,9 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
         column.tags,
         column.description,
         column.relatedUrl,
+        column.publishCount,
+        column.correctCount,
+        column.wrongCount,
         column.created,
         column.updated
       ).values(
@@ -106,6 +118,9 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
         tags,
         description,
         relatedUrl,
+        publishCount,
+        correctCount,
+        wrongCount,
         created,
         updated
       )
@@ -121,6 +136,9 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
       tags = tags,
       description = description,
       relatedUrl = relatedUrl,
+      publishCount = publishCount,
+      correctCount = correctCount,
+      wrongCount = wrongCount,
       created = created,
       updated = updated)
   }
@@ -137,6 +155,9 @@ object QuizQuestion extends SQLSyntaxSupport[QuizQuestion] {
         column.tags -> entity.tags,
         column.description -> entity.description,
         column.relatedUrl -> entity.relatedUrl,
+        column.publishCount -> entity.publishCount,
+        column.correctCount -> entity.correctCount,
+        column.wrongCount -> entity.wrongCount,
         column.created -> entity.created,
         column.updated -> entity.updated
       ).where.eq(column.id, entity.id)
