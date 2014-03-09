@@ -14,6 +14,7 @@ import models.UserManager
 import models.SessionManager
 import models.SessionInfo
 import models.RoomManager
+import models.RoomInfo
 import models.QuizRoomEngine
 import models.TemplateManager
 import flect.websocket.CommandInvoker
@@ -22,11 +23,12 @@ import java.util.UUID
 
 object Application extends Controller {
 
-  private def createParams(request: RequestHeader, sessionInfo: SessionInfo) = {
+  private def createParams(request: RequestHeader, sessionInfo: SessionInfo, roomInfo: Option[RoomInfo] = None) = {
     val wsUri = routes.Application.ws().webSocketURL()(request)
     val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
     val (userId, username) = sessionInfo.user.map(u => (u.id, u.name)).getOrElse((0, ""))
     val roomId = sessionInfo.roomId.getOrElse(0)
+    val roomAdmin = roomInfo.map(_.isAdmin(userId)).getOrElse(false)
     val userEventId = sessionInfo.userEventId.getOrElse(0)
 
     s"""{
@@ -34,6 +36,7 @@ object Application extends Controller {
       "userId" : ${userId},
       "username" : "${username}",
       "roomId" : ${roomId},
+      "roomAdmin" : ${roomAdmin},
       "userEventId" : ${userEventId},
       "uri" : "${wsUri}"
     }"""
@@ -64,7 +67,7 @@ object Application extends Controller {
       val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
       val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
 
-      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo), twitterUrl, debug)(Html.empty)).withSession(
+      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo, Some(room)), twitterUrl, debug)(Html.empty)).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)

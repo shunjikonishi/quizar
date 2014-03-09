@@ -18,9 +18,11 @@ class QuestionManager(roomId: Int) {
     withSQL {
       select(sqls"""
         count(*),
-        SUM(
-          CASE WHEN PUBLISH_COUNT = 0 THEN 0,
-          ELSE 1 END
+        COALESCE(
+          SUM(
+            CASE WHEN PUBLISH_COUNT = 0 THEN 0
+            ELSE 1 END
+          ), 0
         )""").from(QuizQuestion as qq)
     }.map(rs => (rs.int(1), rs.int(2))).single.apply().get
   }
@@ -37,6 +39,10 @@ class QuestionManager(roomId: Int) {
         .and.append(cond)
         .orderBy(qq.id).desc.limit(limit).offset(offset)
     }.map(rs => QuizQuestion(qq.resultName)(rs)).list.apply.map(QuestionInfo.create(_))
+  }
+
+  def get(id: Int): Option[QuestionInfo] = {
+    QuizQuestion.find(id).map(QuestionInfo.create)
   }
 
   def create(q: QuestionInfo): QuestionInfo = {
@@ -83,10 +89,17 @@ class QuestionManager(roomId: Int) {
   def updateAnswers(id: Int, correct: Int, wrong: Int) = {
 
   }
-  
+
+  /*  
   val createCommand = CommandHandler { command =>
     val q = create(QuestionInfo.fromJson(command.data))
     command.json(q.toJson)
+  }
+  */
+
+  val updateCommand = CommandHandler { command =>
+    val ret = update(QuestionInfo.fromJson(command.data))
+    command.text(ret.toString)
   }
 
   val listCommand = CommandHandler { command =>
@@ -104,4 +117,8 @@ class QuestionManager(roomId: Int) {
       "published" -> JsNumber(published)
     )))
   }
+}
+
+object QuestionManager {
+  def apply(roomId: Int) = new QuestionManager(roomId)
 }

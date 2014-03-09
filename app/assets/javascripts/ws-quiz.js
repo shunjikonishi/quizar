@@ -209,6 +209,22 @@ $(function() {
 			"edit" : function(id) { roomId = id;}
 		})
 	}
+	function QuestionList(userId, con) {
+		function init($el) {
+			con.request({
+				"command" : "countQuestion",
+				"success" : function(data) {
+					var count = data.count,
+						published = data.published;
+					$("#question-stock-count").text(count - published);
+					$("#question-published-count").text(published);
+				}
+			})
+		}
+		$.extend(this, {
+			"init" : init
+		})
+	}
 	function DebuggerWrapper() {
 		var impl = null;
 		function log(type, value, time) {
@@ -321,6 +337,9 @@ $(function() {
 					}
 				})
 			}
+			if (params.roomAdmin) {
+				questionList = new QuestionList(params.userId, con)
+			}
 
 			$("#btn-menu").sidr({
 				"onOpen" : function() {
@@ -380,6 +399,13 @@ $(function() {
 					}
 				}
 			};
+			if (params.roomAdmin) {
+				$.extend(TemplateLogic, {
+					"edit-question" : {
+						"beforeShow" : questionList.init
+					}
+				})
+			}
 		}
 		var debug,
 			msgDialog,
@@ -387,6 +413,7 @@ $(function() {
 			makeRoom,
 			templateManager,
 			chat,
+			questionList,
 			$content;
 		init();
 	}

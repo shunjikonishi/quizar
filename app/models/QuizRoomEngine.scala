@@ -17,15 +17,26 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
   private val room: Option[RedisRoom] = {
     session.roomId.map { roomId =>
       Await.result(rm.join(roomId), Duration.Inf)
-      val ret = rm.getRoom(roomId)
+      val room = rm.getRoom(roomId)
       val i = Iteratee.foreach[CommandResponse] { res =>
         filterRedisMessage(res).foreach(s => channel.push(s.toString))
       }
-      ret.commandOut(i)
+      room.commandOut(i)
 
-      addHandler("member", ret.memberCommand)
-      ret.incMember
-      ret
+      val qm = QuestionManager(roomId)
+      addHandler("listQuestion", qm.listCommand)
+      addHandler("countQuestion", qm.countCommand)
+      addHandler("updateQuestion", qm.updateCommand)
+      addHandler("createQuestion") { command =>
+        val q = qm.create(QuestionInfo.fromJson(command.data))
+        val res = command.json(q.toJson)
+        room.channel.send(res.toString)
+        None
+      }
+
+      addHandler("member", room.memberCommand)
+      room.incMember
+      room
     }
   }
 

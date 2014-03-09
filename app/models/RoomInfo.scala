@@ -15,8 +15,8 @@ case class RoomInfo(
     adminUsers: Option[String]
   ) {
 
-  def isAdmin(user: UserInfo) = {
-    user.id == owner || adminUserList.exists(_ == user.id)
+  def isAdmin(userId: Int) = {
+    userId == owner || adminUserList.exists(_ == userId)
   }
 
   def adminUserList: List[Int] = {

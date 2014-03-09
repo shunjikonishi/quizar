@@ -74,12 +74,12 @@
 					<li><a href="#question" class="dynamic">@Messages("questions")</a></li>
 					<li><a href="#ranking" class="dynamic">@Messages("ranking")</a></li>
 					<li><a href="#chat" class="menu-chat">@Messages("chat")</a></li>
-					@userInfo.filter(room.userQuiz && !room.isAdmin(_)).map { user =>
+					@userInfo.filter(u => room.userQuiz && !room.isAdmin(u.id)).map { user =>
 						<li><a href="#post-question" class="dynamic">@Messages("postQuestion")</a></li>
 					}
 				</ul>
 			</li>
-			@userInfo.filter(room.isAdmin(_)).map { user =>
+			@userInfo.filter(u => room.isAdmin(u.id)).map { user =>
 				<li>@Messages("manageRoom")
 					<ul>
 						<li><a href="#edit-room" class="dynamic">@Messages("editRoom")</a></li>
