@@ -5,8 +5,10 @@ import models.entities.User
 
 case class UserInfo(id: Int, name: String, imageUrl: String) {
   def toJson = {
-    Json.toJson(this)(UserInfo.format).toString
+    Json.toJson(this)(UserInfo.format)
   } 
+
+  override def toString = toJson.toString
 }
 
 object UserInfo {

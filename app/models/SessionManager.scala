@@ -14,7 +14,7 @@ class SessionManager(redis: RedisService) {
   }
 
   def set(sessionId: String, info: SessionInfo) = {
-    redis.setex(key(sessionId), SEC_DAY, info.toJson)
+    redis.setex(key(sessionId), SEC_DAY, info.toString)
   }
 
   def remove(sessionId: String) = {

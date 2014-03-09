@@ -16,8 +16,10 @@ case class SessionInfo(id: String, lang: String, user: Option[UserInfo] = None,
     copy(user=Some(UserInfo.create(user)), twitterInfo=Option(accessToken).map(new TokenInfo(_)))
   }
   def toJson = {
-    Json.toJson(this)(SessionInfo.format).toString
+    Json.toJson(this)(SessionInfo.format)
   } 
+
+  override def toString = toJson.toString
 }
 
 object SessionInfo {

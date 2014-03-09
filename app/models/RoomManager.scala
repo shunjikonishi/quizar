@@ -62,7 +62,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
 
   val createCommand = CommandHandler { command =>
     val room = create(RoomInfo.fromJson(command.data))
-    command.json(room.toJsObject)
+    command.json(room.toJson)
   }
 
   val updateCommand = CommandHandler { command =>
@@ -73,7 +73,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   val getCommand = CommandHandler { command =>
     val id = (command.data \ "id").as[Int]
     val room = getRoomInfo(id)
-    val data = room.map(_.toJsObject).getOrElse(JsNull)
+    val data = room.map(_.toJson).getOrElse(JsNull)
     command.json(data)
   }
 }

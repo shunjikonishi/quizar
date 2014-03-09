@@ -24,13 +24,11 @@ case class RoomInfo(
     list.map(_.toInt)
   }
 
-  def toJsObject = {
+  def toJson = {
     Json.toJson(this)(RoomInfo.format)
   }
 
-  def toJson = {
-    Json.toJson(this)(RoomInfo.format).toString
-  } 
+  override def toString = toJson.toString
 }
 
 object RoomInfo {

@@ -6,71 +6,8 @@ import scalikejdbc.SQLInterpolation._
 import org.joda.time.DateTime
 
 import models.entities.QuizQuestion
-
-case class QuestionInfo(
-  id: Int, 
-  roomId: Int, 
-  createdBy: Int, 
-  question: String, 
-  answers: String, 
-  answerType: Int, 
-  tags: Option[String] = None, 
-  description: Option[String] = None, 
-  relatedUrl: Option[String] = None,
-  publishCount: Int, 
-  correctCount: Int, 
-  wrongCount: Int) {
-
-  def toSimpleJson = {
-    JsObject(Seq(
-      "id" -> JsNumber(id),
-      "createdBy" -> JsNumber(createdBy),
-      "question" -> JsString(question),
-      "correctCount" -> JsNumber(correctCount)
-    )).toString
-  }
-
-  def toJsObject = {
-    Json.toJson(this)(QuestionInfo.format)
-  }
-
-  def toJson = {
-    Json.toJson(this)(QuestionInfo.format).toString
-  } 
-}
-
-object QuestionInfo {
-  implicit val format = Json.format[QuestionInfo]
-
-  def create(q: QuizQuestion) = QuestionInfo(
-    id=q.id,
-    roomId=q.roomId,
-    createdBy=q.createdBy,
-    question=q.question,
-    answers=q.answers,
-    answerType=q.answerType,
-    tags=q.tags,
-    description=q.description,
-    relatedUrl=q.relatedUrl,
-    publishCount=q.publishCount,
-    correctCount=q.correctCount,
-    wrongCount=q.wrongCount
-  )
-
-  def fromJson(json: JsValue): QuestionInfo = {
-    json match {
-      case x: JsObject =>
-        val zero = JsObject(Seq(
-          "publishCount" -> JsNumber(0),
-          "correctCount" -> JsNumber(0),
-          "wrongCount" -> JsNumber(0)
-          ))
-        Json.fromJson[QuestionInfo](zero ++ x).get
-      case _ => throw new IllegalArgumentException()
-    }
-  }
-  def fromJson(str: String): QuestionInfo = fromJson(Json.parse(str))
-}
+import flect.websocket.Command
+import flect.websocket.CommandHandler
 
 class QuestionManager(roomId: Int) {
 
@@ -147,4 +84,24 @@ class QuestionManager(roomId: Int) {
 
   }
   
+  val createCommand = CommandHandler { command =>
+    val q = create(QuestionInfo.fromJson(command.data))
+    command.json(q.toJson)
+  }
+
+  val listCommand = CommandHandler { command =>
+    val published = (command.data \ "published").as[Boolean]
+    val offset = (command.data \ "offset").as[Int]
+    val limit = (command.data \ "limit").as[Int]
+    val data = list(published, offset, limit).map(_.toJson)
+    command.json(JsArray(data))
+  }
+
+  val countCommand = CommandHandler { command =>
+    val (count, published) = countAndPublished
+    command.json(JsObject(Seq(
+      "count" -> JsNumber(count),
+      "published" -> JsNumber(published)
+    )))
+  }
 }
