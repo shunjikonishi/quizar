@@ -19,7 +19,6 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       Await.result(rm.join(roomId), Duration.Inf)
       val ret = rm.getRoom(roomId)
       val i = Iteratee.foreach[CommandResponse] { res =>
-println("test1: " + res)
         filterRedisMessage(res).foreach(s => channel.push(s.toString))
       }
       ret.commandOut(i)

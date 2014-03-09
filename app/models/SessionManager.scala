@@ -23,7 +23,6 @@ class SessionManager(redis: RedisService) {
 
   def clearAll = {
     val keys = redis.keys("session-*")
-    println(keys)
     keys.getOrElse(Nil).foreach {
       _.foreach(redis.del(_))
     }
