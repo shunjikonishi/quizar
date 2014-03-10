@@ -57,6 +57,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
     addHandler("makeRoom", RoomManager.createCommand)
     addHandler("updateRoom", RoomManager.updateCommand)
     addHandler("getRoom", RoomManager.getCommand)
+    addHandler("userImage", UserManager.userImageCommand)
     addHandler("tweet") { c =>
       room.foreach { room =>
         val userId = (c.data \ "userId").as[Int]

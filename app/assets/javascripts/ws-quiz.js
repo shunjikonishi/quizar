@@ -229,19 +229,71 @@ $(function() {
 			"edit" : function(id) { roomId = id;}
 		})
 	}
-	function QuestionList(userId, con) {
+	function QuestionList(userId, userImage, con, templateManager) {
+		function appendTr($tbody, q) {
+			var $tr = $("<tr><td class='question-creator'><img src='/assets/images/twitter_default_profile.png'/></td>" +
+				"<td class='question-text'></td></tr>"),
+				$img = $tr.find("img");
+
+			$tr.find(".question-text").text(q.question);
+			if (images[q.createdBy]) {
+				$img.attr("src", images[q.createdBy]);
+			} else {
+				$img.attr("data-userId", q.createdBy);
+				con.request({
+					"command" : "userImage",
+					"data" : q.createdBy,
+					"success" : function(data) {
+						if (data.url) {
+							images[data.id] = data.url;
+							$el.find("[data-userId=" + data.id + "]").attr("src", data.url).removeAttr("data-userId");
+						}
+					}
+				})
+			}
+			$tbody.append($tr);
+		}
+		function loadData(published, offset, limit) {
+			var $tbody = published ? $publishedBody : $stockBody;
+			con.request({
+				"command" : "listQuestion",
+				"data" : {
+					"published" : published,
+					"offset" : offset,
+					"limit" : limit
+				},
+				"success" : function(data) {
+					$tbody.empty();
+					for (var i=0; i<data.length; i++) {
+						appendTr($tbody, data[i]);
+					}
+				}
+			});
+		}
 		function init($el) {
 			$el.find(".tab-content").tabs();
 			con.request({
 				"command" : "countQuestion",
 				"success" : function(data) {
-					var count = data.count,
-						published = data.published;
-					$("#question-stock-count").text(count - published);
-					$("#question-published-count").text(published);
+					publishCount = data.published;
+					stockCount = data.count - publishCount;
+					$("#question-stock-count").text(stockCount);
+					$("#question-published-count").text(publishCount);
 				}
+			});
+			loadData(false, 0, 0);
+			loadData(true, 0, 0);
+			$("#edit-question-new").click(function() {
+				templateManager.show("make-question");
 			})
 		}
+		var stockCount = -1,
+			publishCount = -1,
+			$stockBody = $("#edit-question-stock").find("table tbody"),
+			$publishedBody = $("#edit-question-published").find("table tbody"),
+			images = {};
+		images[userId] = userImage;
+
 		$.extend(this, {
 			"init" : init
 		})
@@ -363,7 +415,7 @@ $(function() {
 				home.init($("#home"), false);
 			}
 			if (params.roomAdmin) {
-				questionList = new QuestionList(params.userId, con)
+				questionList = new QuestionList(params.userId, params.userImage, con, templateManager)
 			}
 
 			$("#btn-menu").sidr({

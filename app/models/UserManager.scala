@@ -1,5 +1,6 @@
 package models
 
+import play.api.libs.json._
 import scalikejdbc.DBSession
 import scalikejdbc.AutoSession
 import scalikejdbc.SQLInterpolation.withSQL
@@ -7,6 +8,8 @@ import scalikejdbc.SQLInterpolation.select
 import twitter4j.{User => TwitterUser}
 import org.joda.time.{DateTime}
 import models.entities.User
+
+import flect.websocket.CommandHandler
 
 class UserManager {
 
@@ -42,6 +45,16 @@ class UserManager {
         updated = now
       )
     }
+  }
+
+  def getUserImageUrl(id: Int) = User.find(id).map(_.imageUrl)
+
+  val userImageCommand = CommandHandler { command =>
+    val id = command.data.as[Int]
+    getUserImageUrl(id).map(url => command.json(JsObject(Seq(
+      "id" -> JsNumber(id),
+      "url" -> JsString(url))))
+    ).getOrElse(command.error("Unknown user: " + id))
   }
 }
 

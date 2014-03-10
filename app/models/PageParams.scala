@@ -8,11 +8,19 @@ case class PageParams(
   debug: Boolean,
   userId: Option[Int] = None,
   username: Option[String] = None,
+  userImage: Option[String] = None,
   roomId: Option[Int] = None,
   roomAdmin: Option[Boolean] = None,
   hashtag: Option[String] = None,
   userEventId: Option[Int] = None
 ) {
+  def withUser(user: UserInfo): PageParams= {
+    copy(
+      userId=Some(user.id),
+      username=Some(user.name),
+      userImage=Some(user.imageUrl)
+    )
+  }
   def withRoom(room: RoomInfo): PageParams = {
     copy(
       roomId=Some(room.id),
@@ -36,14 +44,12 @@ object PageParams {
   def create(request: RequestHeader, session: SessionInfo) = {
     val uri = controllers.routes.Application.ws().webSocketURL()(request)
     val debug = request.getQueryString("debug").map(_ == "true").getOrElse(true)
-    val (userId, username) = session.user.map(u => (Some(u.id), Some(u.name))).getOrElse((None, None))
     val userEventId = session.userEventId
-    PageParams(
+    val ret = PageParams(
       uri=uri,
       debug=debug,
-      userId=userId,
-      username=username,
       userEventId=userEventId
     )
+    session.user.map(ret.withUser(_)).getOrElse(ret)
   }
 }

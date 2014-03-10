@@ -1,0 +1,33 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="make-question" class="workspace">
+	<h1>@Messages("ui.makeQuestion")</h1>
+	<div>
+		<form role="form">
+			<div class="form-group">
+				<label>@Messages("question")</label>
+				<textarea rows="3" class="form-control"></textarea>
+			</div>
+			<div class="form-group">
+				<label>@Messages("choices")</label>
+				<textarea rows="5" class="form-control"></textarea>
+			</div>
+			<p>@Messages("choicesNote")</p>
+			<div class="form-group">
+				<label>@Messages("correctChoice")</label>
+				<select class="form-control">
+					<option>@Messages("firstRow")</option>
+					<option>@Messages("mostFrequentAnswer")</option>
+					<option>@Messages("lessFrequentAnswer")</option>
+					<option>@Messages("noCorrectAnswer")</option>
+				</select>
+			</div>
+			<div id="make-question-edit">
+				<button type="button" class="btn btn-default">@Messages("ui.create")</button>
+			</div>
+			<div id="make-question-publish" style="display:none;">
+				<h2>@Messages("publish")</h2>
+				<button id="btn-publish-question" type="button" class="btn btn-primary">@Messages("publish")</button>
+			</div>
+		</form>
+	</div>
+</div>

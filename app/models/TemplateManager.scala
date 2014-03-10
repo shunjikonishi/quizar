@@ -18,6 +18,7 @@ class TemplateManager(session: SessionInfo) extends CommandHandler {
       case "make-room" => views.html.makeRoom(session)
       case "event" => views.html.event(session)
       case "edit-question" => views.html.question(session)
+      case "make-question" => views.html.makeQuestion(session)
       case _ => Html("NotFound")
     }
   }
