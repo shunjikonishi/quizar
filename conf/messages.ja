@@ -18,6 +18,7 @@ loginWithTwitter=Twitterでログイン
 makeRoom=ルームの作成
 manageRoom=ルーム管理
 new=作成
+noQuestions=問題はまだありません
 postQuestion=問題の投稿
 postTwitter=Twitterにも投稿
 published=出題済み

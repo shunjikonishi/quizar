@@ -17,41 +17,22 @@ import models.RoomManager
 import models.RoomInfo
 import models.QuizRoomEngine
 import models.TemplateManager
+import models.PageParams
 import flect.websocket.CommandInvoker
 
 import java.util.UUID
 
 object Application extends Controller {
 
-  private def createParams(request: RequestHeader, sessionInfo: SessionInfo, roomInfo: Option[RoomInfo] = None) = {
-    val wsUri = routes.Application.ws().webSocketURL()(request)
-    val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
-    val (userId, username) = sessionInfo.user.map(u => (u.id, u.name)).getOrElse((0, ""))
-    val roomId = sessionInfo.roomId.getOrElse(0)
-    val roomAdmin = roomInfo.map(_.isAdmin(userId)).getOrElse(false)
-    val userEventId = sessionInfo.userEventId.getOrElse(0)
-
-    s"""{
-      "debug" : ${debug},
-      "userId" : ${userId},
-      "username" : "${username}",
-      "roomId" : ${roomId},
-      "roomAdmin" : ${roomAdmin},
-      "userEventId" : ${userEventId},
-      "uri" : "${wsUri}"
-    }"""
-  }
-
   def index() = Action { implicit request =>
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
     val sessionInfo = sm.get(sessionId).copy(roomId=None, userEventId=None)
     sm.set(sessionId, sessionInfo)
-
-    val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
     val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
+    val params = PageParams.create(request, sessionInfo)
 
-    Ok(views.html.frame(sessionInfo.user, None, createParams(request, sessionInfo), twitterUrl, debug)
+    Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)
       (views.html.index(sessionInfo, twitterUrl))).withSession(
         "sessionId" -> sessionId
       )
@@ -64,10 +45,10 @@ object Application extends Controller {
       //ToDo userEventId
       val sessionInfo = sm.get(sessionId).copy(roomId=Some(room.id))
       sm.set(sessionId, sessionInfo)
-      val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
       val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
+      val params = PageParams.create(request, sessionInfo).withRoom(room)
 
-      Ok(views.html.frame(sessionInfo.user, Some(room), createParams(request, sessionInfo, Some(room)), twitterUrl, debug)(Html.empty)).withSession(
+      Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)(Html.empty)).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)

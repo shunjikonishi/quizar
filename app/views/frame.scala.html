@@ -1,4 +1,4 @@
-@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], json: String, twitterUrl: String, debug: Boolean)(content: Html)(implicit lang: Lang)
+@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], params: PageParams, twitterUrl: String)(content: Html)(implicit lang: Lang)
 
 @main(Messages("application.title")) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/ext/sidr/stylesheets/jquery.sidr.light.css")">
@@ -58,7 +58,7 @@
 	@roomInfo.map { room =>
 		@views.html.chat(userInfo, twitterUrl)
 	}
-	@if(debug) {
+	@if(params.debug) {
 		@views.html.debug()
 	}
 </div>
@@ -89,7 +89,7 @@
 				</li>
 			}
 		}
-		@if(debug) {
+		@if(params.debug) {
 			<li><a href="#debug" id="btn-debug"><i class="fa fa-bug"></i> @Messages("debug")</a></li>
 		}
 		<li><a href="#help"><i class="fa fa-question-circle" class="dynamic"></i> @Messages("help")</a></li>
@@ -108,7 +108,7 @@
 <script>
 var app;
 $(function() {
-	var params = @Html(json);
+	var params = @Html(params.toString);
 	app = new flect.QuizApp(params);
 });
 </script>
