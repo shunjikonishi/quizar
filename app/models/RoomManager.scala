@@ -1,12 +1,15 @@
 package models
 
-import play.api.libs.json.JsNull
+import play.api.libs.json._
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.iteratee.Enumerator
 import scala.concurrent.Future
 import org.joda.time.DateTime
+import scalikejdbc._
+import scalikejdbc.SQLInterpolation._
 
 import models.entities.QuizRoom
+import models.entities.QuizEvent
 
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -21,6 +24,9 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     redis.close
   }
   
+  private val (qr, qe) = (QuizRoom.qr, QuizEvent.qe)
+  implicit val autoSession = AutoSession
+
   override protected def createRoom(name: String) = new RedisRoom(name.substring(5).toInt, redis)
   def getRoom(id: Int): RedisRoom = getRoom("room." + id)
   def join(id: Int): Future[(Iteratee[String,_], Enumerator[String])] = join("room." + id)
@@ -60,6 +66,21 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.getOrElse(false)
   }
 
+  def list(offset: Int, limit: Int): List[RoomInfo] = {
+    withSQL { 
+      select
+        .from(QuizRoom as qr)
+        .leftJoin(QuizEvent as qe).on(qr.id, qe.roomId)
+        .where.isNull(qe.status).or.in(qe.status, Seq("0", "1"))
+        .orderBy(sqls"COALESCE(qe.exec_date, qr.updated)").desc
+        .limit(limit).offset(offset)
+    }.map { rs =>
+      val room = RoomInfo.create(QuizRoom(qr.resultName)(rs))
+      val event = rs.intOpt(qe.resultName.roomId).map(_ => EventInfo.create(QuizEvent(qe.resultName)(rs)))
+      event.map(room.withEvent(_)).getOrElse(room)
+    }.list.apply
+  }
+
   val createCommand = CommandHandler { command =>
     val room = create(RoomInfo.fromJson(command.data))
     command.json(room.toJson)
@@ -75,6 +96,13 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     val room = getRoomInfo(id)
     val data = room.map(_.toJson).getOrElse(JsNull)
     command.json(data)
+  }
+
+  val listMethod = CommandHandler { command =>
+    val limit = (command.data \ "limit").as[Int]
+    val offset = (command.data \ "offset").as[Int]
+    val data = list(offset, limit).map(_.toJson)
+    command.json(JsArray(data))
   }
 }
 

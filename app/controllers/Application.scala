@@ -25,15 +25,18 @@ import java.util.UUID
 object Application extends Controller {
 
   def index() = Action { implicit request =>
+    val rm = RoomManager
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
     val sessionInfo = sm.get(sessionId).copy(roomId=None, userEventId=None)
     sm.set(sessionId, sessionInfo)
     val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
     val params = PageParams.create(request, sessionInfo)
+    val rooms = rm.list(0, 10)
+    println("rooms: " + rooms)
 
     Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)
-      (views.html.index(sessionInfo, twitterUrl))).withSession(
+      (views.html.index(sessionInfo, twitterUrl, rooms))).withSession(
         "sessionId" -> sessionId
       )
   }

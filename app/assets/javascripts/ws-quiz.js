@@ -377,6 +377,12 @@ $(function() {
 				});
 				return false;
 			})
+			$("#event-future tbody tr").click(function() {
+				var id = $(this).attr("data-room");
+				if (id) {
+					location.href = "/room/" + id;
+				}
+			})
 			var TemplateLogic = {
 				"make-room" : {
 					"beforeShow" : function($el) {

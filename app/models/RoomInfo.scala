@@ -12,7 +12,8 @@ case class RoomInfo(
     userQuiz: Boolean, 
     description: Option[String], 
     owner: Int,
-    adminUsers: Option[String]
+    adminUsers: Option[String],
+    event: Option[EventInfo] = None
   ) {
 
   def isAdmin(userId: Int) = {
@@ -23,6 +24,8 @@ case class RoomInfo(
     val list = adminUsers.map(_.split(",").toList).getOrElse(Nil)
     list.map(_.toInt)
   }
+
+  def withEvent(event: EventInfo) = copy(event=Some(event))
 
   def toJson = {
     Json.toJson(this)(RoomInfo.format)
@@ -47,11 +50,5 @@ object RoomInfo {
 
   def fromJson(json: JsValue) = Json.fromJson[RoomInfo](json).get
   def fromJson(str: String) = Json.fromJson[RoomInfo](Json.parse(str)).get
-}
-
-case class EventInfo(id: Int, name: String)
-
-object EventInfo {
-  implicit val format = Json.format[EventInfo]
 }
 
