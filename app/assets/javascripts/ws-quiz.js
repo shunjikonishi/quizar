@@ -3,6 +3,23 @@ if (typeof(flect) === "undefined") flect = {};
 $(function() {
 	var SUPPORTS_TOUCH = 'ontouchstart' in window;
 
+	function Home(con) {
+		function init($el, load) {
+			$("#event-future tbody tr, #event-yours tbody tr").click(function() {
+				var id = $(this).attr("data-room");
+				if (id) {
+					location.href = "/room/" + id;
+				}
+			});
+			$el.find(".tab-content").tabs();
+		}
+		function clear() {
+		}
+		$.extend(this, {
+			"init" : init,
+			"clear" : clear
+		})
+	}
 	function MessageDialog($el) {
 		function show(msg, second) {
 			second = second || 3;
@@ -183,12 +200,15 @@ $(function() {
 				},
 				"focusInvalid" : true
 			});
-			var $btnUpdate = $("#btn-make-room").click(update);
+			var $btnUpdate = $("#btn-make-room").click(update),
+				$h1 = $("#make-room-h1");
 			if (editRoom) {
 				$("#room-admin").show();
+				$h1.text(MSG.editRoom);
 				$btnUpdate.text(MSG.update);
 			} else {
 				$("#room-admin").hide();
+				$h1.text(MSG.makeRoom);
 				$btnUpdate.text(MSG.create);
 			}
 		}
@@ -211,6 +231,7 @@ $(function() {
 	}
 	function QuestionList(userId, con) {
 		function init($el) {
+			$el.find(".tab-content").tabs();
 			con.request({
 				"command" : "countQuestion",
 				"success" : function(data) {
@@ -308,6 +329,7 @@ $(function() {
 			debug = new DebuggerWrapper();
 			msgDialog = new MessageDialog($("#msg-dialog"));
 			con = new flect.Connection(params.uri, debug);
+			home = new Home(con);
 			makeRoom = new MakeRoom(params.userId, con, msgDialog);
 			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 			$content = $("#content");
@@ -336,6 +358,9 @@ $(function() {
 						})
 					}
 				})
+			}
+			if ($("#home").length) {
+				home.init($("#home"), false);
 			}
 			if (params.roomAdmin) {
 				questionList = new QuestionList(params.userId, con)
@@ -377,11 +402,9 @@ $(function() {
 				});
 				return false;
 			})
-			$("#event-future tbody tr").click(function() {
-				var id = $(this).attr("data-room");
-				if (id) {
-					location.href = "/room/" + id;
-				}
+			$(".dropdown-button").click(function() {
+				$(this).next("ul").toggle();
+				return false;
 			})
 			var TemplateLogic = {
 				"make-room" : {
@@ -416,6 +439,7 @@ $(function() {
 		var debug,
 			msgDialog,
 			con,
+			home,
 			makeRoom,
 			templateManager,
 			chat,

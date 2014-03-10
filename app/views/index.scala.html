@@ -1,5 +1,5 @@
-@(sessionInfo: SessionInfo, twitterUrl: String, rooms: List[RoomInfo] = Nil)(implicit lang: Lang)
-<div class="app-home" id="home">
+@(sessionInfo: SessionInfo, twitterUrl: String, rooms: List[RoomInfo] = Nil, yours: List[RoomInfo] = Nil)(implicit lang: Lang)
+<div id="home" class="workspace">
 	<div>
 		@if(sessionInfo.user.isEmpty) {
 			<div>
@@ -18,41 +18,48 @@
 	</div>
 	<div>
 		<h2>イベント</h2>
-		<ul class="nav nav-tabs">
-			<li class="active"><a href="#event-future" data-toggle="tab">近日開催</a></li>
-			<li><a href="#event-yours" data-toggle="tab">参加イベント</a></li>
-		</ul>
 		<div class="tab-content">
-			<div id="event-future" class="tab-pane active">
-				<table class="table table-hover">
+			<ul>
+				<li><a href="#event-future">@Messages("upcoming")</a></li>
+				<li><a href="#event-yours">@Messages("yourEvents")</a></li>
+			</ul>
+			<div id="event-future">
+				<table class="table-hover">
 					<thead>
 						<tr>
-							<th>日時</th>
-							<th>タイトル</th>
-							<th>定員</th>
+							<th class="event-date">@Messages("datetime")</th>
+							<th class="event-title">@Messages("title")</th>
+							<th class="event-capacity">@Messages("capacity")</th>
 						</tr>
 					</thead>
 					<tbody>
 						@rooms.map { room =>
 							<tr data-room="@room.id">
-								<td>@room.event.map(_.execDate.toString).getOrElse("未定")</td>
-								<td>@room.name @room.event.map("(" + _.title + ")")</td>
-								<td>@room.event.map(_.capacity + "名")</td>
+								<td class="event-date">@room.event.map(_.execDate.toString).getOrElse(Messages("undecided"))</td>
+								<td class="event-title">@room.name @room.event.map("(" + _.title + ")")</td>
+								<td class="event-capacity">@room.event.map(_.capacity + Messages("people"))</td>
 							</tr>
 						}
 					</tbody>
 				</table>
 			</div>
-			<div id="event-yours" class="tab-pane">
-				<table class="table table-hover">
+			<div id="event-yours">
+				<table class="table-hover">
 					<thead>
 						<tr>
-							<th>日時</th>
-							<th>タイトル</th>
-							<th>トップ</th>
+							<th class="event-date">@Messages("datetime")</th>
+							<th class="event-title">@Messages("title")</th>
+							<th class="event-capacity">@Messages("capacity")</th>
 						</tr>
 					</thead>
 					<tbody>
+						@yours.map { room =>
+							<tr data-room="@room.id">
+								<td class="event-date">@room.event.map(_.execDate.toString).getOrElse(Messages("undecided"))</td>
+								<td class="event-title">@room.name @room.event.map("(" + _.title + ")")</td>
+								<td class="event-capacity">@room.event.map(_.capacity + Messages("people"))</td>
+							</tr>
+						}
 					</tbody>
 				</table>
 			</div>

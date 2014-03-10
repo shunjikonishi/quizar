@@ -1,6 +1,9 @@
 .btn-facebook { background-color: #2980b9; color: #ffffff;}
 .btn-twitter { background-color: #55acee; color: #ffffff;}
 
+body {
+	margin: 0;
+}
 .toolbar {
 	position: fixed;
 	right: 0;
@@ -38,7 +41,20 @@
 	display: inline-block;
 }
 
-#content { padding-top: 60px;}
+.dropdown-menu {
+	display: none;
+	position: absolute;
+	right: 0;
+	list-style: none;
+}
+
+.dropdown-menu li {
+	margin: 10px 10px;
+	background-color: #f8f8f8;
+	z-index: 999;
+}
+
+#content { padding-top: 70px;}
 
 .error { color: red;}
 
@@ -105,4 +121,39 @@
 
 #chat-text-len {
 	font-style: italic;
+}
+
+.workspace {
+	margin: 5px auto;
+	width: 95%;
+}
+
+.clearfix {
+	clear:both;
+}
+
+th {
+	text-align: left;
+}
+
+.table-hover > tbody > tr:hover > td,
+.table-hover > tbody > tr:hover > th {
+  background-color: #f5f5f5;
+}
+
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+  background-color: #f9f9f9;
+}
+
+th.event-date, td.event-date { width: 60px;}
+th.event-title, td.event-title { width: 200px;}
+th.event-capacity, td.event-capacity { width: 40px;}
+
+.input-form label {
+	display: block;
+	margin-top: 10px;
+}
+.form-control {
+	width: 100%;
 }

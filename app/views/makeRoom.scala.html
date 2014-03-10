@@ -1,31 +1,40 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
-<div id="make-room">
-	<h1>@Messages("makeRoom")</h1>
-	<div>
-		<form role="form" id="make-room-form">
-			<div class="form-group">
-				<label for="room-name">@Messages("roomName")</label>
-				<input id="room-name" class="form-control"/>
-			</div>
-			<div class="form-group">
+<div id="make-room" class="workspace">
+	<h1 id="make-room-h1">@Messages("makeRoom")</h1>
+	<div class="input-form">
+		<div>
+			<label for="room-name">@Messages("roomName")</label>
+		</div>
+		<div>
+			<input id="room-name" class="form-control"/>
+		</div>
+		<div>
 				<label for="room-tags">@Messages("tags")</label>
+		</div>
+		<div>
 				<input id="room-tags" class="form-control"/>
-			</div>
-			<div class="form-group">
+		</div>
+		<div>
 				<label for="room-hashtag">@Messages("hashtag")</label>
+		</div>
+		<div>
 				<input id="room-hashtag" class="form-control"/>
-			</div>
-			<div class="checkbox">
-				<label>
-					<input id="room-userQuiz" type="checkbox"> @Messages("allowUserQuestion")
-				</label>
-			</div>
-			<div class="form-group">
+		</div>
+		<div>
+		<div class="checkbox">
+			<label>
+				<input id="room-userQuiz" type="checkbox"> @Messages("allowUserQuestion")
+			</label>
+		</div>
+		<div>
 				<label for="room-description">@Messages("description")</label>
-				<textarea id="room-description" class="form-control"></textarea>
-			</div>
+		</div>
+		<div>
+				<textarea id="room-description" rows="5" class="form-control"></textarea>
+		</div>
+		<div>
 			<button type="button" class="btn btn-default" id="btn-make-room">@Messages("ui.create")</button>
-		</form>
+		</div>
 	</div>
 @*
 	<div id="room-admin">

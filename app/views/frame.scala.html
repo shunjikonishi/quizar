@@ -9,11 +9,11 @@
 	</button>
 	@userInfo.map { user => 
 		<div class="btn-group pull-right">
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			<button type="button" class="dropdown-button">
 				<img src="@user.imageUrl"/>
-				<span class="caret"></span>
+				<i class="fa fa-caret-down"></i>
 			</button>
-			<ul class="dropdown-menu" role="menu">
+			<ul class="dropdown-menu">
 				<li><a href="#">@user.name</a></li>
 				<li class="divider"></li>
 				<li><a href="/signout"><i class="fa fa-sign-out"></i> @Messages("signout")</a></li>
@@ -21,11 +21,11 @@
 		</div>
 	}.getOrElse {
 		<div class="btn-group pull-right">
-			<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			<button type="button" class="dropdown-button">
 				<i class="fa fa-sign-in"></i> @Messages("signin")
-				<span class="caret"></span>
+				<i class="fa fa-caret-down"></i>
 			</button>
-			<ul class="dropdown-menu" role="menu">
+			<ul class="dropdown-menu">
 				<li><a href="@twitterUrl"><i class="fa fa-twitter"></i> Twitter</a></li>
 @*
 				<li><a href="#"><i class="fa fa-facebook"></i> Facebook</a></li>
@@ -66,7 +66,7 @@
 	<ul>
 		<li><a href="#home" class="dynamic"><i class="fa fa-home"></i> @Messages("home")</a></li>
 		@userInfo.map { user =>
-			<li><a href="#make-room" class="dynamic">@Messages("makeRoom")</a></li>
+			<li><a href="#make-room" class="dynamic">@Messages("ui.makeRoom")</a></li>
 		}
 		@roomInfo.map { room =>
 			<li>@Messages("roomMenu")
@@ -82,7 +82,7 @@
 			@userInfo.filter(u => room.isAdmin(u.id)).map { user =>
 				<li>@Messages("manageRoom")
 					<ul>
-						<li><a href="#edit-room" class="dynamic">@Messages("editRoom")</a></li>
+						<li><a href="#edit-room" class="dynamic">@Messages("ui.editRoom")</a></li>
 						<li><a href="#event" class="dynamic">@Messages("editEvent")</a></li>
 						<li><a href="#edit-question" class="dynamic">@Messages("editQuestion")</a></li>
 					</ul>

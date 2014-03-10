@@ -10,8 +10,8 @@ signout[ja]=サインアウト
 home=Home
 home[ja]=ホーム
 
-makeRoom=Make room
-makeRoom[ja]=ルームの作成
+ui.makeRoom=Make room
+ui.makeRoom[ja]=ルームの作成
 
 roomMenu=Room menu
 roomMenu[ja]=ルームメニュー
@@ -34,8 +34,8 @@ postQuestion[ja]=問題の投稿
 manageRoom=Room management
 manageRoom[ja]=ルーム管理
 
-editRoom=Edit room
-editRoom[ja]=ルームの編集
+ui.editRoom=Edit room
+ui.editRoom[ja]=ルームの編集
 
 editEvent=Edit event
 editEvent[ja]=イベントの編集
@@ -114,3 +114,30 @@ answerer[ja]=解答者
 
 noQuestions=No questions
 noQuestions[ja]=問題はまだありません
+
+upcoming=Upcoming
+upcoming[ja]=近日開催
+
+yourEvents=Your events
+yourEvents[ja]=参加イベント
+
+datetime=Datetime
+datetime[ja]=日時
+
+title=Title
+title[ja]=タイトル
+
+capacity=Capacity
+capacity[ja]=定員
+
+undecided=Undecided
+undecided[ja]=未定
+
+people=people
+people[ja]=人
+
+ranking=Ranking
+ranking[ja]=ランキング
+
+top=Top
+top[ja]=トップ
