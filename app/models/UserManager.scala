@@ -47,14 +47,10 @@ class UserManager {
     }
   }
 
-  def getUserImageUrl(id: Int) = User.find(id).map(_.imageUrl)
-
-  val userImageCommand = CommandHandler { command =>
+  val getCommand = CommandHandler { command =>
     val id = command.data.as[Int]
-    getUserImageUrl(id).map(url => command.json(JsObject(Seq(
-      "id" -> JsNumber(id),
-      "url" -> JsString(url))))
-    ).getOrElse(command.error("Unknown user: " + id))
+    val user = getUserById(id)
+    command.json(UserInfo.create(user).toJson)
   }
 }
 

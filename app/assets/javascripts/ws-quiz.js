@@ -10,7 +10,8 @@ $(function() {
 			return false;
 		}
 		return true;
-    }, MSG.invalidQuizChoices);
+	}, MSG.invalidQuizChoices);
+
 	var SUPPORTS_TOUCH = 'ontouchstart' in window,
 		EFFECT_TIME = 300,
 		AnswerType = {
@@ -19,6 +20,14 @@ $(function() {
 			"Least" : 2,
 			"NoAnswer" : 3
 		};
+
+	function User(hash) {
+		function getMiniImageUrl() { return this.imageUrl;}
+
+		$.extend(this, hash, {
+			"getMiniImageUrl" : getMiniImageUrl
+		});
+	}
 	function Home(con) {
 		function init($el, load) {
 			$("#event-future tbody tr, #event-yours tbody tr").click(function() {
@@ -249,7 +258,7 @@ $(function() {
 			"edit" : function(id) { roomId = id;}
 		})
 	}
-	function QuestionList(app, userId, userImage, con) {
+	function QuestionList(app, users, userId, con) {
 		var ROWSIZE = 10;
 		function QuestionTable($el, published) {
 			function getQuestion(id) {
@@ -268,18 +277,17 @@ $(function() {
 
 				$tr.attr("data-id", q.id);
 				$tr.find(".q-text").text(q.question);
-				if (images[q.createdBy]) {
-					$img.attr("src", images[q.createdBy]);
+				if (users[q.createdBy]) {
+					$img.attr("src", users[q.createdBy].getMiniImageUrl());
 				} else {
 					$img.attr("data-userId", q.createdBy);
 					con.request({
-						"command" : "userImage",
+						"command" : "getUser",
 						"data" : q.createdBy,
 						"success" : function(data) {
-							if (data.url) {
-								images[data.id] = data.url;
-								$el.find("[data-userId=" + data.id + "]").attr("src", data.url).removeAttr("data-userId");
-							}
+							var user = new User(data);
+							users[user.id] = user;
+							$el.find("[data-userId=" + user.id + "]").attr("src", user.getMiniImageUrl()).removeAttr("data-userId");
 						}
 					})
 				}
@@ -420,9 +428,7 @@ $(function() {
 			publishedTable = null,
 			$tab = null,
 			$btnPrev = null,
-			$btnNext = null,
-			images = {};
-		images[userId] = userImage;
+			$btnNext = null;
 
 		$.extend(this, {
 			"init" : init,
@@ -499,6 +505,7 @@ $(function() {
 								}
 							} else {
 								app.showMessage(MSG.questionPosted);
+								app.tweet(MSG.postQuestionMessage, false);
 								clearField();
 							}
 						}
@@ -689,6 +696,11 @@ $(function() {
 		function showMessage(msg, time) {
 			messageDialog.show(msg, time);
 		}
+		function tweet(msg, withTwitter) {
+			if (chat) {
+				chat.tweet(msg, withTwitter);
+			}
+		}
 		function init() {
 			if (window.sessionStorage) {
 				sessionStorage.clear();
@@ -712,7 +724,14 @@ $(function() {
 					alert(data);
 				});
 			}
-			
+			if (params.userId) {
+				users[params.userId] = new User({
+					"id" : params.userId,
+					"name" : params.username,
+					"imageUrl" : params.userImage
+				});
+			}
+
 			if (params.roomId) {
 				var $chat = $("#chat");
 				chat = new Chat($chat, params.userId, con);
@@ -720,7 +739,12 @@ $(function() {
 					showStatic("chat", $(this).parents("#sidr").length > 0);
 					return false;
 				});
-				con.addEventListener("chat", chat.append);
+				con.addEventListener("chat", function(data) {
+					chat.append(data);
+					if (data.userId != params.userId) {
+						showMessage(data.msg);
+					}
+				});
 				con.addEventListener("member", chat.member);
 				con.ready(function() {
 					if (chat.member() == 0) {
@@ -737,7 +761,7 @@ $(function() {
 				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con)
 			}
 			if (params.roomAdmin) {
-				questionList = new QuestionList(self, params.userId, params.userImage, con)
+				questionList = new QuestionList(self, users, params.userId, con)
 			}
 
 			$("#btn-menu").sidr({
@@ -790,7 +814,8 @@ $(function() {
 			templateManager,
 			chat,
 			questionList,
-			$content;
+			$content,
+			users = {};
 		init();
 
 		var TemplateLogic = {
@@ -818,11 +843,20 @@ $(function() {
 					"afterHide" : questionList.clear
 				}
 			})
+		} else if (params.userQuiz) {
+			$.extend(TemplateLogic, {
+				"post-question" : {
+					"name" : "make-question",
+					"beforeShow" : makeQuestion.init,
+					"afterHide" : makeQuestion.clear
+				}
+			})
 		}
 		$.extend(this, {
 			"showQuestionList" : showQuestionList,
 			"showMakeQuestion" : showMakeQuestion,
-			"showMessage" : showMessage
+			"showMessage" : showMessage,
+			"tweet" : tweet
 		})
 	}
 });

@@ -60,6 +60,7 @@ ui.invalidQuizChoices=Input multiple rows.(Max 5 rows.)
 ui.makeQuestion=Make question
 ui.makeRoom=Make room
 ui.postQuestion=Post question
+ui.postQuestionMessage=I posted a question!
 ui.questionPosted=Post question to room master.
 ui.successUpdate=Update succeed
 ui.update=Update

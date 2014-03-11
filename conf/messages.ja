@@ -60,6 +60,7 @@ ui.invalidQuizChoices=複数行入力してください(最大5行)
 ui.makeQuestion=問題の作成
 ui.makeRoom=ルームの作成
 ui.postQuestion=問題の投稿
+ui.postQuestionMessage=問題を投稿しました!
 ui.questionPosted=問題をルーム管理者に投稿しました
 ui.successUpdate=更新しました
 ui.update=更新

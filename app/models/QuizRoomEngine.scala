@@ -45,17 +45,16 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
   private def filterRedisMessage(res: CommandResponse) = {
     def filterCreateQuestion(res: CommandResponse) = {
       val createdBy = (res.data \ "createdBy").as[Int]
-      createdBy == userId || room.map(_.roomInfo.isAdmin(userId)).getOrElse(false)
+      if (createdBy == userId) {
+        Some(res)
+      } else {
+        None
+      }
     }
-    val filtered = if (res.name == "createQuestion") {
+    if (res.name == "createQuestion") {
       filterCreateQuestion(res)
     } else {
-      true
-    }
-    if (filtered) {
       Some(res)
-    } else {
-      None
     }
   }
 
@@ -72,15 +71,17 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
     addHandler("makeRoom", RoomManager.createCommand)
     addHandler("updateRoom", RoomManager.updateCommand)
     addHandler("getRoom", RoomManager.getCommand)
-    addHandler("userImage", UserManager.userImageCommand)
+    addHandler("getUser", UserManager.getCommand)
     addHandler("tweet") { c =>
       room.foreach { room =>
-        val userId = (c.data \ "userId").as[Int]
+        val username = session.user.map(_.name).get
         val msg = (c.data \ "msg").as[String]
         val withTwitter = (c.data \ "twitter").as[Boolean]
         val img = session.user.map(_.imageUrl).getOrElse("#")
         room.channel.send(new CommandResponse("chat", "json", 
           JsObject(Seq(
+            ("userId", JsNumber(userId)),
+            ("username", JsString(username)),
             ("msg", JsString(msg)),
             ("img", JsString(img))
           ))

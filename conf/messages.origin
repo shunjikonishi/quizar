@@ -210,3 +210,6 @@ ui.editAndPublishQuestion[ja]=問題の編集／出題
 
 back=Back
 back[ja]=戻る
+
+ui.postQuestionMessage=I posted a question!
+ui.postQuestionMessage[ja]=問題を投稿しました!
