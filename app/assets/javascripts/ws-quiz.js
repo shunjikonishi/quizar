@@ -45,23 +45,6 @@ $(function() {
 			"clear" : clear
 		})
 	}
-	function MessageDialog($el) {
-		function show(msg, second) {
-			second = second || 3;
-			$el.css({
-				"animation-duration" : second + "s",
-				"-webkit-animation-duration" : second + "s"
-			})
-			$el.find("span").text(msg);
-			$el.show();
-			setTimeout(function() {
-				$el.hide();
-			}, second * 1000);
-		}
-		$.extend(this, {
-			"show" : show
-		})
-	}
 	function Chat($el, userId, con) {
 		var MAX_LOG = 20;
 		function tweet(msg, withTwitter) {
@@ -76,6 +59,9 @@ $(function() {
 				})
 			}
 		}
+		function isNotifyTweet() {
+			return $el.is(":hidden") && $("#chat-notify").is(":checked");
+		}
 		function member(data) {
 			if (arguments.length == 0) {
 				return $member.text();
@@ -88,19 +74,20 @@ $(function() {
 				$tbody.find("tr:last").remove();
 			}
 			var clazz = cnt % 2 == 0 ? "chat-left" : "chat-right",
-				$tr = $("<tr style='display:none;'><td><div></div></div></td></tr>"),
-				$div = $tr.find("div"),
-				$span = $("<span/>"),
-				$img = $("<img/>");
-			$div.addClass(clazz);
-			$span.text(data.msg);
+				$tr = $("<tr style='display:none;'>" +
+					"<td class='chat-img'></td>" +
+					"<td class='chat-msg'></td>" +
+					"<td class='chat-img'></td></tr>"),
+				$img = $("<img/>"),
+				$tdMsg = $tr.find("td.chat-msg");
+
+			$tdMsg.addClass(clazz);
+			$tdMsg.html(data.username + "<br>" + data.msg);
 			$img.attr("src", data.img);
 			if (clazz == "chat-left") {
-				$div.append($img);
-				$div.append($span);
+				$tr.find("td.chat-img:first").append($img);
 			} else {
-				$div.append($span);
-				$div.append($img);
+				$tr.find("td.chat-img:last").append($img);
 			}
 			$tbody.prepend($tr)
 			$tr.show("slow");
@@ -135,7 +122,8 @@ $(function() {
 		$.extend(this, {
 			"member" : member,
 			"append" : append,
-			"tweet" : tweet
+			"tweet" : tweet,
+			"isNotifyTweet" : isNotifyTweet
 		})
 	}
 	function MakeRoom(userId, con, messageDialog) {
@@ -645,8 +633,14 @@ $(function() {
 		});
 		$("#btn-debug-msg").click(function() {
 			var msg = $("#debug-msg").val(),
-				sec = $("#debug-msg-sec").val();
-			messageDialog.show(msg, sec);
+				sec = $("#debug-msg-sec").val(),
+				img = "http://pbs.twimg.com/profile_images/442961765647650816/UmCaKfSq_mini.jpeg";
+			messageDialog.notifyTweet({
+				"userId" : 1,
+				"username" : "@shunjikonishi",
+				"msg" : msg,
+				"img" : img
+			}, sec);
 		});
 		$.extend(this, {
 			"log" : log
@@ -707,7 +701,7 @@ $(function() {
 			}
 
 			debug = new DebuggerWrapper();
-			messageDialog = new MessageDialog($("#msg-dialog"));
+			messageDialog = new flect.MessageDialog($("#msg-dialog"));
 			con = new flect.Connection(params.uri, debug);
 			home = new Home(con);
 			makeRoom = new MakeRoom(params.userId, con, messageDialog);
@@ -741,8 +735,8 @@ $(function() {
 				});
 				con.addEventListener("chat", function(data) {
 					chat.append(data);
-					if (data.userId != params.userId) {
-						showMessage(data.msg);
+					if (data.userId != params.userId && chat.isNotifyTweet()) {
+						messageDialog.notifyTweet(data);
 					}
 				});
 				con.addEventListener("member", chat.member);

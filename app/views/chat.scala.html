@@ -1,8 +1,13 @@
 @(userInfo: Option[UserInfo], twitterUrl: String)(implicit lang: Lang)
 <div id="chat" class="workspace">
 	<h1>@Messages("chat")</h1>
-	<div class="pull-right">@Html(Messages("html.roomMember"))</div>
-	<div class="clearfix"></div>
+	<div>
+		<div>
+			<input type="checkbox" id="chat-notify"> @Messages("notifyTweet")
+		</div>
+		<div class="pull-right">@Html(Messages("html.roomMember"))</div>
+		<div class="clearfix"></div>
+	</div>
 	@userInfo.map { u =>
 		<div>
 			<textarea id="chat-text" class="form-control" rows="5" style="width: 100%;"></textarea>
@@ -24,7 +29,7 @@
 		</div>
 	}
 	<hr>
-	<table style="width:100%;">
+	<table class="table table-striped">
 		<tbody>
 		</tbody>
 	</table>
