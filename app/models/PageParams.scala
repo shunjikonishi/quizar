@@ -11,6 +11,7 @@ case class PageParams(
   userImage: Option[String] = None,
   roomId: Option[Int] = None,
   roomAdmin: Option[Boolean] = None,
+  userQuiz: Option[Boolean] = None,
   hashtag: Option[String] = None,
   userEventId: Option[Int] = None
 ) {
@@ -25,6 +26,7 @@ case class PageParams(
     copy(
       roomId=Some(room.id),
       roomAdmin=userId.map(room.isAdmin(_)),
+      userQuiz=Some(room.userQuiz),
       hashtag=room.hashtag
     )
   }

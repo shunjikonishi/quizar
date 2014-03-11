@@ -14,6 +14,8 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
   private val rm = RoomManager
 
   init
+  private val userId = session.user.map(_.id).getOrElse(0)
+
   private val room: Option[RedisRoom] = {
     session.roomId.map { roomId =>
       Await.result(rm.join(roomId), Duration.Inf)
@@ -41,7 +43,20 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
   }
 
   private def filterRedisMessage(res: CommandResponse) = {
-    Some(res)
+    def filterCreateQuestion(res: CommandResponse) = {
+      val createdBy = (res.data \ "createdBy").as[Int]
+      createdBy == userId || room.map(_.roomInfo.isAdmin(userId)).getOrElse(false)
+    }
+    val filtered = if (res.name == "createQuestion") {
+      filterCreateQuestion(res)
+    } else {
+      true
+    }
+    if (filtered) {
+      Some(res)
+    } else {
+      None
+    }
   }
 
   protected override def onDisconnect: Unit = {

@@ -3,13 +3,33 @@ package models
 import play.api.libs.json._
 import models.entities.QuizQuestion
 
+object AnswerType {
+  case object FirstRow extends AnswerType(0)
+  case object Most extends AnswerType(1)
+  case object Least extends AnswerType(2)
+  case object NoAnswer extends AnswerType(3)
+
+  val values = Array(FirstRow, Most, Least, NoAnswer)
+
+  def fromCode(code: Int) = values.filter(_.code == code).head
+
+  implicit object format extends Format[AnswerType] {
+    def reads(json: JsValue) = JsSuccess(fromCode(json.as[Int]))
+    def writes(s: AnswerType): JsValue = JsNumber(s.code)
+  }
+}
+
+sealed abstract class AnswerType(val code: Int) {
+  val name = toString
+}
+
 case class QuestionInfo(
   id: Int, 
   roomId: Int, 
   createdBy: Int, 
   question: String, 
   answers: String, 
-  answerType: Int, 
+  answerType: AnswerType, 
   tags: Option[String] = None, 
   description: Option[String] = None, 
   relatedUrl: Option[String] = None,
@@ -44,7 +64,7 @@ object QuestionInfo {
     createdBy=q.createdBy,
     question=q.question,
     answers=q.answers,
-    answerType=q.answerType,
+    answerType=AnswerType.fromCode(q.answerType.toInt),
     tags=q.tags,
     description=q.description,
     relatedUrl=q.relatedUrl,

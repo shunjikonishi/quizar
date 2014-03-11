@@ -1,6 +1,8 @@
 if (typeof(flect) === "undefined") flect = {};
 
 $(function() {
+	var EFFECT_TIME = 300;
+
 	function MemoryStorage() {
 		var cache = {};
 		function getItem(key) {
@@ -61,7 +63,7 @@ $(function() {
 
 			setTimeout(function() {
 				var dir = params.direction || "right";
-				$el.show("slide", { "direction" : dir}, 750, function() {
+				$el.show("slide", { "direction" : dir}, EFFECT_TIME, function() {
 					if (params.afterShow) {
 						params.afterShow($el);
 					}

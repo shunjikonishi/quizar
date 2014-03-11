@@ -1,8 +1,24 @@
 if (typeof(flect) === "undefined") flect = {};
 
 $(function() {
-	var SUPPORTS_TOUCH = 'ontouchstart' in window;
-
+	$.validator.addMethod("quizChoices", function(value, element) {
+		if (!value || value.length == 0) {
+			return false;
+		}
+		var array = value.split("\n").filter(function(v) { return v.length > 0});
+		if (array.length <= 1 || array.length > 5) {
+			return false;
+		}
+		return true;
+    }, MSG.invalidQuizChoices);
+	var SUPPORTS_TOUCH = 'ontouchstart' in window,
+		EFFECT_TIME = 300,
+		AnswerType = {
+			"FirstRow" : 0,
+			"Most" : 1,
+			"Least" : 2,
+			"NoAnswer" : 3
+		};
 	function Home(con) {
 		function init($el, load) {
 			$("#event-future tbody tr, #event-yours tbody tr").click(function() {
@@ -211,6 +227,10 @@ $(function() {
 				$h1.text(MSG.makeRoom);
 				$btnUpdate.text(MSG.create);
 			}
+			$("#make-room-option-btn").click(function() {
+				$(this).find("i").toggle();
+				$("#make-room-option").toggle();
+			})
 		}
 		function clear() {
 			$form = null;
@@ -229,73 +249,340 @@ $(function() {
 			"edit" : function(id) { roomId = id;}
 		})
 	}
-	function QuestionList(userId, userImage, con, templateManager) {
-		function appendTr($tbody, q) {
-			var $tr = $("<tr><td class='question-creator'><img src='/assets/images/twitter_default_profile.png'/></td>" +
-				"<td class='question-text'></td></tr>"),
-				$img = $tr.find("img");
-
-			$tr.find(".question-text").text(q.question);
-			if (images[q.createdBy]) {
-				$img.attr("src", images[q.createdBy]);
-			} else {
-				$img.attr("data-userId", q.createdBy);
-				con.request({
-					"command" : "userImage",
-					"data" : q.createdBy,
-					"success" : function(data) {
-						if (data.url) {
-							images[data.id] = data.url;
-							$el.find("[data-userId=" + data.id + "]").attr("src", data.url).removeAttr("data-userId");
-						}
-					}
-				})
-			}
-			$tbody.append($tr);
-		}
-		function loadData(published, offset, limit) {
-			var $tbody = published ? $publishedBody : $stockBody;
-			con.request({
-				"command" : "listQuestion",
-				"data" : {
-					"published" : published,
-					"offset" : offset,
-					"limit" : limit
-				},
-				"success" : function(data) {
-					$tbody.empty();
-					for (var i=0; i<data.length; i++) {
-						appendTr($tbody, data[i]);
+	function QuestionList(app, userId, userImage, con) {
+		var ROWSIZE = 10;
+		function QuestionTable($el, published) {
+			function getQuestion(id) {
+				for (var i=0; i<questions.length; i++) {
+					var q = questions[i];
+					if (q.id == id) {
+						return q;
 					}
 				}
-			});
+				return null;
+			}
+			function appendTr(q) {
+				var $tr = $("<tr><td class='q-creator'><img src='/assets/images/twitter_default_profile.png'/></td>" +
+					"<td class='q-text'></td></tr>"),
+					$img = $tr.find("img");
+
+				$tr.attr("data-id", q.id);
+				$tr.find(".q-text").text(q.question);
+				if (images[q.createdBy]) {
+					$img.attr("src", images[q.createdBy]);
+				} else {
+					$img.attr("data-userId", q.createdBy);
+					con.request({
+						"command" : "userImage",
+						"data" : q.createdBy,
+						"success" : function(data) {
+							if (data.url) {
+								images[data.id] = data.url;
+								$el.find("[data-userId=" + data.id + "]").attr("src", data.url).removeAttr("data-userId");
+							}
+						}
+					})
+				}
+				$tr.click(function() {
+					var id = $(this).attr("data-id");
+					app.showMakeQuestion(getQuestion(id));
+				})
+				$tbody.append($tr);
+			}
+			function load(offset, limit, slideDir) {
+				con.request({
+					"command" : "listQuestion",
+					"data" : {
+						"published" : published,
+						"offset" : offset,
+						"limit" : limit
+					},
+					"success" : function(data) {
+						var $table = $tbody.parents("table");
+						questions = data;
+						$tbody.empty();
+						if (slideDir) {
+							$table.hide();
+						}
+						for (var i=0; i<data.length; i++) {
+							appendTr(data[i]);
+						}
+						if (slideDir) {
+							$table.show("slide", { "direction" : slideDir}, EFFECT_TIME);
+						}
+					}
+				});
+			}
+			function prev() {
+				if (offset > 0) {
+					offset -= ROWSIZE;
+					load(offset, ROWSIZE, "left");
+					activate();
+				}
+			}
+			function next() {
+				if (offset + ROWSIZE < cnt) {
+					offset += ROWSIZE;
+					load(offset, ROWSIZE, "right");
+					activate();
+				}
+			}
+			function count() {
+				if (arguments.length == 0) {
+					return cnt;
+				} else {
+					cnt = arguments[0];
+					return this;
+				}
+			}
+			function activate() {
+				if (offset == 0) {
+					$btnPrev.attr("disabled", "disabled");
+				} else {
+					$btnPrev.removeAttr("disabled");
+				}
+				if (offset + ROWSIZE >= cnt) {
+					$btnNext.attr("disabled", "disabled");
+				} else {
+					$btnNext.removeAttr("disabled");
+				}
+			}
+			var cnt = 0,
+				offset = 0,
+				questions = [],
+				$tbody = $el.find("table tbody");
+			$el.swipe({
+				"swipeLeft": function(e) {
+					next();
+					e.stopImmediatePropagation();
+				},
+				"swipeRight": function(e) {
+					prev();
+					e.stopImmediatePropagation();
+				},
+				"tap": function (event, target) {
+					if (SUPPORTS_TOUCH) {
+						$(target).click();
+					}
+				}
+			})
+			$.extend(this, {
+				"prev" : prev,
+				"next" : next,
+				"load" : load,
+				"count" : count,
+				"activate" : activate
+			})
+		}
+		function getActiveTable() {
+			var index = $tab.tabs("option", "active");
+			return index == 0 ? stockTable : publishedTable;
 		}
 		function init($el) {
-			$el.find(".tab-content").tabs();
+			stockTable = new QuestionTable($("#edit-question-stock"), false);
+			publishedTable = new QuestionTable($("#edit-question-published"), true);
+
+			$tab = $el.find(".tab-content").tabs({
+				"activate" : function() {
+					getActiveTable().activate();
+				}
+			});
 			con.request({
 				"command" : "countQuestion",
 				"success" : function(data) {
-					publishCount = data.published;
-					stockCount = data.count - publishCount;
-					$("#question-stock-count").text(stockCount);
-					$("#question-published-count").text(publishCount);
+					stockTable.count(data.count - data.published);
+					publishedTable.count(data.published);
+					$("#question-stock-count").text(stockTable.count());
+					$("#question-published-count").text(publishedTable.count());
+					stockTable.activate();
 				}
 			});
-			loadData(false, 0, 0);
-			loadData(true, 0, 0);
+			stockTable.load(0, ROWSIZE);
+			publishedTable.load(0, ROWSIZE);
 			$("#edit-question-new").click(function() {
-				templateManager.show("make-question");
+				app.showMakeQuestion();
+			})
+			$btnPrev = $("#edit-question-left").click(function() {
+				getActiveTable().prev();
+			})
+			$btnNext = $("#edit-question-right").click(function() {
+				getActiveTable().next();
 			})
 		}
-		var stockCount = -1,
-			publishCount = -1,
-			$stockBody = $("#edit-question-stock").find("table tbody"),
-			$publishedBody = $("#edit-question-published").find("table tbody"),
+		function clear() {
+			stockTable = null;
+			publishedTable = null;
+			$tab = null;
+			$btnPrev = null;
+			$btnNext = null;
+		}
+		var stockTable = null;
+			publishedTable = null,
+			$tab = null,
+			$btnPrev = null,
+			$btnNext = null,
 			images = {};
 		images[userId] = userImage;
 
 		$.extend(this, {
-			"init" : init
+			"init" : init,
+			"clear" : clear
+		})
+	}
+	function MakeQuestion(app, roomId, userId, admin, con) {
+		function clearField() {
+			$("#make-q-question").val("");
+			$("#make-q-answers").val("");
+			$("#make-q-answerType").val(AnswerType.FistRow);
+			$("#make-q-tags").val("");
+			$("#make-q-description").val("");
+			$("#make-q-relatedUrl").val("");
+		}
+		function collectField() {
+			var data = {
+				"id" : 0,
+				"roomId" : roomId,
+				"createdBy" : userId
+			};
+			if (editQuestion) {
+				data.id = editQuestion.id;
+				data.createdBy = editQuestion.createdBy;
+			}
+			$form.find(":input").each(function() {
+				var $input = $(this),
+					name = getParameterName($input),
+					value = $input.val();
+				if (name == "answerType") {
+					value = parseInt(value);
+				}
+				data[name] = value;
+			})
+			return data;
+		}
+		function getParameterName($input) {
+			return $input.attr("id").substring(7)
+		}
+		function openEvent() {
+			if (arguments.length == 0) {
+				return eventId;
+			} else {
+				eventId = arguments[0];
+				return this;
+			}
+		}
+		function update() {
+			if (validator && validator.form()) {
+				var data = collectField();
+				if (editQuestion) {
+					con.request({
+						"command" : "updateQuestion",
+						"data" : data,
+						"success" : function(data) {
+							editQuestion = data;
+							if (!eventId) {
+								app.showQuestionList("left");
+							}
+						}
+					});
+				} else {
+					con.request({
+						"command" : "createQuestion",
+						"data" : data,
+						"success" : function(data) {
+							if (admin) {
+								editQuestion = data;
+								if (eventId) {
+									$btnUpdate.text(MSG.update);
+									$publish.show();
+								} else {
+									app.showQuestionList("left");
+								}
+							} else {
+								app.showMessage(MSG.questionPosted);
+								clearField();
+							}
+						}
+					});
+				}
+			}
+		}
+		function publish() {
+			alert("Not implemented yet.")
+		}
+		function init() {
+			$form = $("#make-q-form");
+			$form.find(":input").each(function() {
+				var $input = $(this),
+					id = $input.attr("id");
+				$input.attr("name", id);
+				if (editQuestion) {
+					var name = getParameterName($input);
+					if (editQuestion[name]) {
+						$input.val(editQuestion[name]);
+					}
+				}
+			})
+			validator = $form.validate({
+				"rules" : {
+					"make-q-question" : {
+						"required" : true
+					},
+					"make-q-answers" : {
+						"quizChoices" : true,
+						"required" : true
+					},
+					"make-q-tags" : {
+						"maxlength" : 100
+					},
+					"make-q-relatedUrl" : {
+						"url" : true,
+						"maxlength" : 256
+					}
+				},
+				"focusInvalid" : true
+			});
+			$btnUpdate = $("#make-q-update-btn").click(function() {
+				update();
+			});
+			$publish = $("#make-q-publish");
+			if (editQuestion && eventId) {
+				$publish.show();
+			}
+			$btnPublish = $("#make-q-publish-btn").click(publish);
+			$("#make-q-option-btn").click(function() {
+				$(this).find("i").toggle();
+				$("#make-q-option").toggle();
+			})
+			if (editQuestion) {
+				$("#make-q-h1").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
+				$btnUpdate.text(MSG.update);
+			}
+			if (admin) {
+				$("#make-q-back-btn").click(function() {
+					app.showQuestionList("left");
+				}).show();
+			}
+		}
+		function clear() {
+			editQuestion = null;
+			$form = null;
+			validator = null;
+			$btnUpdate = null;
+			$btnPublish = null;
+			$publish = null;
+		}
+		var eventId = 0,
+			editQuestion = null,
+			$form = null,
+			$btnUpdate = null,
+			$btnPublish = null,
+			$publish = null,
+			validator = null;
+		$.extend(this, {
+			"openEvent" : openEvent,
+			"init" : init,
+			"clear" : clear,
+			"edit" : function(q) { editQuestion = q;}
 		})
 	}
 	function DebuggerWrapper() {
@@ -359,11 +646,12 @@ $(function() {
 		})
 	}
 	flect.QuizApp = function(params) {
+		var self = this;
 		function showStatic(id, sidr) {
 			function doShowStatic() {
 				if (!$el.is(":visible")) {
 					$content.children("div").hide();
-					$el.show("slide", { "direction" : "right"}, 750);
+					$el.show("slide", { "direction" : "right"}, EFFECT_TIME);
 				}
 			}
 			var $el = $("#" + id);
@@ -373,25 +661,56 @@ $(function() {
 				doShowStatic();
 			}
 		}
+		function showQuestionList(direction) {
+			if (questionList) {
+				var params = $.extend({
+					"name" : "edit-question"
+				}, TemplateLogic["edit-question"]);
+				if (direction) {
+					params.direction = direction;
+				}
+				$content.children("div").hide();
+				templateManager.show(params);
+			}
+		}
+		function showMakeQuestion(q) {
+			if (makeQuestion) {
+				if (q) {
+					makeQuestion.edit(q);
+				}
+				$content.children("div").hide();
+				templateManager.show({
+					"name" : "make-question",
+					"beforeShow" : makeQuestion.init,
+					"afterHide" : makeQuestion.clear
+				});
+			}
+		}
+		function showMessage(msg, time) {
+			messageDialog.show(msg, time);
+		}
 		function init() {
 			if (window.sessionStorage) {
 				sessionStorage.clear();
 			}
 
 			debug = new DebuggerWrapper();
-			msgDialog = new MessageDialog($("#msg-dialog"));
+			messageDialog = new MessageDialog($("#msg-dialog"));
 			con = new flect.Connection(params.uri, debug);
 			home = new Home(con);
-			makeRoom = new MakeRoom(params.userId, con, msgDialog);
+			makeRoom = new MakeRoom(params.userId, con, messageDialog);
 			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 			$content = $("#content");
 
 			if (params.debug) {
-				debug.setImpl(new PageDebugger($("#debug"), con, msgDialog));
+				debug.setImpl(new PageDebugger($("#debug"), con, messageDialog));
 				$("#btn-debug").click(function() {
 					showStatic("debug", true);
 					return false;
 				})
+				con.onError(function(data) {
+					alert(data);
+				});
 			}
 			
 			if (params.roomId) {
@@ -414,8 +733,11 @@ $(function() {
 			if ($("#home").length) {
 				home.init($("#home"), false);
 			}
+			if (params.roomAdmin || params.userQuiz) {
+				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con)
+			}
 			if (params.roomAdmin) {
-				questionList = new QuestionList(params.userId, params.userImage, con, templateManager)
+				questionList = new QuestionList(self, params.userId, params.userImage, con)
 			}
 
 			$("#btn-menu").sidr({
@@ -458,45 +780,49 @@ $(function() {
 				$(this).next("ul").toggle();
 				return false;
 			})
-			var TemplateLogic = {
-				"make-room" : {
-					"beforeShow" : function($el) {
-						makeRoom.clear();
-						makeRoom.init($el);
-					},
-					"afterHide" : function($el) {
-						makeRoom.clear();
-					}
-				},
-				"edit-room" : {
-					"name" : "make-room",
-					"beforeShow" : function($el) {
-						makeRoom.clear();
-						makeRoom.edit(params.roomId);
-						makeRoom.init($el)
-					},
-					"afterHide" : function($el) {
-						makeRoom.clear();
-					}
-				}
-			};
-			if (params.roomAdmin) {
-				$.extend(TemplateLogic, {
-					"edit-question" : {
-						"beforeShow" : questionList.init
-					}
-				})
-			}
 		}
 		var debug,
-			msgDialog,
+			messageDialog,
 			con,
 			home,
+			makeQuestion,
 			makeRoom,
 			templateManager,
 			chat,
 			questionList,
 			$content;
 		init();
+
+		var TemplateLogic = {
+			"make-room" : {
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.init($el);
+				},
+				"afterHide" : makeRoom.clear
+			},
+			"edit-room" : {
+				"name" : "make-room",
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.edit(params.roomId);
+					makeRoom.init($el)
+				},
+				"afterHide" : makeRoom.clear
+			}
+		};
+		if (params.roomAdmin) {
+			$.extend(TemplateLogic, {
+				"edit-question" : {
+					"beforeShow" : questionList.init,
+					"afterHide" : questionList.clear
+				}
+			})
+		}
+		$.extend(this, {
+			"showQuestionList" : showQuestionList,
+			"showMakeQuestion" : showMakeQuestion,
+			"showMessage" : showMessage
+		})
 	}
 });

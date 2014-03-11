@@ -1,5 +1,9 @@
 .btn-facebook { background-color: #2980b9; color: #ffffff;}
-.btn-twitter { background-color: #55acee; color: #ffffff;}
+.btn-twitter {
+	padding: 10px;
+	background-color: #55acee; 
+	color: #ffffff;
+}
 
 body {
 	margin: 0;
@@ -132,6 +136,10 @@ body {
 	clear:both;
 }
 
+.table {
+	width: 100%;
+	table-layout: fixed;
+}
 th {
 	text-align: left;
 }
@@ -150,10 +158,26 @@ th.event-date, td.event-date { width: 60px;}
 th.event-title, td.event-title { width: 200px;}
 th.event-capacity, td.event-capacity { width: 40px;}
 
+th.q-creator, td.q-creator { width: 40px;}
+th.q-text, td.q-text {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis
+}
+th.q-answerer, td.q-answerer { width: 60px;}
+
 .input-form label {
 	display: block;
 	margin-top: 10px;
 }
 .form-control {
 	width: 100%;
+}
+
+.option-ctrl {
+	margin-top: 10px;
+}
+
+.row-link tr {
+	cursor: pointer;
 }

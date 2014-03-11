@@ -27,7 +27,12 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   private val (qr, qe) = (QuizRoom.qr, QuizEvent.qe)
   implicit val autoSession = AutoSession
 
-  override protected def createRoom(name: String) = new RedisRoom(name.substring(5).toInt, redis)
+  override protected def createRoom(name: String) = {
+    val id = name.substring(5).toInt
+    val info = getRoomInfo(id).get
+    new RedisRoom(info, redis)
+  }
+
   def getRoom(id: Int): RedisRoom = getRoom("room." + id)
   def join(id: Int): Future[(Iteratee[String,_], Enumerator[String])] = join("room." + id)
 

@@ -2,39 +2,49 @@
 <div id="make-room" class="workspace">
 	<h1 id="make-room-h1">@Messages("makeRoom")</h1>
 	<div class="input-form">
-		<div>
-			<label for="room-name">@Messages("roomName")</label>
-		</div>
-		<div>
-			<input id="room-name" class="form-control"/>
-		</div>
-		<div>
-				<label for="room-tags">@Messages("tags")</label>
-		</div>
-		<div>
-				<input id="room-tags" class="form-control"/>
-		</div>
-		<div>
-				<label for="room-hashtag">@Messages("hashtag")</label>
-		</div>
-		<div>
-				<input id="room-hashtag" class="form-control"/>
-		</div>
-		<div>
-		<div class="checkbox">
-			<label>
-				<input id="room-userQuiz" type="checkbox"> @Messages("allowUserQuestion")
-			</label>
-		</div>
-		<div>
-				<label for="room-description">@Messages("description")</label>
-		</div>
-		<div>
-				<textarea id="room-description" rows="5" class="form-control"></textarea>
-		</div>
-		<div>
-			<button type="button" class="btn btn-default" id="btn-make-room">@Messages("ui.create")</button>
-		</div>
+		<form id="make-room-form">
+			<div>
+				<label for="room-name">@Messages("roomName")</label>
+			</div>
+			<div>
+				<input id="room-name" class="form-control"/>
+			</div>
+			<div class="checkbox">
+				<label>
+					<input id="room-userQuiz" type="checkbox"> @Messages("allowUserQuestion")
+				</label>
+			</div>
+			<div class="option-ctrl">
+				@Messages("options") 
+				<span id="make-room-option-btn">
+					<i class="fa fa-toggle-down fa-lg"></i>
+					<i class="fa fa-toggle-up fa-lg" style="display:none;"></i>
+				</span>
+			</div>
+			<div class="option-panel" id="make-room-option" style="display:none;">
+				<div>
+						<label for="room-tags">@Messages("tags")</label>
+				</div>
+				<div>
+						<input id="room-tags" class="form-control"/>
+				</div>
+				<div>
+						<label for="room-hashtag">@Messages("hashtag")</label>
+				</div>
+				<div>
+						<input id="room-hashtag" class="form-control"/>
+				</div>
+				<div>
+						<label for="room-description">@Messages("description")</label>
+				</div>
+				<div>
+						<textarea id="room-description" rows="5" class="form-control"></textarea>
+				</div>
+			</div>
+			<div>
+				<button type="button" id="btn-make-room">@Messages("ui.create")</button>
+			</div>
+		</form>
 	</div>
 @*
 	<div id="room-admin">

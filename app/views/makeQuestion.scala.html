@@ -1,33 +1,82 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="make-question" class="workspace">
-	<h1>@Messages("ui.makeQuestion")</h1>
-	<div>
-		<form role="form">
-			<div class="form-group">
-				<label>@Messages("question")</label>
-				<textarea rows="3" class="form-control"></textarea>
+	<h1 id="make-q-h1">@Messages("ui.makeQuestion")</h1>
+	<div class="input-form">
+		<form id="make-q-form">
+			<div>
+				<label for="make-q-question">@Messages("question")</label>
 			</div>
-			<div class="form-group">
-				<label>@Messages("choices")</label>
-				<textarea rows="5" class="form-control"></textarea>
+			<div>
+				<textarea id="make-q-question" rows="3" class="form-control"></textarea>
 			</div>
-			<p>@Messages("choicesNote")</p>
-			<div class="form-group">
-				<label>@Messages("correctChoice")</label>
-				<select class="form-control">
-					<option>@Messages("firstRow")</option>
-					<option>@Messages("mostFrequentAnswer")</option>
-					<option>@Messages("lessFrequentAnswer")</option>
-					<option>@Messages("noCorrectAnswer")</option>
+			<div>
+				<label for="make-q-answers">@Messages("choices")</label>
+			</div>
+			<div>
+				<textarea id="make-q-answers" rows="5" class="form-control"></textarea>
+				<p>@Messages("choicesNote")</p>
+			</div>
+			<div>
+				<label for="make-q-answerType">@Messages("correctChoice")</label>
+			</div>
+			<div>
+				<select id="make-q-answerType" class="form-control">
+					<option value="@AnswerType.FirstRow.code">@Messages("firstRow")</option>
+					<option value="@AnswerType.Most.code">@Messages("mostFrequentAnswer")</option>
+					<option value="@AnswerType.Least.code">@Messages("lessFrequentAnswer")</option>
+					<option value="@AnswerType.NoAnswer.code">@Messages("noCorrectAnswer")</option>
 				</select>
 			</div>
-			<div id="make-question-edit">
-				<button type="button" class="btn btn-default">@Messages("ui.create")</button>
+			<div class="option-ctrl">
+				@Messages("options") 
+				<span id="make-q-option-btn">
+					<i class="fa fa-toggle-down fa-lg"></i>
+					<i class="fa fa-toggle-up fa-lg" style="display:none;"></i>
+				</span>
 			</div>
-			<div id="make-question-publish" style="display:none;">
-				<h2>@Messages("publish")</h2>
-				<button id="btn-publish-question" type="button" class="btn btn-primary">@Messages("publish")</button>
+			<div class="option-panel" id="make-q-option" style="display:none;">
+				<div>
+					<label for="make-q-tags">@Messages("tags")</label>
+				</div>
+				<div>
+					<input id="make-q-tags" class="form-control">
+				</div>
+				<div>
+					<label for="make-q-description">@Messages("description")</label>
+				</div>
+				<div>
+					<textarea id="make-q-description" rows="5" class="form-control"></textarea>
+				</div>
+				<div>
+					<label for="make-q-relatedUrl">@Messages("relatedUrl")</label>
+				</div>
+				<div>
+					<input id="make-q-relatedUrl" class="form-control">
+				</div>
 			</div>
 		</form>
+		<div id="make-q-update">
+			<button id="make-q-update-btn" type="button" class="btn btn-default">@Messages("ui.create")</button>
+			<button id="make-q-back-btn" type="button" class="btn btn-default" style="display:none;">@Messages("back")</button>
+		</div>
+		<div id="make-q-publish" style="display:none;">
+			<h2>@Messages("publish")</h2>
+			<button id="make-q-publish-btn" type="button" class="btn btn-primary">@Messages("publish")</button>
+			<div>
+				<label>
+					<input id="make-q-includeRank" type="checkbox"> @Messages("includeToRanking")
+				</label>
+			</div>
+			<div>
+				<label>@Messages("timeLimit")</label>
+			</div>
+			<div>
+				<select id="make-q-timelimit" class="form-control">
+					<option>@Messages("tenSec")</option>
+					<option>@Messages("oneMin")</option>
+					<option>@Messages("noLimit")</option>
+				</select>
+			</div>
+		</div>
 	</div>
 </div>

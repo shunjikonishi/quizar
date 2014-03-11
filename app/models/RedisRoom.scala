@@ -9,7 +9,9 @@ import flect.redis.Room
 import flect.websocket.CommandResponse
 import flect.websocket.CommandHandler
 
-class RedisRoom(roomId: Int, redis: RedisService) extends Room("room." + roomId, redis) {
+class RedisRoom(val roomInfo: RoomInfo, redis: RedisService) extends Room("room." + roomInfo.id, redis) {
+
+  val roomId = roomInfo.id
 
   val commandOut = {
     val (cout, cchannel) = Concurrent.broadcast[CommandResponse]

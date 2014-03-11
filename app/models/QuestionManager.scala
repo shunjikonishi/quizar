@@ -23,22 +23,24 @@ class QuestionManager(roomId: Int) {
             CASE WHEN PUBLISH_COUNT = 0 THEN 0
             ELSE 1 END
           ), 0
-        )""").from(QuizQuestion as qq)
+        )""").from(QuizQuestion as qq).where.eq(qq.roomId, roomId)
     }.map(rs => (rs.int(1), rs.int(2))).single.apply().get
   }
 
   def list(published: Boolean, offset: Int, limit: Int): List[QuestionInfo] = {
-    withSQL { 
+    val sql = withSQL { 
       val cond = published match {
-        case true => SQLSyntax.eq(qq.publishCount, 0)
-        case false => SQLSyntax.ne(qq.publishCount, 0)
+        case true => SQLSyntax.ne(qq.publishCount, 0)
+        case false => SQLSyntax.eq(qq.publishCount, 0)
       }
       select
         .from(QuizQuestion as qq)
         .where.eq(qq.roomId, roomId)
         .and.append(cond)
         .orderBy(qq.id).desc.limit(limit).offset(offset)
-    }.map(rs => QuizQuestion(qq.resultName)(rs)).list.apply.map(QuestionInfo.create(_))
+    }
+println("questionList: " + sql.statement)
+    sql.map(rs => QuizQuestion(qq.resultName)(rs)).list.apply.map(QuestionInfo.create(_))
   }
 
   def get(id: Int): Option[QuestionInfo] = {
@@ -52,7 +54,7 @@ class QuestionManager(roomId: Int) {
       createdBy=q.createdBy,
       question=q.question,
       answers=q.answers,
-      answerType=q.answerType,
+      answerType=q.answerType.code.toString,
       tags=q.tags,
       description=q.description,
       relatedUrl=q.relatedUrl,
@@ -71,7 +73,7 @@ class QuestionManager(roomId: Int) {
       entity.copy(
         question=q.question,
         answers=q.answers,
-        answerType=q.answerType,
+        answerType=q.answerType.code.toString,
         tags=q.tags,
         description=q.description,
         relatedUrl=q.relatedUrl,

@@ -56,7 +56,7 @@ ui.update=Update
 ui.update[ja]=更新
 
 ui.successUpdate=Update succeed
-ui.successUpdate[ja]=更新に成功しました
+ui.successUpdate[ja]=更新しました
 
 roomName=Room name
 roomName[ja]=ルーム名
@@ -104,7 +104,7 @@ published=Published
 published[ja]=出題済み
 
 questionFrom=From
-questionFrom[ja]=出題者
+questionFrom[ja]=作成
 
 new=New
 new[ja]=作成
@@ -175,3 +175,38 @@ noCorrectAnswer[ja]=正解なし
 publish=Publish
 publish[ja]=出題
 
+includeToRanking=Include to ranking
+includeToRanking[ja]=ランキングに含める
+
+timeLimit=Time limit
+timeLimit[ja]=制限時間
+
+tenSec=10 seconds
+tenSec[ja]=10秒
+
+oneMin=1 minute
+oneMin[ja]=1分
+
+noLimit=No limit(manually)
+noLimit[ja]=無制限(手動)
+
+ui.invalidQuizChoices=Input multiple rows.(Max 5 rows.)
+ui.invalidQuizChoices[ja]=複数行入力してください(最大5行)
+
+ui.questionPosted=Post question to room master.
+ui.questionPosted[ja]=問題をルーム管理者に投稿しました
+
+relatedUrl=Related URL
+relatedUrl[ja]=関連URL
+
+options=Options
+options[ja]=オプション
+
+ui.editQuestion=Edit question
+ui.editQuestion[ja]=問題の編集
+
+ui.editAndPublishQuestion=Edit and publish question
+ui.editAndPublishQuestion[ja]=問題の編集／出題
+
+back=Back
+back[ja]=戻る
