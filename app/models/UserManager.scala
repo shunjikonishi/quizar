@@ -7,23 +7,23 @@ import scalikejdbc.SQLInterpolation.withSQL
 import scalikejdbc.SQLInterpolation.select
 import twitter4j.{User => TwitterUser}
 import org.joda.time.{DateTime}
-import models.entities.User
+import models.entities.QuizUser
 
 import flect.websocket.CommandHandler
 
 class UserManager {
 
-  private val u = User.u
+  private val qu = QuizUser.qu
 
-  def findByTwitterId(id: Long)(implicit session: DBSession = AutoSession): Option[User] = {
+  def findByTwitterId(id: Long)(implicit session: DBSession = AutoSession): Option[QuizUser] = {
     withSQL { 
-      select.from(User as u).where.eq(u.twitterId, id)
-    }.map(User(u.resultName)).single.apply()
+      select.from(QuizUser as qu).where.eq(qu.twitterId, id)
+    }.map(QuizUser(qu.resultName)).single.apply()
   }
 
-  def getUserById(id: Int) = User.find(id).getOrElse(throw new IllegalArgumentException())
+  def getUserById(id: Int) = QuizUser.find(id).getOrElse(throw new IllegalArgumentException())
 
-  def getUserByTwitter(tu: TwitterUser): User = {
+  def getUserByTwitter(tu: TwitterUser): QuizUser = {
     val now = new DateTime()
     findByTwitterId(tu.getId).map { u =>
       val user = u.copy(
@@ -35,7 +35,7 @@ class UserManager {
       user.save()
       user
     }.getOrElse {
-      User.create(
+      QuizUser.create(
         name = "@" + tu.getScreenName,
         twitterId = Some(tu.getId),
         twitterScreenName = Some(tu.getScreenName),

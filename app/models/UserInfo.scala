@@ -1,7 +1,7 @@
 package models
 
 import play.api.libs.json.Json
-import models.entities.User
+import models.entities.QuizUser
 
 case class UserInfo(id: Int, name: String, imageUrl: String) {
   def toJson = {
@@ -14,7 +14,7 @@ case class UserInfo(id: Int, name: String, imageUrl: String) {
 object UserInfo {
   implicit val format = Json.format[UserInfo]
 
-  def create(user: User) = UserInfo(
+  def create(user: QuizUser) = UserInfo(
     user.id,
     user.name,
     user.imageUrl
