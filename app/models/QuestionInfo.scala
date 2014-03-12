@@ -11,15 +11,15 @@ object AnswerType {
 
   val values = Array(FirstRow, Most, Least, NoAnswer)
 
-  def fromCode(code: Int) = values.filter(_.code == code).head
+  def fromCode(code: Short) = values.filter(_.code == code).head
 
   implicit object format extends Format[AnswerType] {
-    def reads(json: JsValue) = JsSuccess(fromCode(json.as[Int]))
+    def reads(json: JsValue) = JsSuccess(fromCode(json.as[Short]))
     def writes(s: AnswerType): JsValue = JsNumber(s.code)
   }
 }
 
-sealed abstract class AnswerType(val code: Int) {
+sealed abstract class AnswerType(val code: Short) {
   val name = toString
 }
 
@@ -64,7 +64,7 @@ object QuestionInfo {
     createdBy=q.createdBy,
     question=q.question,
     answers=q.answers,
-    answerType=AnswerType.fromCode(q.answerType.toInt),
+    answerType=AnswerType.fromCode(q.answerType),
     tags=q.tags,
     description=q.description,
     relatedUrl=q.relatedUrl,

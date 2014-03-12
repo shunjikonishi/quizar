@@ -44,14 +44,60 @@ $(function() {
 		});
 	}
 	function Home(con) {
-		function init($el, load) {
-			$("#event-future tbody tr, #event-yours tbody tr").click(function() {
+		function bindEvent($el) {
+			$el.find("tbody tr").click(function() {
 				var id = $(this).attr("data-room");
 				if (id) {
 					location.href = "/room/" + id;
 				}
 			});
-			$el.find(".tab-content").tabs();
+		}
+		function buildTable($el, data) {
+			var $tbody = $el.find("tbody");
+			for (var i=0; i<data.length; i++) {
+				var room = data[i],
+					$tr = $("<tr><td class='event-date'></td><td class='event-title'></td><td classs='event-capacity'></td></tr>"),
+					date = MSG.undecided,
+					title = room.name,
+					capacity = "";
+				if (room.event) {
+					if (room.event.title) {
+						title += "(" + room.event.title + ")";
+					}
+					if (room.event.execDate) {
+						date = room.event.execDate;
+					}
+					if (room.event.capacity) {
+						capacity = room.event.capacity + MSG.people;
+					}
+				}
+				$tr.attr("data-room", room.id);
+				$tr.find(".event-date").text(date);
+				$tr.find(".event-title").text(title);
+				$tr.find(".event-capacity").text(capacity);
+				$tbody.append($tr);
+			}
+		}
+		function init($el, loaded) {
+			var $futures = $("#event-future"),
+				$yours = $("#event-yours");
+			if (loaded) {
+				bindEvent($futures);
+				bindEvent($yours);
+			} else {
+				con.request({
+					"command" : "listRoom",
+					"data" : {
+						"limit" : 10,
+						"offset" : 0
+					},
+					"success" : function(data) {
+						buildTable($futures, data);
+						bindEvent($futures);
+					}
+				})
+			}
+			$el.find(".tab-content").tabs().show();
 		}
 		function clear() {
 		}
@@ -781,7 +827,7 @@ console.log("test1")
 				})
 			}
 			if ($("#home").length) {
-				home.init($("#home"), false);
+				home.init($("#home"), true);
 			}
 			if (params.roomAdmin || params.userQuiz) {
 				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con);
@@ -847,6 +893,10 @@ console.log("test1")
 		init();
 
 		var TemplateLogic = {
+			"home" : {
+				"beforeShow" : home.init,
+				"afterHide" : home.clear
+			},
 			"make-room" : {
 				"beforeShow" : function($el) {
 					makeRoom.clear();

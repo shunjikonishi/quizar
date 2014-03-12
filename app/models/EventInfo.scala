@@ -11,15 +11,15 @@ object EventStatus {
 
   val values = Array(Prepared, Running, End)
 
-  def fromCode(code: Int) = values.filter(_.code == code).head
+  def fromCode(code: Short) = values.filter(_.code == code).head
 
   implicit object format extends Format[EventStatus] {
-    def reads(json: JsValue) = JsSuccess(fromCode(json.as[Int]))
+    def reads(json: JsValue) = JsSuccess(fromCode(json.as[Short]))
     def writes(s: EventStatus): JsValue = JsNumber(s.code)
   }
 }
 
-sealed abstract class EventStatus(val code: Int) {
+sealed abstract class EventStatus(val code: Short) {
   val name = toString
 }
 
@@ -51,7 +51,7 @@ object EventInfo {
     id=event.id,
     roomId=event.roomId,
     title=event.title,
-    status=EventStatus.fromCode(event.status.toInt),
+    status=EventStatus.fromCode(event.status),
     execDate=event.execDate,
     endDate=event.endDate,
     capacity=event.capacity,

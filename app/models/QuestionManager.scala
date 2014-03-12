@@ -54,7 +54,7 @@ println("questionList: " + sql.statement)
       createdBy=q.createdBy,
       question=q.question,
       answers=q.answers,
-      answerType=q.answerType.code.toString,
+      answerType=q.answerType.code,
       tags=q.tags,
       description=q.description,
       relatedUrl=q.relatedUrl,
@@ -73,7 +73,7 @@ println("questionList: " + sql.statement)
       entity.copy(
         question=q.question,
         answers=q.answers,
-        answerType=q.answerType.code.toString,
+        answerType=q.answerType.code,
         tags=q.tags,
         description=q.description,
         relatedUrl=q.relatedUrl,

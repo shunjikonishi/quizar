@@ -70,6 +70,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
     addHandler("noop") { c => None}
     addHandler("makeRoom", RoomManager.createCommand)
     addHandler("updateRoom", RoomManager.updateCommand)
+    addHandler("listRoom", RoomManager.listCommand)
     addHandler("getRoom", RoomManager.getCommand)
     addHandler("getUser", UserManager.getCommand)
     addHandler("tweet") { c =>

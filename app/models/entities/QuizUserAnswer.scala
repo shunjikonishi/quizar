@@ -9,9 +9,10 @@ case class QuizUserAnswer(
   publishId: Int, 
   eventId: Int, 
   answer: Int, 
-  status: String, 
+  status: Short, 
   time: Int, 
-  created: DateTime) {
+  created: DateTime, 
+  updated: DateTime) {
 
   def save()(implicit session: DBSession = QuizUserAnswer.autoSession): QuizUserAnswer = QuizUserAnswer.save(this)(session)
 
@@ -24,16 +25,17 @@ object QuizUserAnswer extends SQLSyntaxSupport[QuizUserAnswer] {
 
   override val tableName = "quiz_user_answer"
 
-  override val columns = Seq("user_id", "publish_id", "event_id", "answer", "status", "time", "created")
+  override val columns = Seq("user_id", "publish_id", "event_id", "answer", "status", "time", "created", "updated")
 
   def apply(qua: ResultName[QuizUserAnswer])(rs: WrappedResultSet): QuizUserAnswer = new QuizUserAnswer(
     userId = rs.int(qua.userId),
     publishId = rs.int(qua.publishId),
     eventId = rs.int(qua.eventId),
     answer = rs.int(qua.answer),
-    status = rs.string(qua.status),
+    status = rs.short(qua.status),
     time = rs.int(qua.time),
-    created = rs.timestamp(qua.created).toDateTime
+    created = rs.timestamp(qua.created).toDateTime,
+    updated = rs.timestamp(qua.updated).toDateTime
   )
       
   val qua = QuizUserAnswer.syntax("qua")
@@ -71,9 +73,10 @@ object QuizUserAnswer extends SQLSyntaxSupport[QuizUserAnswer] {
     publishId: Int,
     eventId: Int,
     answer: Int,
-    status: String,
+    status: Short,
     time: Int,
-    created: DateTime)(implicit session: DBSession = autoSession): QuizUserAnswer = {
+    created: DateTime,
+    updated: DateTime)(implicit session: DBSession = autoSession): QuizUserAnswer = {
     withSQL {
       insert.into(QuizUserAnswer).columns(
         column.userId,
@@ -82,7 +85,8 @@ object QuizUserAnswer extends SQLSyntaxSupport[QuizUserAnswer] {
         column.answer,
         column.status,
         column.time,
-        column.created
+        column.created,
+        column.updated
       ).values(
         userId,
         publishId,
@@ -90,7 +94,8 @@ object QuizUserAnswer extends SQLSyntaxSupport[QuizUserAnswer] {
         answer,
         status,
         time,
-        created
+        created,
+        updated
       )
     }.update.apply()
 
@@ -101,7 +106,8 @@ object QuizUserAnswer extends SQLSyntaxSupport[QuizUserAnswer] {
       answer = answer,
       status = status,
       time = time,
-      created = created)
+      created = created,
+      updated = updated)
   }
 
   def save(entity: QuizUserAnswer)(implicit session: DBSession = autoSession): QuizUserAnswer = {
@@ -113,7 +119,8 @@ object QuizUserAnswer extends SQLSyntaxSupport[QuizUserAnswer] {
         column.answer -> entity.answer,
         column.status -> entity.status,
         column.time -> entity.time,
-        column.created -> entity.created
+        column.created -> entity.created,
+        column.updated -> entity.updated
       ).where.eq(column.userId, entity.userId).and.eq(column.publishId, entity.publishId)
     }.update.apply()
     entity 

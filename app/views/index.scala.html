@@ -18,7 +18,7 @@
 	</div>
 	<div>
 		<h2>イベント</h2>
-		<div class="tab-content">
+		<div class="tab-content" style="display:none;">
 			<ul>
 				<li><a href="#event-future">@Messages("upcoming")</a></li>
 				<li><a href="#event-yours">@Messages("yourEvents")</a></li>
@@ -35,8 +35,8 @@
 					<tbody>
 						@rooms.map { room =>
 							<tr data-room="@room.id">
-								<td class="event-date">@room.event.map(_.execDate.toString).getOrElse(Messages("undecided"))</td>
-								<td class="event-title">@room.name @room.event.map("(" + _.title + ")")</td>
+								<td class="event-date">@room.event.map(_.execDate.toString).getOrElse(Messages("ui.undecided"))</td>
+								<td class="event-title">@room.name @room.event.flatMap(_.title).map("(" + _ + ")")</td>
 								<td class="event-capacity">@room.event.map(_.capacity + Messages("people"))</td>
 							</tr>
 						}
@@ -55,7 +55,7 @@
 					<tbody>
 						@yours.map { room =>
 							<tr data-room="@room.id">
-								<td class="event-date">@room.event.map(_.execDate.toString).getOrElse(Messages("undecided"))</td>
+								<td class="event-date">@room.event.map(_.execDate.toString).getOrElse(Messages("ui.undecided"))</td>
 								<td class="event-title">@room.name @room.event.map("(" + _.title + ")")</td>
 								<td class="event-capacity">@room.event.map(_.capacity + Messages("people"))</td>
 							</tr>

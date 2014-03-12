@@ -130,8 +130,8 @@ title[ja]=タイトル
 capacity=Capacity
 capacity[ja]=定員
 
-undecided=Undecided
-undecided[ja]=未定
+ui.undecided=Undecided
+ui.undecided[ja]=未定
 
 people=people
 people[ja]=人

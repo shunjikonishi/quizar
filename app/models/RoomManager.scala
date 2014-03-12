@@ -76,7 +76,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
       select
         .from(QuizRoom as qr)
         .leftJoin(QuizEvent as qe).on(qr.id, qe.roomId)
-        .where.isNull(qe.status).or.in(qe.status, Seq("0", "1"))
+        .where.isNull(qe.status).or.in(qe.status, Seq(EventStatus.Prepared.code, EventStatus.Running.code))
         .orderBy(sqls"COALESCE(qe.exec_date, qr.updated)").desc
         .limit(limit).offset(offset)
     }.map { rs =>
@@ -103,7 +103,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     command.json(data)
   }
 
-  val listMethod = CommandHandler { command =>
+  val listCommand = CommandHandler { command =>
     val limit = (command.data \ "limit").as[Int]
     val offset = (command.data \ "offset").as[Int]
     val data = list(offset, limit).map(_.toJson)
