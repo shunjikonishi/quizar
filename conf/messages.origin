@@ -216,3 +216,21 @@ ui.postQuestionMessage[ja]=問題を投稿しました!
 
 notifyTweet=Notify tweet
 notifyTweet[ja]=チャットメッセージを通知する
+
+manageEvent=Event management
+manageEvent[ja]=イベント管理
+
+startDate=Start date
+startDate[ja]=開始日
+
+startTime=Start time
+startTime[ja]=開始時刻
+
+passcode=Passcode
+passcode[ja]=パスコード
+
+startEvent=Start event
+startEvent[ja]=イベント開始
+
+save=Save
+save[ja]=保存

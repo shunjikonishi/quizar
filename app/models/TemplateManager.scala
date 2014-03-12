@@ -16,7 +16,7 @@ class TemplateManager(session: SessionInfo) extends CommandHandler {
         val twitterUrl = session.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
         views.html.index(session, twitterUrl)
       case "make-room" => views.html.makeRoom(session)
-      case "event" => views.html.event(session)
+      case "edit-event" => views.html.event(session)
       case "edit-question" => views.html.question(session)
       case "make-question" => views.html.makeQuestion(session)
       case _ => Html("NotFound")

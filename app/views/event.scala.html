@@ -1,49 +1,58 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="edit-event" class="workspace">
-	<h1>イベント管理</h1>
+	<h1>@Messages("manageEvent")</h1>
 	<div class="input-form">
 		<form id="event-form">
 			<div>
-				<label>定員</label>
+				<label for="event-capacity">@Messages("capacity")</label>
 			</div>
 			<div>
-				<select class="form-control">
-					<option>20人</option>
-					<option>50人</option>
-					<option>100人</option>
+				<select id="event-capacity" class="form-control">
+					<option value="20">20 @Messages("people")</option>
+					<option value="50">50 @Messages("people")</option>
+					<option value="100">100 @Messages("people")</option>
 				</select>
 			</div>
 			<div class="form-group">
-				<label>タイトル</label>
+				<label for="event-title">@Messages("title")</label>
 			</div>
 			<div>
-				<input class="form-control">
+				<input id="title" class="form-control">
+			</div>
+			<div class="option-ctrl">
+				@Messages("options") 
+				<span>
+					<i class="fa fa-toggle-down fa-lg"></i>
+					<i class="fa fa-toggle-up fa-lg" style="display:none;"></i>
+				</span>
+			</div>
+			<div class="option-panel" style="display:none;">
+				<div>
+					<label for="event-date">@Messages("startDate")</label>
+				</div>
+				<div>
+					<input id="event-date" class="form-control" type="date">
+				</div>
+				<div>
+					<label for="event-time">@Messages("startTime")</label>
+				</div>
+				<div>
+					<input id="event-time" class="form-control" type="time">
+				</div>
+				<div>
+					<label for="event-passcode">@Messages("passcode")</label>
+				</div>
+				<div>
+					<input id="event-passcode" class="form-control">
+				</div>
+				<div>
+					<label for="event-description">@Messages("description")</label>
+					<textarea id="event-description" rows="5" class="form-control"></textarea>
+				</div>
 			</div>
 			<div>
-				<label>予定日</label>
-			</div>
-			<div>
-				<input class="form-control" type="date">
-			</div>
-			<div>
-				<label>開始時間</label>
-			</div>
-			<div>
-				<input class="form-control" type="time">
-			</div>
-			<div>
-				<label>パスコード</label>
-			</div>
-			<div>
-				<input class="form-control">
-			</div>
-			<div>
-				<label>説明</label>
-				<textarea rows="5" class="form-control"></textarea>
-			</div>
-			<div>
-				<button class="btn btn-primary">イベント開始</button>
-				<button class="btn btn-primary">変更を保存</button>
+				<button id="event-start-btn">@Messages("startEvent")</button>
+				<button id="event-update-btn">@Messages("save")</button>
 			</div>
 		</form>
 	</div>

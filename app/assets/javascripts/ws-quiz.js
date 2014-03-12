@@ -19,8 +19,23 @@ $(function() {
 			"Most" : 1,
 			"Least" : 2,
 			"NoAnswer" : 3
+		},
+		EventStatus = {
+			"Prepared" : 0,
+			"Running" : 1,
+			"End" : 2
 		};
 
+	function optionControl($ctrl, $panel) {
+		if (!$panel) {
+			$panel = $ctrl.find(".option-panel");
+			$ctrl = $ctrl.find(".option-ctrl");
+		}
+		$ctrl.click(function() {
+			$(this).find("i").toggle();
+			$panel.toggle();
+		})
+	}
 	function User(hash) {
 		function getMiniImageUrl() { return this.imageUrl;}
 
@@ -224,10 +239,7 @@ $(function() {
 				$h1.text(MSG.makeRoom);
 				$btnUpdate.text(MSG.create);
 			}
-			$("#make-room-option-btn").click(function() {
-				$(this).find("i").toggle();
-				$("#make-room-option").toggle();
-			})
+			optionControl($el);
 		}
 		function clear() {
 			$form = null;
@@ -504,7 +516,7 @@ $(function() {
 		function publish() {
 			alert("Not implemented yet.")
 		}
-		function init() {
+		function init($el) {
 			$form = $("#make-q-form");
 			$form.find(":input").each(function() {
 				var $input = $(this),
@@ -544,10 +556,7 @@ $(function() {
 				$publish.show();
 			}
 			$btnPublish = $("#make-q-publish-btn").click(publish);
-			$("#make-q-option-btn").click(function() {
-				$(this).find("i").toggle();
-				$("#make-q-option").toggle();
-			})
+			optionControl($el);
 			if (editQuestion) {
 				$("#make-q-h1").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
 				$btnUpdate.text(MSG.update);
@@ -579,6 +588,29 @@ $(function() {
 			"clear" : clear,
 			"edit" : function(q) { editQuestion = q;}
 		})
+	}
+	function EditEvent(app, roomId, eventId, con) {
+		function loadEvent(data) {
+
+		}
+		function init($el) {
+console.log("test1")
+			optionControl($el);
+			if (eventId) {
+				con.request({
+					"command" : "getEvent",
+					"data" : eventId,
+					"success" : loadEvent
+				})
+			}
+		}
+		function clear() {
+			//Do nothing
+		}
+		$.extend(this, {
+			"init" : init,
+			"clear" : clear
+		});
 	}
 	function DebuggerWrapper() {
 		var impl = null;
@@ -752,10 +784,11 @@ $(function() {
 				home.init($("#home"), false);
 			}
 			if (params.roomAdmin || params.userQuiz) {
-				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con)
+				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con);
 			}
 			if (params.roomAdmin) {
-				questionList = new QuestionList(self, users, params.userId, con)
+				questionList = new QuestionList(self, users, params.userId, con);
+				editEvent = new EditEvent(self, params.roomId, params.eventId, con);
 			}
 
 			$("#btn-menu").sidr({
@@ -805,6 +838,7 @@ $(function() {
 			home,
 			makeQuestion,
 			makeRoom,
+			editEvent,
 			templateManager,
 			chat,
 			questionList,
@@ -835,6 +869,12 @@ $(function() {
 				"edit-question" : {
 					"beforeShow" : questionList.init,
 					"afterHide" : questionList.clear
+				}
+			})
+			$.extend(TemplateLogic, {
+				"edit-event" : {
+					"beforeShow" : editEvent.init,
+					"afterHide" : editEvent.clear
 				}
 			})
 		} else if (params.userQuiz) {

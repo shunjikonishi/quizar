@@ -13,6 +13,8 @@ case class PageParams(
   roomAdmin: Option[Boolean] = None,
   userQuiz: Option[Boolean] = None,
   hashtag: Option[String] = None,
+  eventId : Option[Int] = None,
+  eventStatus: Option[Int] = None,
   userEventId: Option[Int] = None
 ) {
   def withUser(user: UserInfo): PageParams= {
@@ -28,6 +30,13 @@ case class PageParams(
       roomAdmin=userId.map(room.isAdmin(_)),
       userQuiz=Some(room.userQuiz),
       hashtag=room.hashtag
+    )
+  }
+  def withEvent(event: EventInfo, userEventId: Int) = {
+    copy(
+      eventId=Some(event.id),
+      eventStatus=Some(event.status.code),
+      userEventId=Some(userEventId)
     )
   }
 
