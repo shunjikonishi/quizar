@@ -35,6 +35,19 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         room.channel.send(res.toString)
         None
       }
+      val em = EventManager(roomId)
+      addHandler("createEvent", em.createCommand)
+      addHandler("updateEvent", em.updateCommand)
+      addHandler("getEvent", em.getCommand)
+      addHandler("openEvent") { command =>
+        val id = command.data.as[Int]
+        val ret = em.open(id)
+        if (ret) {
+          Some(new CommandResponse("openEvent", JsNumber(id)))
+        } else {
+          None
+        }
+      }
 
       addHandler("member", room.memberCommand)
       room.incMember
@@ -79,7 +92,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         val msg = (c.data \ "msg").as[String]
         val withTwitter = (c.data \ "twitter").as[Boolean]
         val img = session.user.map(_.imageUrl).getOrElse("#")
-        room.channel.send(new CommandResponse("chat", "json", 
+        room.channel.send(new CommandResponse("chat", 
           JsObject(Seq(
             ("userId", JsNumber(userId)),
             ("username", JsString(username)),

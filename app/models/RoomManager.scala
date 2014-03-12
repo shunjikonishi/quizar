@@ -97,7 +97,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   }
 
   val getCommand = CommandHandler { command =>
-    val id = (command.data \ "id").as[Int]
+    val id = command.data.as[Int]
     val room = getRoomInfo(id)
     val data = room.map(_.toJson).getOrElse(JsNull)
     command.json(data)

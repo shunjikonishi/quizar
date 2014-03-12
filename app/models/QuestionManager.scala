@@ -39,7 +39,6 @@ class QuestionManager(roomId: Int) {
         .and.append(cond)
         .orderBy(qq.id).desc.limit(limit).offset(offset)
     }
-println("questionList: " + sql.statement)
     sql.map(rs => QuizQuestion(qq.resultName)(rs)).list.apply.map(QuestionInfo.create(_))
   }
 

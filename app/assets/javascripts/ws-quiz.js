@@ -232,7 +232,7 @@ $(function() {
 			if (roomId && !editRoom) {
 				con.request({
 					"command" : "getRoom",
-					"data" : { "id" : roomId},
+					"data" : roomId,
 					"success" : function(data) {
 						editRoom = data;
 						init($el);
@@ -637,10 +637,82 @@ $(function() {
 	}
 	function EditEvent(app, roomId, eventId, con) {
 		function loadEvent(data) {
+			for (var name in data) {
+				var $input = $("#event-" + name);
+				if ($input.length) {
+					$input.val(data[name]);
+				}
+			}
+			if (data.execDate) {
+				console.log("execDate: " + data.execDate);
+			}
+			eventStatus = data.status;
+		}
+		function collectData() {
+			var date = $("#event-date").val(),
+				time = $("#event-time").val(),
+				ret = {
+					"id" : eventId || 0,
+					"roomId" : roomId,
+					"status" : eventStatus
+				};
+			$form.find(":input.auto-collect").each(function() {
+				var $input = $(this),
+					name = $input.attr("id").substring(6),
+					value = $input.val();
+				if (value) {
+					ret[name] = $input.val();
+				}
+			});
+			if (date) {
+				if (time) {
+					date += " " + time;
+				}
+				ret["execDate"] = date;
+			}
+			ret.capacity = parseInt(ret.capacity);
+console.log(JSON.stringify(ret));
+			return ret;
+		}
+		function openEvent() {
+			if (eventStatus != EventStatus.Prepared) {
+				return;
+			}
+			if (!eventId) {
+				updateEvent(true);
+			} else {
+				con.request({
+					"command" : "openEvent",
+					"data" : eventId
+				})
+			}
+		}
+		function closeEvent() {
 
 		}
+		function updateEvent(start) {
+			var data = collectData();
+			if (data.id) {
+				con.request({
+					"command" : "updateEvent",
+					"data" : data
+				});
+			} else {
+				con.request({
+					"command" : "createEvent",
+					"data" : data,
+					"success" : function(data) {
+						eventId = data.id;
+						eventStatus = data.status;
+						if (start) {
+							openEvent();
+						}
+					}
+				});
+			}
+		}
 		function init($el) {
-console.log("test1")
+			$form = $el.find("form");
 			optionControl($el);
 			if (eventId) {
 				con.request({
@@ -649,10 +721,23 @@ console.log("test1")
 					"success" : loadEvent
 				})
 			}
+			$("#event-start-btn").click(function() {
+				if (eventStatus == EventStatus.Prepared) {
+					openEvent();
+				} else if (eventStatus == EventStatus.Ruuning) {
+					closeEvent();
+				}
+			});
+			$("#event-update-btn").click(function() {
+				updateEvent(false);
+			});
 		}
 		function clear() {
-			//Do nothing
+			$form = null;
+			eventStatus = EventStatus.Prepared;
 		}
+		var $form = null,
+			eventStatus = EventStatus.Prepared;
 		$.extend(this, {
 			"init" : init,
 			"clear" : clear
@@ -793,7 +878,7 @@ console.log("test1")
 					return false;
 				})
 				con.onError(function(data) {
-					alert(data);
+					console.log(data);
 				});
 			}
 			if (params.userId) {
