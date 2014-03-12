@@ -126,6 +126,7 @@ $(function() {
 			}
 		}
 		function onMessage(event) {
+console.log(event.data);
 			var data = JSON.parse(event.data),
 				startTime = times[data.id],
 				func = null;

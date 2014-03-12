@@ -133,8 +133,8 @@ capacity[ja]=定員
 ui.undecided=Undecided
 ui.undecided[ja]=未定
 
-people=people
-people[ja]=人
+ui.people=people
+ui.people[ja]=人
 
 ranking=Ranking
 ranking[ja]=ランキング

@@ -25,19 +25,16 @@ case class PageParams(
     )
   }
   def withRoom(room: RoomInfo): PageParams = {
-    copy(
+    val ret = copy(
       roomId=Some(room.id),
       roomAdmin=userId.map(room.isAdmin(_)),
       userQuiz=Some(room.userQuiz),
       hashtag=room.hashtag
     )
-  }
-  def withEvent(event: EventInfo, userEventId: Int) = {
-    copy(
-      eventId=Some(event.id),
-      eventStatus=Some(event.status.code),
-      userEventId=Some(userEventId)
-    )
+    room.event.map(e => ret.copy(
+      eventId=Some(e.id),
+      eventStatus=Some(e.status.code)
+    )).getOrElse(ret)
   }
 
   def toJson = {

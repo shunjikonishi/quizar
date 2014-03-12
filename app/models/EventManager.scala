@@ -12,9 +12,20 @@ import flect.websocket.CommandResponse
 class EventManager(roomId: Int) {
 
   implicit val autoSession = QuizEvent.autoSession
+  private val qe = QuizEvent.qe
 
   def getEvent(id: Int): Option[EventInfo] = {
     QuizEvent.find(id).map(EventInfo.create(_))
+  }
+
+  def getCurrentEvent: Option[EventInfo] = {
+    withSQL { 
+      select
+        .from(QuizEvent as qe)
+        .where.eq(qe.roomId, roomId).and.in(qe.status, Seq(EventStatus.Prepared.code, EventStatus.Running.code))
+        .orderBy(qe.id).desc
+        .limit(1)
+    }.map(QuizEvent(qe.resultName)).list.apply.headOption.map(EventInfo.create(_))
   }
 
   def create(event: EventInfo)(implicit session: DBSession): EventInfo = {

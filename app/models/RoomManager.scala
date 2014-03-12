@@ -37,7 +37,10 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   def join(id: Int): Future[(Iteratee[String,_], Enumerator[String])] = join("room." + id)
 
   def getRoomInfo(id: Int): Option[RoomInfo] = {
-    QuizRoom.find(id).map(RoomInfo.create(_))
+    val room = QuizRoom.find(id).map(RoomInfo.create(_))
+    room.map(_.copy(
+      event = EventManager(id).getCurrentEvent
+    ))
   }
 
   def create(room: RoomInfo): RoomInfo = {

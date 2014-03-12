@@ -56,7 +56,7 @@ $(function() {
 			var $tbody = $el.find("tbody");
 			for (var i=0; i<data.length; i++) {
 				var room = data[i],
-					$tr = $("<tr><td class='event-date'></td><td class='event-title'></td><td classs='event-capacity'></td></tr>"),
+					$tr = $("<tr><td class='event-date'></td><td class='event-title'></td><td class='event-capacity'></td></tr>"),
 					date = MSG.undecided,
 					title = room.name,
 					capacity = "";
@@ -68,7 +68,7 @@ $(function() {
 						date = room.event.execDate;
 					}
 					if (room.event.capacity) {
-						capacity = room.event.capacity + MSG.people;
+						capacity = "" + room.event.capacity + MSG.people;
 					}
 				}
 				$tr.attr("data-room", room.id);
@@ -702,6 +702,7 @@ console.log(JSON.stringify(ret));
 					"command" : "createEvent",
 					"data" : data,
 					"success" : function(data) {
+console.log(data);
 						eventId = data.id;
 						eventStatus = data.status;
 						if (start) {
@@ -976,6 +977,7 @@ console.log(JSON.stringify(ret));
 			$content,
 			users = {};
 		init();
+		console.log(params);
 
 		var TemplateLogic = {
 			"home" : {
