@@ -5,6 +5,7 @@ import scalikejdbc.SQLInterpolation._
 import org.joda.time.{DateTime}
 
 case class QuizPublish(
+  id: Int, 
   eventId: Int, 
   questionId: Int, 
   opened: Boolean, 
@@ -22,9 +23,10 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
 
   override val tableName = "quiz_publish"
 
-  override val columns = Seq("event_id", "question_id", "opened", "created", "updated")
+  override val columns = Seq("id", "event_id", "question_id", "opened", "created", "updated")
 
   def apply(qp: ResultName[QuizPublish])(rs: WrappedResultSet): QuizPublish = new QuizPublish(
+    id = rs.int(qp.id),
     eventId = rs.int(qp.eventId),
     questionId = rs.int(qp.questionId),
     opened = rs.boolean(qp.opened),
@@ -36,9 +38,9 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
 
   override val autoSession = AutoSession
 
-  def find(eventId: Int, questionId: Int)(implicit session: DBSession = autoSession): Option[QuizPublish] = {
+  def find(id: Int)(implicit session: DBSession = autoSession): Option[QuizPublish] = {
     withSQL { 
-      select.from(QuizPublish as qp).where.eq(qp.eventId, eventId).and.eq(qp.questionId, questionId)
+      select.from(QuizPublish as qp).where.eq(qp.id, id)
     }.map(QuizPublish(qp.resultName)).single.apply()
   }
           
@@ -68,7 +70,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
     opened: Boolean,
     created: DateTime,
     updated: DateTime)(implicit session: DBSession = autoSession): QuizPublish = {
-    withSQL {
+    val generatedKey = withSQL {
       insert.into(QuizPublish).columns(
         column.eventId,
         column.questionId,
@@ -82,9 +84,10 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
         created,
         updated
       )
-    }.update.apply()
+    }.updateAndReturnGeneratedKey.apply()
 
     QuizPublish(
+      id = generatedKey.toInt, 
       eventId = eventId,
       questionId = questionId,
       opened = opened,
@@ -95,18 +98,19 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
   def save(entity: QuizPublish)(implicit session: DBSession = autoSession): QuizPublish = {
     withSQL { 
       update(QuizPublish).set(
+        column.id -> entity.id,
         column.eventId -> entity.eventId,
         column.questionId -> entity.questionId,
         column.opened -> entity.opened,
         column.created -> entity.created,
         column.updated -> entity.updated
-      ).where.eq(column.eventId, entity.eventId).and.eq(column.questionId, entity.questionId)
+      ).where.eq(column.id, entity.id)
     }.update.apply()
     entity 
   }
         
   def destroy(entity: QuizPublish)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(QuizPublish).where.eq(column.eventId, entity.eventId).and.eq(column.questionId, entity.questionId) }.update.apply()
+    withSQL { delete.from(QuizPublish).where.eq(column.id, entity.id) }.update.apply()
   }
         
 }

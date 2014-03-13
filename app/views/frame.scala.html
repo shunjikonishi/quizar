@@ -15,6 +15,7 @@
 			</button>
 			<ul class="dropdown-menu">
 				<li><a href="#">@user.name</a></li>
+				<li class="entry-event"><a href="#" class="entry-event-btn">@Messages("entryEvent")</a></li>
 				<li class="divider"></li>
 				<li><a href="/signout"><i class="fa fa-sign-out"></i> @Messages("signout")</a></li>
 			</ul>
@@ -51,16 +52,25 @@
 		}
 	</div>
 </div>
-<div id="content" class="container">
-	<div id="content-dynamic">
-		@content
+<div class="container">
+	<div id="entry-event-alert" class="entry-event alert alert-info">
+		<div class="pull-right">
+			<button class="entry-event-btn">@Messages("entry")</button>
+			<button id="not-entry-event">@Messages("notEntry")</button>
+		</div>
+		<p>@Messages("eventConfirm")</p>
 	</div>
-	@roomInfo.map { room =>
-		@views.html.chat(userInfo, twitterUrl)
-	}
-	@if(params.debug) {
-		@views.html.debug()
-	}
+	<div id="content">
+		<div id="content-dynamic">
+			@content
+		</div>
+		@roomInfo.map { room =>
+			@views.html.chat(userInfo, twitterUrl)
+		}
+		@if(params.debug) {
+			@views.html.debug()
+		}
+	</div>
 </div>
 <div id="sidr" style="display:none;">
 	<ul>

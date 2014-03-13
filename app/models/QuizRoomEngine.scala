@@ -40,7 +40,26 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("updateEvent", em.updateCommand)
       addHandler("getEvent", em.getCommand)
       addHandler("getCurrentEvent", em.getCurrentCommand)
-      addHandler("openEvent") { command =>
+      addHandler("entryEvent") { command =>
+        val userId = (command.data \ "userId").as[Int]
+        val eventId = (command.data \ "eventId").as[Int]
+        val passcode = (command.data \ "passcode").asOpt[String]
+        val json = try {
+          val userEventId = em.entry(userId, eventId, passcode)
+          session.user.foreach { user =>
+            room.send(new CommandResponse("newEntry", user.toJson))
+          }
+          JsObject(Seq("userEventId" -> JsNumber(userEventId)))
+        } catch {
+          case e: PasscodeRequireException =>
+            JsObject(Seq("requirePass" -> JsBoolean(true)))
+          case e: Exception =>
+            JsObject(Seq("error" -> JsString(e.getMessage)))
+        }
+        Some(command.json(json))
+      }
+
+       addHandler("openEvent") { command =>
         val id = command.data.as[Int]
         val ret = em.open(id)
         if (ret) {
@@ -68,6 +87,8 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       val createdBy = (res.data \ "createdBy").as[Int]
       if (createdBy == userId) {
         Some(res)
+      } else if (room.map(_.roomInfo.isAdmin(userId)).getOrElse(false)) {
+        Some(new CommandResponse("postQuestion", JsNumber(createdBy)))
       } else {
         None
       }

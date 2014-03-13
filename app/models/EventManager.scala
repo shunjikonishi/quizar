@@ -1,9 +1,11 @@
 package models
 
 import play.api.libs.json._
+import play.api.i18n.Messages;
 import scalikejdbc._
 import scalikejdbc.SQLInterpolation._
 import models.entities.QuizEvent
+import models.entities.QuizUserEvent
 import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -12,10 +14,26 @@ import flect.websocket.CommandResponse
 class EventManager(roomId: Int) {
 
   implicit val autoSession = QuizEvent.autoSession
-  private val qe = QuizEvent.qe
+  private val (qe, que) = (QuizEvent.qe, QuizUserEvent.que)
 
+  private def roundTime(d: DateTime) = {
+    val hour = d.getHourOfDay
+    val min = d.getMinuteOfHour match {
+      case n if (n < 15) => 0
+      case n if (n < 30) => 15
+      case n if (n < 45) => 30
+      case _ => 45
+    }
+    val ret = d.withTime(hour, min, 0, 0)
+    println("roundTime: " + d + ", " + ret)
+    ret
+  }
   def getEvent(id: Int): Option[EventInfo] = {
     QuizEvent.find(id).map(EventInfo.create(_))
+  }
+
+  def getUserEventId(userId: Int, eventId: Int): Option[Int] = {
+    QuizUserEvent.findAllBy(SQLSyntax.eq(que.userId, userId).and.eq(que.eventId, eventId)).headOption.map(_.id)
   }
 
   def getCurrentEvent: Option[EventInfo] = {
@@ -67,7 +85,7 @@ class EventManager(roomId: Int) {
       val now = new DateTime()
       val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, EXEC_DATE = ?, UPDATED = ? " + 
           "WHERE ID = ? AND STATUS = ?")
-        .bind(EventStatus.Running.code, now, now, id, EventStatus.Prepared.code)
+        .bind(EventStatus.Running.code, roundTime(now), now, id, EventStatus.Prepared.code)
         .update.apply();
       ret == 1
     }
@@ -78,10 +96,47 @@ class EventManager(roomId: Int) {
       val now = new DateTime()
       val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, END_DATE = ?, UPDATED = ? " + 
           "WHERE ID = ? AND STATUS = ?")
-        .bind(EventStatus.Finished.code, now, now, id, EventStatus.Running.code)
+        .bind(EventStatus.Finished.code, roundTime(now), now, id, EventStatus.Running.code)
         .update.apply();
       //ToDo ranking
       ret == 1
+    }
+  }
+
+  def entry(userId: Int, eventId: Int, userpass: Option[String]): Int = {
+    DB localTx { implicit session =>
+      val sameUser = QuizUserEvent.countBy(SQLSyntax.eq(que.userId, userId).and.eq(que.eventId, eventId))
+      if (sameUser == 1) {
+        throw new QuizException(Messages("alreadyEntryEvent"))
+      }
+      val event = QuizEvent.find(eventId).getOrElse(throw new IllegalArgumentException("Event not found: " + eventId))
+      val entryCount = QuizUserEvent.countBy(SQLSyntax.eq(que.eventId, eventId))
+      if (entryCount >= event.capacity) {
+        throw new QuizException(Messages("capacityOver"))
+      }
+      event.passcode match {
+        case Some(x) =>
+          userpass match {
+            case Some(y) =>
+              if (x != y) {
+                throw new InvalidPasscodeException()
+              }
+            case None =>
+              throw new PasscodeRequireException()
+          }
+        case None => //OK
+      }
+      val now = new DateTime()
+      QuizUserEvent.create(
+        userId=userId,
+        eventId=eventId,
+        roomId=roomId,
+        correctCount=0,
+        wrongCount=0,
+        time=0,
+        point=0,
+        created=now,
+        updated=now).id
     }
   }
 
@@ -107,6 +162,7 @@ class EventManager(roomId: Int) {
     val data = event.map(_.toJson).getOrElse(JsNull)
     command.json(data)
   }
+
 }
 
 object EventManager {

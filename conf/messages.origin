@@ -249,3 +249,30 @@ ui.question[ja]=問題
 
 ui.failOpenEvent=Could not start this event.
 ui.failOpenEvent[ja]=このイベントを開始することができませんでした
+
+scheduledDate=Scheduled date
+scheduledDate[ja]=開催予定
+
+ui.eventRunning=In session
+ui.eventRunning[ja]=開催中
+
+eventConfirm=Now this room has an event! Are you entry?
+eventConfirm[ja]=この部屋では現在イベントを開催しています。参加しますか？
+
+entry=Entry
+entry[ja]=参加
+
+notEntry=No
+notEntry=参加しない
+
+entryEvent=Entry event
+entryEvent[ja]=イベントに参加
+
+alreadyEntryEvent=You already entried to this event.
+alreadyEntryEvent[ja]=あなたは既にこのイベントに参加しています
+
+capacityOver=Entry has been closed.
+capacityOver[ja]=エントリーは締め切られました
+
+ui.newEntry=I'm joining this event now!
+ui.newEntry[ja]=イベントにエントリーしました!

@@ -137,7 +137,9 @@ $(function() {
 					if (room.event.title) {
 						title += "(" + room.event.title + ")";
 					}
-					if (room.event.execDate) {
+					if (room.event.status == EventStatus.Running) {
+						date = MSG.eventRunning;
+					} else if (room.event.execDate) {
 						date = new DateTime(room.event.execDate).datetimeStr();
 					}
 					if (room.event.capacity) {
@@ -151,26 +153,21 @@ $(function() {
 				$tbody.append($tr);
 			}
 		}
-		function init($el, loaded) {
+		function init($el) {
 			var $futures = $("#event-future"),
 				$yours = $("#event-yours");
-			if (loaded) {
-				bindEvent($futures);
-				bindEvent($yours);
-			} else {
-				con.request({
-					"command" : "listRoom",
-					"data" : {
-						"limit" : 10,
-						"offset" : 0
-					},
-					"success" : function(data) {
-						buildTable($futures, data);
-						bindEvent($futures);
-					}
-				})
-			}
-			$el.find(".tab-content").tabs().show();
+			con.request({
+				"command" : "listRoom",
+				"data" : {
+					"limit" : 10,
+					"offset" : 0
+				},
+				"success" : function(data) {
+					buildTable($futures, data);
+					bindEvent($futures);
+					$el.find(".tab-content").tabs().show();
+				}
+			})
 		}
 		function clear() {
 		}
@@ -635,7 +632,6 @@ $(function() {
 								}
 							} else {
 								app.showMessage(MSG.questionPosted);
-								app.tweet(MSG.postQuestionMessage, false);
 								clearField();
 							}
 						}
@@ -718,6 +714,61 @@ $(function() {
 			"edit" : function(q) { editQuestion = q;}
 		})
 	}
+	function EntryEvent(app, params, con) {
+		function isEnable() {
+			return params.eventId && !params.userEventId && params.eventStatus == EventStatus.Running;
+		}
+		function openEvent() {
+			if (isEnable()) {
+				$(".entry-event").show();
+			}
+		}
+		function closeEvent() {
+			$(".entry-event").hide();
+		}
+		function entry() {
+			if (isEnable()) {
+				con.request({
+					"command" : "entryEvent",
+					"data" : {
+						"userId" : params.userId,
+						"eventId" : params.eventId
+					},
+					"success" : function(data) {
+						if (data.error) {
+							app.showMessage(data.error);
+						} else if (data.requirePass) {
+							app.showPasscode();
+						} else if (data.userEventId) {
+							params.userEventId = data.userEventId;
+						} else {
+							alert("Invalid data: " + JSON.stringify(data));
+						}
+					}
+				})
+				$("#entry-event-alert").hide();
+			}
+		}
+		function init($el) {
+
+		}
+		function clear() {
+
+		}
+		$(".entry-event-btn").click(entry);
+		$("#not-entry-event").click(function() {
+			$("#entry-event-alert").hide();
+		});
+		if (isEnable()) {
+			openEvent();
+		}
+		$.extend(this, {
+			"init" : init,
+			"clear" : clear,
+			"openEvent" : openEvent,
+			"closeEvent" : closeEvent
+		})
+	}
 	function EditEvent(app, roomId, con) {
 		function loadEvent(data) {
 			if (data) {
@@ -787,11 +838,9 @@ $(function() {
 			}
 		}
 		function closeEvent() {
-console.log("test1: " + eventId + ", " + eventStatus);
 			if (!eventId || eventStatus != EventStatus.Running) {
 				return;
 			}
-console.log("test2: " + eventId + ", " + eventStatus);
 			con.request({
 				"command" : "closeEvent",
 				"data" : eventId,
@@ -861,7 +910,6 @@ console.log("test2: " + eventId + ", " + eventStatus);
 			});
 			optionControl($el);
 			$toggleBtn = $("#event-toggle-btn").click(function() {
-console.log("test0: " + eventId + ", " + eventStatus);
 				if (eventStatus == EventStatus.Prepared) {
 					openEvent();
 				} else if (eventStatus == EventStatus.Running) {
@@ -1065,6 +1113,16 @@ console.log("test0: " + eventId + ", " + eventStatus);
 					}
 				});
 				con.addEventListener("member", chat.member);
+				con.addEventListener("newEntry", function(data) {
+					var user = new User(data);
+					users[user.id] = user;
+					messageDialog.notifyTweet({
+						"userId" : user.id,
+						"username" : user.name,
+						"msg" : MSG.newEntry,
+						"img" : user.imageUrl
+					})
+				})
 				con.ready(function() {
 					if (chat.member() == 0) {
 						con.request({
@@ -1079,18 +1137,27 @@ console.log("test0: " + eventId + ", " + eventStatus);
 					if (makeQuestion) {
 						makeQuestion.openEvent(params.eventId);
 					}
+					if (entryEvent) {
+						setTimeout(entryEvent.openEvent, 3000);
+					}
 				})
 				con.addEventListener("finishEvent", function(data) {
 					effectDialog.show(MSG.finish);
 					params.eventId = 0;
 					params.eventStatus = EventStatus.Prepared;
+					params.userEventId = 0;
 					if (makeQuestion) {
 						makeQuestion.closeEvent();
+					}
+					if (entryEvent) {
+						entryEvent.closeEvent();
 					}
 				})
 			}
 			if ($("#home").length) {
-				home.init($("#home"), true);
+				con.ready(function() {
+					home.init($("#home"));
+				});
 			}
 			if (params.roomAdmin || params.userQuiz) {
 				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con);
@@ -1101,6 +1168,9 @@ console.log("test0: " + eventId + ", " + eventStatus);
 			if (params.roomAdmin) {
 				questionList = new QuestionList(self, users, params.userId, con);
 				editEvent = new EditEvent(self, params.roomId, con);
+			}
+			if (params.userId && params.roomId && !params.roomAdmin) {
+				entryEvent = new EntryEvent(self, params, con);
 			}
 
 			$("#btn-menu").sidr({
@@ -1152,6 +1222,7 @@ console.log("test0: " + eventId + ", " + eventStatus);
 			makeQuestion,
 			makeRoom,
 			editEvent,
+			entryEvent,
 			templateManager,
 			chat,
 			questionList,

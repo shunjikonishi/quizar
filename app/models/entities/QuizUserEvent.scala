@@ -5,6 +5,7 @@ import scalikejdbc.SQLInterpolation._
 import org.joda.time.{DateTime}
 
 case class QuizUserEvent(
+  id: Int, 
   userId: Int, 
   eventId: Int, 
   roomId: Int, 
@@ -26,9 +27,10 @@ object QuizUserEvent extends SQLSyntaxSupport[QuizUserEvent] {
 
   override val tableName = "quiz_user_event"
 
-  override val columns = Seq("user_id", "event_id", "room_id", "correct_count", "wrong_count", "time", "point", "created", "updated")
+  override val columns = Seq("id", "user_id", "event_id", "room_id", "correct_count", "wrong_count", "time", "point", "created", "updated")
 
   def apply(que: ResultName[QuizUserEvent])(rs: WrappedResultSet): QuizUserEvent = new QuizUserEvent(
+    id = rs.int(que.id),
     userId = rs.int(que.userId),
     eventId = rs.int(que.eventId),
     roomId = rs.int(que.roomId),
@@ -44,9 +46,9 @@ object QuizUserEvent extends SQLSyntaxSupport[QuizUserEvent] {
 
   override val autoSession = AutoSession
 
-  def find(userId: Int, eventId: Int)(implicit session: DBSession = autoSession): Option[QuizUserEvent] = {
+  def find(id: Int)(implicit session: DBSession = autoSession): Option[QuizUserEvent] = {
     withSQL { 
-      select.from(QuizUserEvent as que).where.eq(que.userId, userId).and.eq(que.eventId, eventId)
+      select.from(QuizUserEvent as que).where.eq(que.id, id)
     }.map(QuizUserEvent(que.resultName)).single.apply()
   }
           
@@ -80,7 +82,7 @@ object QuizUserEvent extends SQLSyntaxSupport[QuizUserEvent] {
     point: Int,
     created: DateTime,
     updated: DateTime)(implicit session: DBSession = autoSession): QuizUserEvent = {
-    withSQL {
+    val generatedKey = withSQL {
       insert.into(QuizUserEvent).columns(
         column.userId,
         column.eventId,
@@ -102,9 +104,10 @@ object QuizUserEvent extends SQLSyntaxSupport[QuizUserEvent] {
         created,
         updated
       )
-    }.update.apply()
+    }.updateAndReturnGeneratedKey.apply()
 
     QuizUserEvent(
+      id = generatedKey.toInt, 
       userId = userId,
       eventId = eventId,
       roomId = roomId,
@@ -119,6 +122,7 @@ object QuizUserEvent extends SQLSyntaxSupport[QuizUserEvent] {
   def save(entity: QuizUserEvent)(implicit session: DBSession = autoSession): QuizUserEvent = {
     withSQL { 
       update(QuizUserEvent).set(
+        column.id -> entity.id,
         column.userId -> entity.userId,
         column.eventId -> entity.eventId,
         column.roomId -> entity.roomId,
@@ -128,13 +132,13 @@ object QuizUserEvent extends SQLSyntaxSupport[QuizUserEvent] {
         column.point -> entity.point,
         column.created -> entity.created,
         column.updated -> entity.updated
-      ).where.eq(column.userId, entity.userId).and.eq(column.eventId, entity.eventId)
+      ).where.eq(column.id, entity.id)
     }.update.apply()
     entity 
   }
         
   def destroy(entity: QuizUserEvent)(implicit session: DBSession = autoSession): Unit = {
-    withSQL { delete.from(QuizUserEvent).where.eq(column.userId, entity.userId).and.eq(column.eventId, entity.eventId) }.update.apply()
+    withSQL { delete.from(QuizUserEvent).where.eq(column.id, entity.id) }.update.apply()
   }
         
 }

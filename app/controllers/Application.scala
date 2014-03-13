@@ -10,6 +10,7 @@ import play.api.i18n.Messages
 import play.api.templates.Html
 
 import models.TwitterManager
+import models.EventManager
 import models.UserManager
 import models.SessionManager
 import models.SessionInfo
@@ -49,7 +50,13 @@ object Application extends Controller {
       val sessionInfo = sm.get(sessionId).copy(roomId=Some(room.id))
       sm.set(sessionId, sessionInfo)
       val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
-      val params = PageParams.create(request, sessionInfo).withRoom(room)
+      val userEventId = if (sessionInfo.user.isDefined && room.event.isDefined) {
+        EventManager(room.id).getUserEventId(sessionInfo.user.get.id, room.event.get.id)
+      } else {
+        None
+      }
+      println("userEventId = " + userEventId)
+      val params = PageParams.create(request, sessionInfo, userEventId).withRoom(room)
 
       Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)(Html.empty)).withSession(
         "sessionId" -> sessionId

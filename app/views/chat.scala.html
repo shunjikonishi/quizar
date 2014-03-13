@@ -3,7 +3,9 @@
 	<h1>@Messages("chat")</h1>
 	<div>
 		<div>
-			<input type="checkbox" id="chat-notify"> @Messages("notifyTweet")
+			<label>
+				<input type="checkbox" id="chat-notify"> @Messages("notifyTweet")
+			</label>
 		</div>
 		<div class="pull-right">@Html(Messages("html.roomMember"))</div>
 		<div class="clearfix"></div>
@@ -12,7 +14,7 @@
 		<div>
 			<textarea id="chat-text" class="form-control" rows="5" style="width: 100%;"></textarea>
 			<div id="chat-text-len">140</div>
-			<div class="checkbox">
+			<div>
 				<label>
 					<input id="chat-twitter" type="checkbox" checked="checked"> @Messages("postTwitter")
 				</label>
