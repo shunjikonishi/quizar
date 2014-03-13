@@ -106,7 +106,7 @@ $(function() {
 			"clear" : clear
 		})
 	}
-	function Chat($el, userId, con) {
+	function Chat($el, userId, hashtag, con) {
 		var MAX_LOG = 20;
 		function tweet(msg, withTwitter) {
 			if (userId) {
@@ -167,7 +167,7 @@ $(function() {
 				if (msg.length == 0 || msg.length > 140) {
 					return;
 				}
-				$text.val("");
+				$text.val(hashtag);
 				tweet(msg, withTwitter);
 			});
 			$text.keyup(function() {
@@ -180,6 +180,14 @@ $(function() {
 				$len.text(len);
 			})
 		}
+		if (hashtag) {
+			if (hashtag.charAt(0) != "#") {
+				hashtag = "#" + hashtag;
+			}
+		} else {
+			hashtag = "";
+		}
+		$text.val(hashtag);
 		$.extend(this, {
 			"member" : member,
 			"append" : append,
@@ -644,7 +652,7 @@ $(function() {
 				}
 			}
 			if (data.execDate) {
-				console.log("execDate: " + data.execDate);
+				console.log("execDate: " + data.execDate + ", " + new Date(data.execDate));
 			}
 			eventStatus = data.status;
 		}
@@ -671,7 +679,6 @@ $(function() {
 				ret["execDate"] = date;
 			}
 			ret.capacity = parseInt(ret.capacity);
-console.log(JSON.stringify(ret));
 			return ret;
 		}
 		function openEvent() {
@@ -695,18 +702,22 @@ console.log(JSON.stringify(ret));
 			if (data.id) {
 				con.request({
 					"command" : "updateEvent",
-					"data" : data
+					"data" : data,
+					"success" : function() {
+						app.showMessage(MSG.successUpdate);
+					}
 				});
 			} else {
 				con.request({
 					"command" : "createEvent",
 					"data" : data,
 					"success" : function(data) {
-console.log(data);
 						eventId = data.id;
 						eventStatus = data.status;
 						if (start) {
 							openEvent();
+						} else {
+							app.showMessage(MSG.successUpdate);
 						}
 					}
 				});
@@ -762,6 +773,9 @@ console.log(data);
 	function PageDebugger($el, con, messageDialog) {
 		var MAX_LOG = 10;
 		function log(type, value, time) {
+			if (typeof(value) === "object") {
+				value = JSON.stringify(value);
+			}
 			if (cnt > MAX_LOG) {
 				$tbody.find("tr:first").remove();
 			}
@@ -774,6 +788,7 @@ console.log(data);
 			}
 			$tbody.append($tr);
 			cnt++;
+			console.log(type + ", " + value + (time ? ", " + time + "ms" : ""));
 		}
 		var $tbody = $el.find("table tbody"),
 			cnt = 0;
@@ -892,7 +907,7 @@ console.log(data);
 
 			if (params.roomId) {
 				var $chat = $("#chat");
-				chat = new Chat($chat, params.userId, con);
+				chat = new Chat($chat, params.userId, params.hashtag, con);
 				$(".menu-chat").click(function() {
 					showStatic("chat", $(this).parents("#sidr").length > 0);
 					return false;
@@ -977,7 +992,7 @@ console.log(data);
 			$content,
 			users = {};
 		init();
-		console.log(params);
+		debug.log("params", params);
 
 		var TemplateLogic = {
 			"home" : {

@@ -9,8 +9,7 @@ case class TokenInfo(token: String, secret: String) {
 }
 
 case class SessionInfo(id: String, lang: String, user: Option[UserInfo] = None, 
-    roomId: Option[Int] = None, userEventId: Option[Int] = None, 
-    twitterInfo: Option[TokenInfo] = None) {
+    roomId: Option[Int] = None, twitterInfo: Option[TokenInfo] = None) {
 
   def login(user: QuizUser, accessToken: AccessToken = null) = {
     copy(user=Some(UserInfo.create(user)), twitterInfo=Option(accessToken).map(new TokenInfo(_)))

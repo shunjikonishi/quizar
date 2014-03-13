@@ -49,10 +49,10 @@ case class PageParams(
 object PageParams {
   implicit val format = Json.format[PageParams]
 
-  def create(request: RequestHeader, session: SessionInfo) = {
+  def create(request: RequestHeader, session: SessionInfo, userEventId: Option[Int]=None) = {
     val uri = controllers.routes.Application.ws().webSocketURL()(request)
+    //ToDo remove debug
     val debug = request.getQueryString("debug").map(_ == "true").getOrElse(true)
-    val userEventId = session.userEventId
     val ret = PageParams(
       uri=uri,
       debug=debug,

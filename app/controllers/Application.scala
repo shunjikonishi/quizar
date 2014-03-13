@@ -28,7 +28,7 @@ object Application extends Controller {
     val rm = RoomManager
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
-    val sessionInfo = sm.get(sessionId).copy(roomId=None, userEventId=None)
+    val sessionInfo = sm.get(sessionId).copy(roomId=None)
     sm.set(sessionId, sessionInfo)
     val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
     val params = PageParams.create(request, sessionInfo)
@@ -42,7 +42,7 @@ object Application extends Controller {
   }
 
   def room(id: Int) = Action { implicit request =>
-    RoomManager.getRoomInfo(id).map { room =>
+    RoomManager.getRoomInfo(id, true).map { room =>
       val sm = SessionManager
       val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
       //ToDo userEventId

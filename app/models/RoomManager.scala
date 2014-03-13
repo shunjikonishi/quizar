@@ -29,18 +29,22 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
 
   override protected def createRoom(name: String) = {
     val id = name.substring(5).toInt
-    val info = getRoomInfo(id).get
+    val info = getRoomInfo(id, false).get
     new RedisRoom(info, redis)
   }
 
   def getRoom(id: Int): RedisRoom = getRoom("room." + id)
   def join(id: Int): Future[(Iteratee[String,_], Enumerator[String])] = join("room." + id)
 
-  def getRoomInfo(id: Int): Option[RoomInfo] = {
+  def getRoomInfo(id: Int, includeCurrentEvent: Boolean): Option[RoomInfo] = {
     val room = QuizRoom.find(id).map(RoomInfo.create(_))
-    room.map(_.copy(
-      event = EventManager(id).getCurrentEvent
-    ))
+    if (includeCurrentEvent) {
+      room.map(_.copy(
+        event = EventManager(id).getCurrentEvent
+      ))
+    } else {
+      room
+    }
   }
 
   def create(room: RoomInfo): RoomInfo = {
@@ -101,7 +105,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
 
   val getCommand = CommandHandler { command =>
     val id = command.data.as[Int]
-    val room = getRoomInfo(id)
+    val room = getRoomInfo(id, false)
     val data = room.map(_.toJson).getOrElse(JsNull)
     command.json(data)
   }

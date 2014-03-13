@@ -31,13 +31,13 @@
 					<label for="event-date">@Messages("startDate")</label>
 				</div>
 				<div>
-					<input id="event-date" class="form-control" type="date">
+					<input id="event-date" class="form-control" type="date" min="@(new org.joda.time.DateTime().toString("yyyy-MM-dd"))">
 				</div>
 				<div>
 					<label for="event-time">@Messages("startTime")</label>
 				</div>
 				<div>
-					<input id="event-time" class="form-control" type="time">
+					<input id="event-time" class="form-control" type="time" step="900">
 				</div>
 				<div>
 					<label for="event-passcode">@Messages("passcode")</label>
