@@ -276,3 +276,12 @@ capacityOver[ja]=エントリーは締め切られました
 
 ui.newEntry=I'm joining this event now!
 ui.newEntry[ja]=イベントにエントリーしました!
+
+inputPasscode=To entry this event, you must input passcode!
+inputPasscode[ja]=このイベントに参加するためにはパスコードの入力が必要です。
+
+cancel=Cancel
+cancel[ja]=キャンセル
+
+invalidPasscode=The passcode is incorrect.
+invalidPasscode[ja]=パスコードが正しくありません

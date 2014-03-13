@@ -13,6 +13,8 @@ $(function() {
 			$el.show();
 			setTimeout(function() {
 				$el.hide();
+				$el.css("animation-name", "");
+				$el.css("-webkit-animation-name", "");
 				shown = false;
 				if (msgs.length > 0) {
 					var temp = msgs;

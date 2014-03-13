@@ -1,0 +1,13 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="passcode" class="workspace">
+	<div>
+		<p>@Messages("inputPasscode")</p>
+	</div>
+	<div>
+		<input id="event-passcode-user" type="password" maxlength="100" class="form-control">
+	</div>
+	<div>
+		<button id="event-passcode-btn">@Messages("entry")</button>
+		<button id="event-cancel-btn">@Messages("cancel")</button>
+	</div>
+</div>

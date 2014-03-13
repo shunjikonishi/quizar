@@ -265,7 +265,7 @@ $(function() {
 			"isNotifyTweet" : isNotifyTweet
 		})
 	}
-	function MakeRoom(userId, con, messageDialog) {
+	function MakeRoom(app, userId, con) {
 		function getParameterName($input) {
 			return $input.attr("id").substring(5);
 		}
@@ -289,7 +289,7 @@ $(function() {
 						"command" : "updateRoom",
 						"data" : data,
 						"success" : function(data) {
-							messageDialog.show(MSG.successUpdate);
+							app.showMessage(MSG.successUpdate);
 						}
 					})
 				} else {
@@ -726,31 +726,47 @@ $(function() {
 		function closeEvent() {
 			$(".entry-event").hide();
 		}
+		function doEntry(passcode) {
+			var data = {
+				"userId" : params.userId,
+				"eventId" : params.eventId
+			};
+			if (passcode) {
+				data.passcode = passcode;
+			}
+			con.request({
+				"command" : "entryEvent",
+				"data" : data,
+				"success" : function(data) {
+					if (data.error) {
+						app.showMessage(data.error);
+					} else if (data.requirePass) {
+						app.showPasscode();
+					} else if (data.userEventId) {
+						params.userEventId = data.userEventId;
+						if (passcode) {
+							app.showChat();
+						}
+					} else {
+						alert("Invalid data: " + JSON.stringify(data));
+					}
+				}
+			})
+		}
 		function entry() {
 			if (isEnable()) {
-				con.request({
-					"command" : "entryEvent",
-					"data" : {
-						"userId" : params.userId,
-						"eventId" : params.eventId
-					},
-					"success" : function(data) {
-						if (data.error) {
-							app.showMessage(data.error);
-						} else if (data.requirePass) {
-							app.showPasscode();
-						} else if (data.userEventId) {
-							params.userEventId = data.userEventId;
-						} else {
-							alert("Invalid data: " + JSON.stringify(data));
-						}
-					}
-				})
+				doEntry();
 				$("#entry-event-alert").hide();
 			}
 		}
 		function init($el) {
-
+			$("#event-passcode-btn").click(function() {
+				var passcode = $("#event-passcode-user").val();
+				doEntry(passcode);
+			})
+			$("#event-cancel-btn").click(function() {
+				app.showChat();
+			})
 		}
 		function clear() {
 
@@ -815,6 +831,17 @@ $(function() {
 			ret.capacity = parseInt(ret.capacity);
 			return ret;
 		}
+		function clearField() {
+			$("#event-date").val("");
+			$("#event-time").val("");
+			$form.find(":input.auto-collect").each(function() {
+				var $input = $(this),
+					name = $input.attr("id").substring(6);
+				if (name != "capacity") {
+					$(this).val("");
+				}
+			});
+		}
 		function openEvent() {
 			if (eventStatus != EventStatus.Prepared) {
 				return;
@@ -848,6 +875,7 @@ $(function() {
 					if (data) {
 						eventId = 0;
 						eventStatus = EventStatus.Prepared;
+						clearField();
 						$toggleBtn.text(MSG.start);
 					}
 				}
@@ -1034,6 +1062,9 @@ $(function() {
 				doShowStatic();
 			}
 		}
+		function showChat() {
+			showStatic("chat", false);
+		}
 		function showQuestionList(direction) {
 			if (questionList) {
 				var params = $.extend({
@@ -1059,6 +1090,16 @@ $(function() {
 				});
 			}
 		}
+		function showPasscode() {
+			if (entryEvent) {
+				$content.children("div").hide();
+				templateManager.show({
+					"name" : "passcode",
+					"beforeShow" : entryEvent.init,
+					"afterHide" : entryEvent.clear
+				});
+			}
+		}
 		function showMessage(msg, time) {
 			messageDialog.show(msg, time);
 		}
@@ -1077,7 +1118,7 @@ $(function() {
 			effectDialog = new EffectDialog($("#effect-dialog"));
 			con = new flect.Connection(params.uri, debug);
 			home = new Home(con);
-			makeRoom = new MakeRoom(params.userId, con, messageDialog);
+			makeRoom = new MakeRoom(app, params.userId, con);
 			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 			$content = $("#content");
 
@@ -1213,6 +1254,10 @@ $(function() {
 				$(this).next("ul").toggle();
 				return false;
 			})
+			$(".dropdown-menu a").click(function() {
+				$(this).parents(".dropdown-menu").hide();
+				return false;
+			})
 		}
 		var debug,
 			messageDialog,
@@ -1278,6 +1323,8 @@ $(function() {
 		$.extend(this, {
 			"showQuestionList" : showQuestionList,
 			"showMakeQuestion" : showMakeQuestion,
+			"showPasscode" : showPasscode,
+			"showChat" : showChat,
 			"showMessage" : showMessage,
 			"tweet" : tweet
 		})

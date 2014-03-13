@@ -5,6 +5,7 @@ alreadyEntryEvent=あなたは既にこのイベントに参加しています
 answerer=解答者
 application.title=勉強会！
 back=戻る
+cancel=キャンセル
 capacity=定員
 capacityOver=エントリーは締め切られました
 chat=チャット
@@ -25,6 +26,8 @@ help=ヘルプ
 home=ホーム
 html.roomMember=<span id="room-member">0</span>人がこの部屋にいます
 includeToRanking=ランキングに含める
+inputPasscode=このイベントに参加するためにはパスコードの入力が必要です。
+invalidPasscode=パスコードが正しくありません
 lessFrequentAnswer=最も少なかった回答
 loginRequiredToChat=チャットに参加するためにはログインする必要があります
 loginWithTwitter=Twitterでログイン

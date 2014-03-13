@@ -5,6 +5,7 @@ alreadyEntryEvent=You already entried to this event.
 answerer=Panel
 application.title=Meet up!
 back=Back
+cancel=Cancel
 capacity=Capacity
 capacityOver=Entry has been closed.
 chat=Chat
@@ -25,6 +26,8 @@ help=Help
 home=Home
 html.roomMember=<span id="room-member">0</span> people in this room.
 includeToRanking=Include to ranking
+inputPasscode=To entry this event, you must input passcode!
+invalidPasscode=The passcode is incorrect.
 lessFrequentAnswer=Answer the less frequent
 loginRequiredToChat=If you want to chat, you should sign in.
 loginWithTwitter=Sign in with twitter
