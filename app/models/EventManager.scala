@@ -67,8 +67,20 @@ class EventManager(roomId: Int) {
       val now = new DateTime()
       val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, EXEC_DATE = ?, UPDATED = ? " + 
           "WHERE ID = ? AND STATUS = ?")
-        .bind(EventStatus.Running.code, now, now, id, EventStatus.Prepared)
+        .bind(EventStatus.Running.code, now, now, id, EventStatus.Prepared.code)
         .update.apply();
+      ret == 1
+    }
+  }
+
+  def close(id: Int): Boolean = {
+    DB localTx { implicit session =>
+      val now = new DateTime()
+      val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, END_DATE = ?, UPDATED = ? " + 
+          "WHERE ID = ? AND STATUS = ?")
+        .bind(EventStatus.Finished.code, now, now, id, EventStatus.Running.code)
+        .update.apply();
+      //ToDo ranking
       ret == 1
     }
   }
@@ -86,6 +98,12 @@ class EventManager(roomId: Int) {
   val getCommand = CommandHandler { command =>
     val id = command.data.as[Int]
     val event = getEvent(id)
+    val data = event.map(_.toJson).getOrElse(JsNull)
+    command.json(data)
+  }
+
+  val getCurrentCommand = CommandHandler { command =>
+    val event = getCurrentEvent
     val data = event.map(_.toJson).getOrElse(JsNull)
     command.json(data)
   }

@@ -35,7 +35,7 @@
 					<tbody>
 						@rooms.map { room =>
 							<tr data-room="@room.id">
-								<td class="event-date">@room.event.map(_.execDate.map(_.toString("M/d HH:mm")).getOrElse(Messages("ui.undecided")))</td>
+								<td class="event-date">@room.event.map(_.execDate.map(_.toString("M-d HH:mm")).getOrElse(Messages("ui.undecided")))</td>
 								<td class="event-title">@room.name @room.event.flatMap(_.title).map("(" + _ + ")")</td>
 								<td class="event-capacity">@room.event.map(_.capacity + Messages("ui.people"))</td>
 							</tr>

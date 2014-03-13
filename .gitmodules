@@ -1,3 +1,6 @@
 [submodule "app/redis"]
 	path = app/redis
 	url = https://github.com/shunjikonishi/play-redis-submodule.git
+[submodule "public/javascripts/ext/animateDialog"]
+	path = public/javascripts/ext/animateDialog
+	url = https://github.com/shunjikonishi/jquery-animateDialog.git

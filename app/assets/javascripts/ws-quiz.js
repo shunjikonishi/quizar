@@ -11,6 +11,9 @@ $(function() {
 		}
 		return true;
 	}, MSG.invalidQuizChoices);
+	$.validator.addMethod("time", function(value, element) {
+        return this.optional(element) || /^\d{2}:\d{2}$/.test(value);
+	}, MSG.invalidTime);
 
 	var SUPPORTS_TOUCH = 'ontouchstart' in window,
 		EFFECT_TIME = 300,
@@ -23,9 +26,23 @@ $(function() {
 		EventStatus = {
 			"Prepared" : 0,
 			"Running" : 1,
-			"End" : 2
+			"Finished" : 2
 		};
 
+	//Common functions
+	function normalizeMultiline(str) {
+		value.split("\n").filter(function(v) { return v.length > 0}).join("\n");
+	}
+	function copyIdToName($el) {
+		$el.each(function() {
+			var $input = $(this),
+					id = $input.attr("id");
+			if (id) {
+				$input.attr("name", id);
+			}
+		});
+		return $el;
+	}
 	function optionControl($ctrl, $panel) {
 		if (!$panel) {
 			$panel = $ctrl.find(".option-panel");
@@ -35,6 +52,62 @@ $(function() {
 			$(this).find("i").toggle();
 			$panel.toggle();
 		})
+	}
+	function DateTime() {
+		function dateStr() {
+			var y = value.getFullYear(),
+				m = value.getMonth() + 1,
+				d = value.getDate();
+			if (m < 10) {
+				m = "0" + m;
+			} 
+			if (d < 10) {
+				d = "0" + d;
+			} 
+			return y + "-" + m + "-" + d;
+		}
+		function timeStr() {
+			var h = value.getHours(),
+				m = value.getMinutes();
+			if (h < 10) {
+				h = "0" + h;
+			}
+			if (m < 10) {
+				m = "0" + m;
+			}
+			return h + ":" + m;
+		}
+		function datetimeStr() {
+			return dateStr().substring(5) + " " + timeStr();
+		}
+		function getTime() {
+			return value.getTime();
+		}
+		var value;
+		switch (arguments.length) {
+			case 1: 
+				value = new Date(arguments[0]);
+				break;
+			case 2:
+				value = new Date(arguments[0] + " " + arguments[1]);
+				break;
+		}
+		$.extend(this, {
+			"dateStr" : dateStr,
+			"timeStr" : timeStr,
+			"datetimeStr" : datetimeStr,
+			"getTime" : getTime
+		})
+	}
+	function EffectDialog($el) {
+		function show(msg) {
+			$el.animateDialog(msg, {
+				"name" : "rotateZoom"
+			});
+		}
+		$.extend(this, {
+			"show" : show
+		});
 	}
 	function User(hash) {
 		function getMiniImageUrl() { return this.imageUrl;}
@@ -65,7 +138,7 @@ $(function() {
 						title += "(" + room.event.title + ")";
 					}
 					if (room.event.execDate) {
-						date = room.event.execDate;
+						date = new DateTime(room.event.execDate).datetimeStr();
 					}
 					if (room.event.capacity) {
 						capacity = "" + room.event.capacity + MSG.people;
@@ -249,10 +322,8 @@ $(function() {
 				return;
 			}
 			$form = $("#make-room-form");
-			$form.find(":input").each(function() {
-				var $input = $(this),
-					id = $input.attr("id");
-				$input.attr("name", id);
+			copyIdToName($form.find(":input")).each(function() {
+				var $input = $(this);
 				if (editRoom) {
 					var name = getParameterName($input);
 					if (editRoom[name]) {
@@ -276,7 +347,7 @@ $(function() {
 					"room-hashtag" : {
 						"maxlength" : 20
 					},
-					"description" : {
+					"room-description" : {
 						"maxlength" : 400
 					}
 				},
@@ -516,7 +587,8 @@ $(function() {
 					value = parseInt(value);
 				}
 				data[name] = value;
-			})
+			});
+			data.answers = normalizeMultiline(data.answers);
 			return data;
 		}
 		function getParameterName($input) {
@@ -529,6 +601,10 @@ $(function() {
 				eventId = arguments[0];
 				return this;
 			}
+		}
+		function closeEvent() {
+			eventId = 0;
+			return this;
 		}
 		function update() {
 			if (validator && validator.form()) {
@@ -572,10 +648,8 @@ $(function() {
 		}
 		function init($el) {
 			$form = $("#make-q-form");
-			$form.find(":input").each(function() {
-				var $input = $(this),
-					id = $input.attr("id");
-				$input.attr("name", id);
+			copyIdToName($form.find(":input")).each(function() {
+				var $input = $(this);
 				if (editQuestion) {
 					var name = getParameterName($input);
 					if (editQuestion[name]) {
@@ -638,23 +712,32 @@ $(function() {
 			validator = null;
 		$.extend(this, {
 			"openEvent" : openEvent,
+			"closeEvent" : closeEvent,
 			"init" : init,
 			"clear" : clear,
 			"edit" : function(q) { editQuestion = q;}
 		})
 	}
-	function EditEvent(app, roomId, eventId, con) {
+	function EditEvent(app, roomId, con) {
 		function loadEvent(data) {
-			for (var name in data) {
-				var $input = $("#event-" + name);
-				if ($input.length) {
-					$input.val(data[name]);
+			if (data) {
+				for (var name in data) {
+					var $input = $("#event-" + name);
+					if ($input.length) {
+						$input.val(data[name]);
+					}
 				}
+				if (data.execDate) {
+					var d = new DateTime(data.execDate);
+					$("#event-date").val(d.dateStr());
+					$("#event-time").val(d.timeStr());
+				}
+				eventId = data.id;
+				eventStatus = data.status;
+				$toggleBtn.text(eventStatus == EventStatus.Prepared ? MSG.start : MSG.finish);;
+			} else {
+				$toggleBtn.text(MSG.start);;
 			}
-			if (data.execDate) {
-				console.log("execDate: " + data.execDate + ", " + new Date(data.execDate));
-			}
-			eventStatus = data.status;
 		}
 		function collectData() {
 			var date = $("#event-date").val(),
@@ -676,7 +759,7 @@ $(function() {
 				if (time) {
 					date += " " + time;
 				}
-				ret["execDate"] = date;
+				ret["execDate"] = new Date(date).getTime();
 			}
 			ret.capacity = parseInt(ret.capacity);
 			return ret;
@@ -690,65 +773,122 @@ $(function() {
 			} else {
 				con.request({
 					"command" : "openEvent",
-					"data" : eventId
+					"data" : eventId,
+					"success" : function(data) {
+						if (data) {
+							eventStatus = EventStatus.Running;
+							$toggleBtn.text(MSG.finish);
+							app.showQuestionList();
+						} else {
+							app.showMessage(MSG.failOpenEvent);
+						}
+					}
 				})
 			}
 		}
 		function closeEvent() {
-
+console.log("test1: " + eventId + ", " + eventStatus);
+			if (!eventId || eventStatus != EventStatus.Running) {
+				return;
+			}
+console.log("test2: " + eventId + ", " + eventStatus);
+			con.request({
+				"command" : "closeEvent",
+				"data" : eventId,
+				"success" : function(data) {
+					if (data) {
+						eventId = 0;
+						eventStatus = EventStatus.Prepared;
+						$toggleBtn.text(MSG.start);
+					}
+				}
+			})
 		}
 		function updateEvent(start) {
-			var data = collectData();
-			if (data.id) {
-				con.request({
-					"command" : "updateEvent",
-					"data" : data,
-					"success" : function() {
-						app.showMessage(MSG.successUpdate);
-					}
-				});
-			} else {
-				con.request({
-					"command" : "createEvent",
-					"data" : data,
-					"success" : function(data) {
-						eventId = data.id;
-						eventStatus = data.status;
-						if (start) {
-							openEvent();
-						} else {
+			if (validator && validator.form()) {
+				var data = collectData();
+				if (data.id) {
+					con.request({
+						"command" : "updateEvent",
+						"data" : data,
+						"success" : function() {
 							app.showMessage(MSG.successUpdate);
 						}
-					}
-				});
+					});
+				} else {
+					con.request({
+						"command" : "createEvent",
+						"data" : data,
+						"success" : function(data) {
+							eventId = data.id;
+							eventStatus = data.status;
+							if (start) {
+								openEvent();
+							} else {
+								app.showMessage(MSG.successUpdate);
+							}
+						}
+					});
+				}
 			}
 		}
 		function init($el) {
 			$form = $el.find("form");
+			copyIdToName($form.find(":input"));
+			validator = $form.validate({
+				"rules" : {
+					"event-capacity" : {
+						"required" : true,
+						"digits" : true
+					},
+					"event-title" : {
+						"maxlength" : 100
+					},
+					"event-date" : {
+						"date" : true
+					},
+					"event-time" : {
+						"time" : true
+					},
+					"event-passcode" : {
+						"maxlength" : 100
+					},
+					"event-description" : {
+						"maxlength" : 400
+					}
+				},
+				"focusInvalid" : true
+			});
 			optionControl($el);
-			if (eventId) {
-				con.request({
-					"command" : "getEvent",
-					"data" : eventId,
-					"success" : loadEvent
-				})
-			}
-			$("#event-start-btn").click(function() {
+			$toggleBtn = $("#event-toggle-btn").click(function() {
+console.log("test0: " + eventId + ", " + eventStatus);
 				if (eventStatus == EventStatus.Prepared) {
 					openEvent();
-				} else if (eventStatus == EventStatus.Ruuning) {
+				} else if (eventStatus == EventStatus.Running) {
 					closeEvent();
 				}
-			});
+			})
 			$("#event-update-btn").click(function() {
 				updateEvent(false);
 			});
+			con.request({
+				"command" : "getCurrentEvent",
+				"success" : loadEvent
+			})
+		}
+		function setEventStatus(id, status) {
+			eventId = id;
+			eventStatus = status;
 		}
 		function clear() {
 			$form = null;
-			eventStatus = EventStatus.Prepared;
+			validator = null;
+			$toggleBtn = null;
 		}
 		var $form = null,
+			validator = null,
+			$toggleBtn = null,
+			eventId = 0;
 			eventStatus = EventStatus.Prepared;
 		$.extend(this, {
 			"init" : init,
@@ -811,6 +951,7 @@ $(function() {
 			}
 		});
 		$("#btn-debug-msg").click(function() {
+			/*
 			var msg = $("#debug-msg").val(),
 				sec = $("#debug-msg-sec").val(),
 				img = "http://pbs.twimg.com/profile_images/442961765647650816/UmCaKfSq_mini.jpeg";
@@ -820,6 +961,10 @@ $(function() {
 				"msg" : msg,
 				"img" : img
 			}, sec);
+			*/
+			$("#effect-dialog").animateDialog("Start!", {
+				"name" : "rotateZoom"
+			})
 		});
 		$.extend(this, {
 			"log" : log
@@ -881,6 +1026,7 @@ $(function() {
 
 			debug = new DebuggerWrapper();
 			messageDialog = new flect.MessageDialog($("#msg-dialog"));
+			effectDialog = new EffectDialog($("#effect-dialog"));
 			con = new flect.Connection(params.uri, debug);
 			home = new Home(con);
 			makeRoom = new MakeRoom(params.userId, con, messageDialog);
@@ -925,6 +1071,22 @@ $(function() {
 							"command" : "member"
 						})
 					}
+				});
+				con.addEventListener("startEvent", function(data) {
+					effectDialog.show(MSG.start);
+					params.eventId = data;
+					params.eventStatus = EventStatus.Running;
+					if (makeQuestion) {
+						makeQuestion.openEvent(params.eventId);
+					}
+				})
+				con.addEventListener("finishEvent", function(data) {
+					effectDialog.show(MSG.finish);
+					params.eventId = 0;
+					params.eventStatus = EventStatus.Prepared;
+					if (makeQuestion) {
+						makeQuestion.closeEvent();
+					}
 				})
 			}
 			if ($("#home").length) {
@@ -932,10 +1094,13 @@ $(function() {
 			}
 			if (params.roomAdmin || params.userQuiz) {
 				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con);
+				if (params.eventId && params.eventStatus == EventStatus.Running) {
+					makeQuestion.openEvent(params.eventId);
+				}
 			}
 			if (params.roomAdmin) {
 				questionList = new QuestionList(self, users, params.userId, con);
-				editEvent = new EditEvent(self, params.roomId, params.eventId, con);
+				editEvent = new EditEvent(self, params.roomId, con);
 			}
 
 			$("#btn-menu").sidr({
@@ -981,6 +1146,7 @@ $(function() {
 		}
 		var debug,
 			messageDialog,
+			effectDialog,
 			con,
 			home,
 			makeQuestion,

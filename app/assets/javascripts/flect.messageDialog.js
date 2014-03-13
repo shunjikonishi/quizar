@@ -5,6 +5,8 @@ $(function() {
 		function doShow(second) {
 			second = second || 3;
 			$el.css({
+				"animation-name" : "fade",
+				"-webkit-animation-name" : "fade",
 				"animation-duration" : second + "s",
 				"-webkit-animation-duration" : second + "s"
 			});

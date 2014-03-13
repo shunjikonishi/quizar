@@ -63,19 +63,19 @@ body {
 .error { color: red;}
 
 #msg-dialog {
-	animation-name: "msg";
+	animation-name: "fade";
 	animation-duration: 3s;
 	animation-timing-function: ease;
 	animation-delay: 0;
 	animation-iteration-count: 1;
 	animation-direction: alternate;
-	-webkit-animation-name: "msg";
+	-webkit-animation-name: "fade";
 	-webkit-animation-duration: 3s;
 	-webkit-animation-timing-function: ease;
 	-webkit-animation-delay: 0;
 	-webkit-animation-iteration-count: 1;
 	-webkit-animation-direction: alternate;
-	position: absolute;
+	position: fixed;
 	left: 50%;
 	top: 50%;
 	margin-left: -140px;
@@ -86,18 +86,6 @@ body {
 	border-radius: 4px;
 	background-color: #ddd;
 }
-@keyframes msg {
-  0%   { opacity:0; }
-  50%  { opacity:1; }
-  100%   { opacity:0; }
-}
-
-@-webkit-keyframes msg {
-  0%   { opacity:0; }
-  50%  { opacity:1; }
-  100%   { opacity:0; }
-}
-
 #msg-dialog .message {
 	display: block;
 	text-align: center;
@@ -111,6 +99,26 @@ body {
 #msg-dialog .tweet img {
 	float: left;
 	margin: 5px;
+}
+
+#effect-dialog {
+	position: fixed;
+	left: 50%;
+	top: 20%;
+	margin-left: -140px;
+	min-height: 50px; 
+	width: 280px;
+	border: double 3px #000000;
+	border-radius: 4px;
+	background-color: #FFFF00;
+	color: #000000;
+	font-size: 24px;
+}
+
+#effect-dialog .message {
+  display: block;
+  text-align: center;
+  margin: 10px auto;
 }
 
 #msg-dialog .tweet p {

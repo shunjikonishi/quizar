@@ -7,9 +7,9 @@ import org.joda.time.{DateTime}
 object EventStatus {
   case object Prepared extends EventStatus(0)
   case object Running extends EventStatus(1)
-  case object End extends EventStatus(2)
+  case object Finished extends EventStatus(2)
 
-  val values = Array(Prepared, Running, End)
+  val values = Array(Prepared, Running, Finished)
 
   def fromCode(code: Short) = values.filter(_.code == code).head
 

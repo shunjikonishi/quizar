@@ -32,21 +32,29 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("createQuestion") { command =>
         val q = qm.create(QuestionInfo.fromJson(command.data))
         val res = command.json(q.toJson)
-        room.channel.send(res.toString)
+        room.send(res)
         None
       }
       val em = EventManager(roomId)
       addHandler("createEvent", em.createCommand)
       addHandler("updateEvent", em.updateCommand)
       addHandler("getEvent", em.getCommand)
+      addHandler("getCurrentEvent", em.getCurrentCommand)
       addHandler("openEvent") { command =>
         val id = command.data.as[Int]
         val ret = em.open(id)
         if (ret) {
-          Some(new CommandResponse("openEvent", JsNumber(id)))
-        } else {
-          None
+          room.send(new CommandResponse("startEvent", JsNumber(id)))
         }
+        Some(command.json(JsBoolean(ret)))
+      }
+      addHandler("closeEvent") { command =>
+        val id = command.data.as[Int]
+        val ret = em.close(id)
+        if (ret) {
+          room.send(new CommandResponse("finishEvent", JsNumber(id)))
+        }
+        Some(command.json(JsBoolean(ret)))
       }
 
       addHandler("member", room.memberCommand)

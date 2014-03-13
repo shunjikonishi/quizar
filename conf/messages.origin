@@ -193,6 +193,9 @@ noLimit[ja]=無制限(手動)
 ui.invalidQuizChoices=Input multiple rows.(Max 5 rows.)
 ui.invalidQuizChoices[ja]=複数行入力してください(最大5行)
 
+ui.invalidTime=Invalid time format
+ui.invalidTime[ja]=時刻フォーマットが不正です
+
 ui.questionPosted=Post question to room master.
 ui.questionPosted[ja]=問題をルーム管理者に投稿しました
 
@@ -234,3 +237,15 @@ startEvent[ja]=イベント開始
 
 save=Save
 save[ja]=保存
+
+ui.start=Start!
+ui.start[ja]=開始!
+
+ui.finish=Finish!
+ui.finish[ja]=終了!
+
+ui.question=Question
+ui.question[ja]=問題
+
+ui.failOpenEvent=Could not start this event.
+ui.failOpenEvent[ja]=このイベントを開始することができませんでした
