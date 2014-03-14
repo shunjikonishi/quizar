@@ -1259,8 +1259,9 @@ console.log("test2: " + data.answers);
 				return false;
 			})
 			$(".dropdown-menu a").click(function() {
-				$(this).parents(".dropdown-menu").hide();
-				return false;
+				var $a = $(this);
+				$a.parents(".dropdown-menu").hide();
+				return $a.attr("href") != "#";
 			})
 		}
 		var debug,
