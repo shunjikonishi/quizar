@@ -56,26 +56,16 @@
 			</div>
 		</form>
 		<div id="make-q-update">
-			<button id="make-q-update-btn" type="button" class="btn btn-default">@Messages("ui.create")</button>
-			<button id="make-q-back-btn" type="button" class="btn btn-default" style="display:none;">@Messages("back")</button>
+			<button id="make-q-update-btn" class="btn" type="button" >@Messages("ui.create")</button>
+			<button id="make-q-back-btn" class="btn" type="button" style="display:none;">@Messages("back")</button>
 		</div>
 		<div id="make-q-publish" style="display:none;">
 			<h2>@Messages("publish")</h2>
-			<button id="make-q-publish-btn" type="button" class="btn btn-primary">@Messages("publish")</button>
+			<button id="make-q-publish-btn" class="btn" type="button" >@Messages("publish")</button>
 			<div>
 				<label>
-					<input id="make-q-includeRank" type="checkbox"> @Messages("includeToRanking")
+					<input id="make-q-includeRank" type="checkbox" value="true" checked="checked"> @Messages("includeToRanking")
 				</label>
-			</div>
-			<div>
-				<label>@Messages("timeLimit")</label>
-			</div>
-			<div>
-				<select id="make-q-timelimit" class="form-control">
-					<option>@Messages("tenSec")</option>
-					<option>@Messages("oneMin")</option>
-					<option>@Messages("noLimit")</option>
-				</select>
 			</div>
 		</div>
 	</div>

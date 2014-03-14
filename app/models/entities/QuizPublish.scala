@@ -8,7 +8,9 @@ case class QuizPublish(
   id: Int, 
   eventId: Int, 
   questionId: Int, 
-  opened: Boolean, 
+  correctAnswer: Int, 
+  answersIndex: String, 
+  includeRanking: Boolean, 
   created: DateTime, 
   updated: DateTime) {
 
@@ -23,13 +25,15 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
 
   override val tableName = "quiz_publish"
 
-  override val columns = Seq("id", "event_id", "question_id", "opened", "created", "updated")
+  override val columns = Seq("id", "event_id", "question_id", "correct_answer", "answers_index", "include_ranking", "created", "updated")
 
   def apply(qp: ResultName[QuizPublish])(rs: WrappedResultSet): QuizPublish = new QuizPublish(
     id = rs.int(qp.id),
     eventId = rs.int(qp.eventId),
     questionId = rs.int(qp.questionId),
-    opened = rs.boolean(qp.opened),
+    correctAnswer = rs.int(qp.correctAnswer),
+    answersIndex = rs.string(qp.answersIndex),
+    includeRanking = rs.boolean(qp.includeRanking),
     created = rs.timestamp(qp.created).toDateTime,
     updated = rs.timestamp(qp.updated).toDateTime
   )
@@ -67,20 +71,26 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
   def create(
     eventId: Int,
     questionId: Int,
-    opened: Boolean,
+    correctAnswer: Int,
+    answersIndex: String,
+    includeRanking: Boolean,
     created: DateTime,
     updated: DateTime)(implicit session: DBSession = autoSession): QuizPublish = {
     val generatedKey = withSQL {
       insert.into(QuizPublish).columns(
         column.eventId,
         column.questionId,
-        column.opened,
+        column.correctAnswer,
+        column.answersIndex,
+        column.includeRanking,
         column.created,
         column.updated
       ).values(
         eventId,
         questionId,
-        opened,
+        correctAnswer,
+        answersIndex,
+        includeRanking,
         created,
         updated
       )
@@ -90,7 +100,9 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
       id = generatedKey.toInt, 
       eventId = eventId,
       questionId = questionId,
-      opened = opened,
+      correctAnswer = correctAnswer,
+      answersIndex = answersIndex,
+      includeRanking = includeRanking,
       created = created,
       updated = updated)
   }
@@ -101,7 +113,9 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
         column.id -> entity.id,
         column.eventId -> entity.eventId,
         column.questionId -> entity.questionId,
-        column.opened -> entity.opened,
+        column.correctAnswer -> entity.correctAnswer,
+        column.answersIndex -> entity.answersIndex,
+        column.includeRanking -> entity.includeRanking,
         column.created -> entity.created,
         column.updated -> entity.updated
       ).where.eq(column.id, entity.id)

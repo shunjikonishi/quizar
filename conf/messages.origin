@@ -55,6 +55,9 @@ ui.create[ja]=作成
 ui.update=Update
 ui.update[ja]=更新
 
+ui.post=Post
+ui.post[ja]=投稿
+
 ui.successUpdate=Update succeed
 ui.successUpdate[ja]=更新しました
 
@@ -199,6 +202,9 @@ ui.invalidTime[ja]=時刻フォーマットが不正です
 ui.questionPosted=Post question to room master.
 ui.questionPosted[ja]=問題をルーム管理者に投稿しました
 
+ui.test=Test
+ui.test[ja]=Test
+
 relatedUrl=Related URL
 relatedUrl[ja]=関連URL
 
@@ -285,3 +291,6 @@ cancel[ja]=キャンセル
 
 invalidPasscode=The passcode is incorrect.
 invalidPasscode[ja]=パスコードが正しくありません
+
+alreadyPublished=This question is already published in this event.
+alreadyPublished[ja]=この問題は既に出題済みです

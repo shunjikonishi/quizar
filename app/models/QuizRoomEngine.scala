@@ -30,6 +30,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("countQuestion", qm.countCommand)
       addHandler("updateQuestion", qm.updateCommand)
       addHandler("createQuestion", qm.createCommand)
+      addHandler("publishQuestion", qm.publishCommand)
 
       val em = EventManager(roomId, room)
       addHandler("createEvent", em.createCommand)

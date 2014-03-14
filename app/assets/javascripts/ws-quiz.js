@@ -508,6 +508,20 @@ $(function() {
 			var index = $tab.tabs("option", "active");
 			return index == 0 ? stockTable : publishedTable;
 		}
+		function countQuestions(activate) {
+			con.request({
+				"command" : "countQuestion",
+				"success" : function(data) {
+					stockTable.count(data.count - data.published);
+					publishedTable.count(data.published);
+					$("#question-stock-count").text(stockTable.count());
+					$("#question-published-count").text(publishedTable.count());
+					if (activate) {
+						stockTable.activate();
+					}
+				}
+			});
+		}
 		function init($el) {
 			stockTable = new QuestionTable($("#edit-question-stock"), false);
 			publishedTable = new QuestionTable($("#edit-question-published"), true);
@@ -517,16 +531,7 @@ $(function() {
 					getActiveTable().activate();
 				}
 			});
-			con.request({
-				"command" : "countQuestion",
-				"success" : function(data) {
-					stockTable.count(data.count - data.published);
-					publishedTable.count(data.published);
-					$("#question-stock-count").text(stockTable.count());
-					$("#question-published-count").text(publishedTable.count());
-					stockTable.activate();
-				}
-			});
+			countQuestions(true);
 			stockTable.load(0, ROWSIZE);
 			publishedTable.load(0, ROWSIZE);
 			$("#edit-question-new").click(function() {
@@ -538,6 +543,12 @@ $(function() {
 			$btnNext = $("#edit-question-right").click(function() {
 				getActiveTable().next();
 			})
+		}
+		function reload() {
+			if (stockTable) {
+				countQuestions(getActiveTable() == stockTable);
+				stockTable.load(0, ROWSIZE);
+			}
 		}
 		function clear() {
 			stockTable = null;
@@ -554,14 +565,15 @@ $(function() {
 
 		$.extend(this, {
 			"init" : init,
-			"clear" : clear
+			"clear" : clear,
+			"reload" : reload
 		})
 	}
 	function MakeQuestion(app, roomId, userId, admin, con) {
 		function clearField() {
 			$("#make-q-question").val("");
 			$("#make-q-answers").val("");
-			$("#make-q-answerType").val(AnswerType.FistRow);
+			$("#make-q-answerType").val(AnswerType.FirstRow);
 			$("#make-q-tags").val("");
 			$("#make-q-description").val("");
 			$("#make-q-relatedUrl").val("");
@@ -585,9 +597,7 @@ $(function() {
 				}
 				data[name] = value;
 			});
-console.log("test1: " + data.answers);
 			data.answers = normalizeMultiline(data.answers);
-console.log("test2: " + data.answers);
 			return data;
 		}
 		function getParameterName($input) {
@@ -606,29 +616,37 @@ console.log("test2: " + data.answers);
 			return this;
 		}
 		function update() {
+			if (editQuestion && editQuestion.publishCount > 0) {
+				app.showMessage("Can not update published question");
+			}
 			if (validator && validator.form()) {
-				var data = collectField();
+				var q = collectField();
 				if (editQuestion) {
 					con.request({
 						"command" : "updateQuestion",
-						"data" : data,
+						"data" : q,
 						"success" : function(data) {
-							editQuestion = data;
+							editQuestion = q;
 							if (!eventId) {
 								app.showQuestionList("left");
+							} else {
+								app.showMessage(MSG.successUpdate);
 							}
+							$btnPublish.removeAttr("disabled");
 						}
 					});
 				} else {
 					con.request({
 						"command" : "createQuestion",
-						"data" : data,
+						"data" : q,
 						"success" : function(data) {
 							if (admin) {
 								editQuestion = data;
 								if (eventId) {
+									app.showMessage(MSG.successUpdate);
 									$btnUpdate.text(MSG.update);
 									$publish.show("slow");
+									$btnPublish.removeAttr("disabled");
 								} else {
 									app.showQuestionList("left");
 								}
@@ -642,7 +660,27 @@ console.log("test2: " + data.answers);
 			}
 		}
 		function publish() {
-			alert("Not implemented yet.")
+			con.request({
+				"command" : "publishQuestion",
+				"data" : {
+					"questionId" : editQuestion.id,
+					"eventId" : eventId,
+					"includeRanking" : $includeRank.is(":checked")
+				},
+				"success" : function(data) {
+					if (data != "OK") {
+						app.showMessage(data);
+					}
+				}
+			})
+		}
+		function enableIncludeRank(b) {
+			if (b) {
+				$includeRank.removeAttr("disabled");
+			} else {
+				$includeRank.removeAttr("checked");
+				$includeRank.attr("disabled" , "disabled");
+			}
 		}
 		function init($el) {
 			$form = $("#make-q-form");
@@ -674,10 +712,12 @@ console.log("test2: " + data.answers);
 				},
 				"focusInvalid" : true
 			});
-			$btnUpdate = $("#make-q-update-btn").click(function() {
-				update();
-			});
+			$form.find(":input").change(function() {
+				$btnPublish.attr("disabled", "disabled");
+			})
+			$btnUpdate = $("#make-q-update-btn").click(update);
 			$publish = $("#make-q-publish");
+			$includeRank = $("#make-q-includeRank");
 			if (editQuestion && eventId) {
 				$publish.show();
 			}
@@ -686,26 +726,41 @@ console.log("test2: " + data.answers);
 			if (editQuestion) {
 				$("#make-q-h1").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
 				$btnUpdate.text(MSG.update);
+				if (editQuestion.publishCount > 0) {
+					$form.find(":input").attr("disabled", "disabled");
+					$btnUpdate.attr("disabled", "diabled");
+				}
+				if (editQuestion.answerType == AnswerType.NoAnswer) {
+					enableIncludeRank(false);
+				}
 			}
+			$("#make-q-answerType").change(function() {
+				var value = $(this).val();
+				enableIncludeRank(value != AnswerType.NoAnswer);
+			});
 			if (admin) {
 				$("#make-q-back-btn").click(function() {
 					app.showQuestionList("left");
 				}).show();
+			} else {
+				$btnUpdate.text(MSG.post);
 			}
 		}
 		function clear() {
 			editQuestion = null;
 			$form = null;
-			validator = null;
 			$btnUpdate = null;
 			$btnPublish = null;
+			$includeRank = null;
 			$publish = null;
+			validator = null;
 		}
 		var eventId = 0,
 			editQuestion = null,
 			$form = null,
 			$btnUpdate = null,
 			$btnPublish = null,
+			$includeRank = null,
 			$publish = null,
 			validator = null;
 		$.extend(this, {
@@ -715,6 +770,9 @@ console.log("test2: " + data.answers);
 			"clear" : clear,
 			"edit" : function(q) { editQuestion = q;}
 		})
+	}
+	function PublishQuestion(app, params, con) {
+
 	}
 	function EntryEvent(app, params, con) {
 		function isEnable() {
@@ -1069,6 +1127,15 @@ console.log("test2: " + data.answers);
 		function showChat() {
 			showStatic("chat", false);
 		}
+		function showQuestion(data) {
+			if (publishQuestion) {
+				var params = {
+					"name" : "publish-question"
+				};
+				$content.children("div").hide();
+				templateManager.show(params);
+			}
+		}
 		function showQuestionList(direction) {
 			if (questionList) {
 				var params = $.extend({
@@ -1134,6 +1201,7 @@ console.log("test2: " + data.answers);
 				})
 				con.onError(function(data) {
 					console.log(data);
+					alert(data);
 				});
 			}
 			if (params.userId) {
@@ -1161,12 +1229,7 @@ console.log("test2: " + data.answers);
 				con.addEventListener("newEntry", function(data) {
 					var user = new User(data);
 					users[user.id] = user;
-					messageDialog.notifyTweet({
-						"userId" : user.id,
-						"username" : user.name,
-						"msg" : MSG.newEntry,
-						"img" : user.imageUrl
-					})
+					messageDialog.notifyUserAction(user, MSG.newEntry);
 				})
 				con.ready(function() {
 					if (chat.member() == 0) {
@@ -1197,7 +1260,12 @@ console.log("test2: " + data.answers);
 					if (entryEvent) {
 						entryEvent.closeEvent();
 					}
-				})
+				});
+
+				publishQuestion = new PublishQuestion(self, params, con);
+				con.addEventListener("question", function(data) {
+					showQuestion(data);
+				});
 			}
 			if ($("#home").length) {
 				con.ready(function() {
@@ -1213,6 +1281,25 @@ console.log("test2: " + data.answers);
 			if (params.roomAdmin) {
 				questionList = new QuestionList(self, users, params.userId, con);
 				editEvent = new EditEvent(self, params.roomId, con);
+				con.addEventListener("postQuestion", function(data) {
+					var userId = data,
+						user = users[userId];
+
+					questionList.reload();
+					if (user) {
+						messageDialog.notifyUserAction(user, MSG.postQuestionMessage);
+					} else {
+						con.request({
+							"command" : "getUser",
+							"data" : userId,
+							"success" : function(data) {
+								var user = new User(data);
+								users[user.id] = user;
+								messageDialog.notifyUserAction(user, MSG.postQuestionMessage);
+							}
+						});
+					}
+				});
 			}
 			if (params.userId && params.roomId && !params.roomAdmin) {
 				entryEvent = new EntryEvent(self, params, con);
@@ -1276,6 +1363,7 @@ console.log("test2: " + data.answers);
 			templateManager,
 			chat,
 			questionList,
+			publishQuestion,
 			$content,
 			users = {};
 		init();

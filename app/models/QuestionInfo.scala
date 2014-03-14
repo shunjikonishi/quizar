@@ -37,6 +37,8 @@ case class QuestionInfo(
   correctCount: Int, 
   wrongCount: Int) {
 
+  def answerList = answers.split("\n").toList
+  
   def toSimpleJson = {
     JsObject(Seq(
       "id" -> JsNumber(id),

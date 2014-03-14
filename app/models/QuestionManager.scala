@@ -1,11 +1,14 @@
 package models
 
 import play.api.libs.json._
+import play.api.i18n.Messages;
 import scalikejdbc._
 import scalikejdbc.SQLInterpolation._
+import scala.util.Random
 import org.joda.time.DateTime
 
 import models.entities.QuizQuestion
+import models.entities.QuizPublish
 import flect.websocket.Command
 import flect.websocket.CommandResponse
 import flect.websocket.CommandHandler
@@ -85,20 +88,38 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
 
   }
 
-  def publish(id: Int) = {
+  def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = {
+    val randomList = Random.shuffle(q.answerList.zipWithIndex)
+    val answers = randomList.map(_._1)
+    val answersIndex = randomList.map(_._2)
+    val correctAnswer = q.answerType match {
+      case AnswerType.FirstRow => answersIndex.indexOf(0)
+      case _ => 0
+    }
+    val now = new DateTime()
+    DB.localTx { implicit session =>
+      val entity = QuizPublish.create(
+        eventId=eventId,
+        questionId=q.id,
+        correctAnswer=correctAnswer,
+        answersIndex=answersIndex.mkString(""),
+        includeRanking=includeRanking,
+        created=now,
+        updated=now)
+      SQL("UPDATE QUIZ_QUESTION SET PUBLISH_COUNT = PUBLISH_COUNT + 1, UPDATED = ? " + 
+          "WHERE ID = ?")
+        .bind(now, q.id)
+        .update.apply();
 
+      PublishInfo(
+        entity.id,
+        eventId,
+        q.id,
+        q.question,
+        answers
+      )
+    }
   }
-
-  def updateAnswers(id: Int, correct: Int, wrong: Int) = {
-
-  }
-
-  /*  
-  val createCommand = CommandHandler { command =>
-    val q = create(QuestionInfo.fromJson(command.data))
-    command.json(q.toJson)
-  }
-  */
 
   val updateCommand = CommandHandler { command =>
     val ret = update(QuestionInfo.fromJson(command.data))
@@ -126,6 +147,23 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
     val res = command.json(q.toJson)
     broadcast.send(res)
     CommandResponse.None
+  }
+
+  val publishCommand = CommandHandler { command =>
+    val questionId = (command.data \ "questionId").as[Int]
+    val eventId = (command.data \ "eventId").as[Int]
+    val includeRanking = (command.data \ "includeRanking").as[Boolean]
+    val ret = get(questionId).map { q =>
+      try {
+        val pub = publish(eventId, q, includeRanking)
+        broadcast.send(new CommandResponse("question", pub.toJson))
+        "OK"
+      } catch {
+        case e: Exception =>
+          Messages("alreadyPublished")
+      }
+    }.getOrElse(throw new IllegalArgumentException("Question not found: " + questionId))
+    command.text(ret)
   }
 }
 

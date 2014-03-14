@@ -69,13 +69,22 @@ $(function() {
 			}
 			doShow(second);
 		}
+		function notifyUserAction(user, msg) {
+			notifyTweet({
+				"userId" : user.id,
+				"username" : user.name,
+				"msg" : msg,
+				"img" : user.imageUrl
+			});
+		}
 		var shown = false,
 			msgs = [],
 			tweets = [];
 
 		$.extend(this, {
 			"show" : show,
-			"notifyTweet" : notifyTweet
+			"notifyTweet" : notifyTweet,
+			"notifyUserAction" : notifyUserAction
 		})
 	}
 });
