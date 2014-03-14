@@ -6,6 +6,7 @@ case class PublishInfo(
   id: Int, 
   eventId: Int, 
   questionId: Int, 
+  seq: Int,
   question: String,
   answers: List[String]
 ) {

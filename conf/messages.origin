@@ -294,3 +294,9 @@ invalidPasscode[ja]=パスコードが正しくありません
 
 alreadyPublished=This question is already published in this event.
 alreadyPublished[ja]=この問題は既に出題済みです
+
+ui.questionSeq=Question {0}
+ui.questionSeq[ja]=第 {0} 問
+
+ui.timeLimitExceeded=Time limit exceeded.
+ui.timeLimitExceeded[ja]=制限時間を過ぎています

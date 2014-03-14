@@ -31,6 +31,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("updateQuestion", qm.updateCommand)
       addHandler("createQuestion", qm.createCommand)
       addHandler("publishQuestion", qm.publishCommand)
+      addHandler("answer", qm.answerCommand)
 
       val em = EventManager(roomId, room)
       addHandler("createEvent", em.createCommand)
@@ -47,7 +48,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
     }
   }
 
-  private def filterRedisMessage(res: CommandResponse) = {
+  private def filterRedisMessage(res: CommandResponse): Option[CommandResponse] = {
     def filterCreateQuestion(res: CommandResponse) = {
       val createdBy = (res.data \ "createdBy").as[Int]
       if (createdBy == userId) {
@@ -58,8 +59,13 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         None
       }
     }
+    def filterAnswer(res: CommandResponse) = {
+      room.filter(_.roomInfo.isAdmin(userId)).map(_ => res)
+    }
     if (res.name == "createQuestion") {
       filterCreateQuestion(res)
+    } else if (res.name == "answer") {
+      filterAnswer(res)
     } else {
       Some(res)
     }

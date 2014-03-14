@@ -9,6 +9,7 @@ import org.joda.time.DateTime
 
 import models.entities.QuizQuestion
 import models.entities.QuizPublish
+import models.entities.QuizUserAnswer
 import flect.websocket.Command
 import flect.websocket.CommandResponse
 import flect.websocket.CommandHandler
@@ -16,7 +17,7 @@ import flect.websocket.CommandBroadcast
 
 class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
 
-  private val qq = QuizQuestion.qq
+  private val (qq, qp) = (QuizQuestion.qq, QuizPublish.qp)
   implicit val autoSession = AutoSession
   
   def countAndPublished: (Int, Int) = {
@@ -111,15 +112,34 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
         .bind(now, q.id)
         .update.apply();
 
+      val seq = QuizPublish.countBy(SQLSyntax.eq(qp.eventId, eventId))
+
       PublishInfo(
         entity.id,
         eventId,
         q.id,
+        seq.toInt,
         q.question,
         answers
       )
     }
   }
+
+  def answer(answer: AnswerInfo) = {
+    val now = new DateTime()
+    AnswerInfo.fromEntity(QuizUserAnswer.create(
+      userId=answer.userId, 
+      publishId=answer.publishId,
+      eventId=answer.eventId, 
+      userEventId=answer.userEventId, 
+      answer=answer.answer, 
+      status=answer.status.code,
+      time=answer.time,
+      created=now,
+      updated=now
+    ))
+  }
+
 
   val updateCommand = CommandHandler { command =>
     val ret = update(QuestionInfo.fromJson(command.data))
@@ -164,6 +184,12 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
       }
     }.getOrElse(throw new IllegalArgumentException("Question not found: " + questionId))
     command.text(ret)
+  }
+
+  val answerCommand = CommandHandler { command =>
+    val ret = answer(AnswerInfo.fromJson(command.data))
+    broadcast.send(new CommandResponse("answer", ret.toJson))
+    CommandResponse.None
   }
 }
 

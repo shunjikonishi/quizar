@@ -45,6 +45,11 @@ $(function() {
 			})
 		}
 		function showTemplate(template, params) {
+			function doAfterShow() {
+				if (params.afterShow) {
+					params.afterShow($el);
+				}
+			}
 			if (beforeHide) {
 				beforeHide($el);
 			}
@@ -62,12 +67,13 @@ $(function() {
 			afterHide = params.afterHide;
 
 			setTimeout(function() {
-				var dir = params.direction || "right";
-				$el.show("slide", { "direction" : dir}, EFFECT_TIME, function() {
-					if (params.afterShow) {
-						params.afterShow($el);
-					}
-				});
+				var dir = params.direction || "right",
+					effect = params.effect;
+				if (effect == "none") {
+					$el.show(0, doAfterShow)
+				} else {
+					$el.show("slide", { "direction" : dir}, EFFECT_TIME, doAfterShow);
+				}
 			}, 0);
 		}
 		var storage = window.sessionStorage ? window.sessionStorage : new MemoryStorage(),

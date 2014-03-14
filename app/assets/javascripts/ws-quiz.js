@@ -30,6 +30,13 @@ $(function() {
 		};
 
 	//Common functions
+	function enableInput($input, b) {
+		if (b) {
+			$input.removeAttr("disabled");
+		} else {
+			$input.attr("disabled", "disabled");
+		}
+	}
 	function normalizeMultiline(str) {
 		return str.split("\n").filter(function(v) { return v.length > 0}).join("\n");
 	}
@@ -466,16 +473,8 @@ $(function() {
 				}
 			}
 			function activate() {
-				if (offset == 0) {
-					$btnPrev.attr("disabled", "disabled");
-				} else {
-					$btnPrev.removeAttr("disabled");
-				}
-				if (offset + ROWSIZE >= cnt) {
-					$btnNext.attr("disabled", "disabled");
-				} else {
-					$btnNext.removeAttr("disabled");
-				}
+				enableInput($btnPrev, offset > 0);
+				enableInput($btnNext, offset + ROWSIZE < cnt);
 			}
 			var cnt = 0,
 				offset = 0,
@@ -632,7 +631,7 @@ $(function() {
 							} else {
 								app.showMessage(MSG.successUpdate);
 							}
-							$btnPublish.removeAttr("disabled");
+							enableInput($btnPublish, true);
 						}
 					});
 				} else {
@@ -646,7 +645,7 @@ $(function() {
 									app.showMessage(MSG.successUpdate);
 									$btnUpdate.text(MSG.update);
 									$publish.show("slow");
-									$btnPublish.removeAttr("disabled");
+									enableInput($btnPublish, true);
 								} else {
 									app.showQuestionList("left");
 								}
@@ -675,11 +674,9 @@ $(function() {
 			})
 		}
 		function enableIncludeRank(b) {
-			if (b) {
-				$includeRank.removeAttr("disabled");
-			} else {
+			enableInput($includeRank, b);
+			if (!b) {
 				$includeRank.removeAttr("checked");
-				$includeRank.attr("disabled" , "disabled");
 			}
 		}
 		function init($el) {
@@ -713,7 +710,7 @@ $(function() {
 				"focusInvalid" : true
 			});
 			$form.find(":input").change(function() {
-				$btnPublish.attr("disabled", "disabled");
+				enableInput($btnPublish, false);
 			})
 			$btnUpdate = $("#make-q-update-btn").click(update);
 			$publish = $("#make-q-publish");
@@ -727,8 +724,8 @@ $(function() {
 				$("#make-q-h1").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
 				$btnUpdate.text(MSG.update);
 				if (editQuestion.publishCount > 0) {
-					$form.find(":input").attr("disabled", "disabled");
-					$btnUpdate.attr("disabled", "diabled");
+					enableInput($form.find(":input"), false);
+					enableInput($btnUpdate, false);
 				}
 				if (editQuestion.answerType == AnswerType.NoAnswer) {
 					enableIncludeRank(false);
@@ -772,7 +769,108 @@ $(function() {
 		})
 	}
 	function PublishQuestion(app, params, con) {
+		var TIMELIMIT = 10000;
+		function answer() {
+			var time = new Date().getTime() - startTime,
+				$btn = $(this),
+				n = parseInt($btn.attr("id").substring(7));
+			if (answered) {
+				return;
+			}
+			answered = true;
+			enableInput($buttons, false);
+			if (time > TIMELIMIT) {
+				app.showMessage("timeLimitExceeded");
+				return;
+			}
+			con.request({
+				"command" : "answer",
+				"data" : {
+					"userId" : params.userId,
+					"publishId" : question.id,
+					"eventId" : params.eventId,
+					"userEventId" : params.userEventId,
+					"answer" : n,
+					"time" : time
+				}
+			});
+		}
+		function receiveAnswer(answer) {
+			var n = answer.answer,
+				$cnt = $("#answer-" + n).find(".answer-cnt"),
+				current = parseInt($cnt.text());
+			$cnt.text(current + 1);
+		}
+		function progress() {
+			function doProgress() {
+				if (answered) {
+					return;
+				}
+				n--;
+				$progress.css("width", n + "%");
+				if (n < 20) {
+					$progress.removeClass("progress-bar-warning").addClass("progress-bar-danger");
+				} else if (n < 60) {
+					$progress.removeClass("progress-bar-success").addClass("progress-bar-warning");
+				}
+				if (n > 0) {
+					setTimeout(doProgress, interval);
+				} else {
+					enableInput($buttons, false);
+				}
+			}
+			var n = 100,
+				interval = TIMELIMIT / 100,
+				$progress = $("#progress");
+			$progress.css("width", "100%");
+			setTimeout(doProgress, interval);
+		}
+		function init($el) {
+			$("#publish-question-seq").text(MSG.format(MSG.questionSeq, question.seq));
+			$buttons = $el.find(".btn-question").hide();
+			if (params.roomAdmin) {
+				$buttons.find(".answer-cnt").text("0");
+			} else if (params.userEventId) {
+				$buttons.click(answer);
+			} else {
+				enableInput($buttons, false);
+			}
 
+			for (var i=0; i<question.answers.length; i++) {
+				var $btn = $("#answer-" + i).show();
+				$btn.find(".answer").text(question.answers[i]);
+			}
+			$text = $("#question-text").text(question.question).hide();
+		}
+		function afterShow() {
+			startTime = new Date().getTime();
+			$text.show("blind", { "direction" : "left"}, 1000);
+			progress();
+		}
+		function clear() {
+			question = null;
+			$buttons = null;
+			$text = null;
+			startTime = 0;
+			answered = false;
+			console.log("a clear");
+		}
+		function setQuestion(q) {
+			question = q;
+		}
+		var question = null,
+			$buttons = null,
+			$text = null,
+			startTime = 0,
+			answered = false;
+
+		$.extend(this, {
+			"init" : init,
+			"afterShow" : afterShow,
+			"clear" : clear,
+			"receiveAnswer" : receiveAnswer,
+			"setQuestion" : setQuestion
+		})
 	}
 	function EntryEvent(app, params, con) {
 		function isEnable() {
@@ -1130,7 +1228,14 @@ $(function() {
 		function showQuestion(data) {
 			if (publishQuestion) {
 				var params = {
-					"name" : "publish-question"
+					"name" : "publish-question",
+					"effect" : "none",
+					"beforeShow" : function($el) {
+						publishQuestion.setQuestion(data);
+						publishQuestion.init($el);
+					},
+					"afterShow" : publishQuestion.afterShow,
+					"afterHide" : publishQuestion.clear
 				};
 				$content.children("div").hide();
 				templateManager.show(params);
@@ -1300,6 +1405,7 @@ $(function() {
 						});
 					}
 				});
+				con.addEventListener("answer", publishQuestion.receiveAnswer);
 			}
 			if (params.userId && params.roomId && !params.roomAdmin) {
 				entryEvent = new EntryEvent(self, params, con);
