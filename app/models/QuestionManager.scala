@@ -7,9 +7,11 @@ import org.joda.time.DateTime
 
 import models.entities.QuizQuestion
 import flect.websocket.Command
+import flect.websocket.CommandResponse
 import flect.websocket.CommandHandler
+import flect.websocket.CommandBroadcast
 
-class QuestionManager(roomId: Int) {
+class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
 
   private val qq = QuizQuestion.qq
   implicit val autoSession = AutoSession
@@ -118,8 +120,15 @@ class QuestionManager(roomId: Int) {
       "published" -> JsNumber(published)
     )))
   }
+
+  val createCommand = CommandHandler { command =>
+    val q = create(QuestionInfo.fromJson(command.data))
+    val res = command.json(q.toJson)
+    broadcast.send(res)
+    CommandResponse.None
+  }
 }
 
 object QuestionManager {
-  def apply(roomId: Int) = new QuestionManager(roomId)
+  def apply(roomId: Int, broadcast: CommandBroadcast) = new QuestionManager(roomId, broadcast)
 }

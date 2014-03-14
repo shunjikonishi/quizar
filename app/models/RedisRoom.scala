@@ -8,8 +8,9 @@ import flect.redis.RedisService
 import flect.redis.Room
 import flect.websocket.CommandResponse
 import flect.websocket.CommandHandler
+import flect.websocket.CommandBroadcast
 
-class RedisRoom(val roomInfo: RoomInfo, redis: RedisService) extends Room("room." + roomInfo.id, redis) {
+class RedisRoom(val roomInfo: RoomInfo, redis: RedisService) extends Room("room." + roomInfo.id, redis) with CommandBroadcast {
 
   val roomId = roomInfo.id
 

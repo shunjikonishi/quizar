@@ -25,16 +25,12 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       }
       room.commandOut(i)
 
-      val qm = QuestionManager(roomId)
+      val qm = QuestionManager(roomId, room)
       addHandler("listQuestion", qm.listCommand)
       addHandler("countQuestion", qm.countCommand)
       addHandler("updateQuestion", qm.updateCommand)
-      addHandler("createQuestion") { command =>
-        val q = qm.create(QuestionInfo.fromJson(command.data))
-        val res = command.json(q.toJson)
-        room.send(res)
-        None
-      }
+      addHandler("createQuestion", qm.createCommand)
+
       val em = EventManager(roomId)
       addHandler("createEvent", em.createCommand)
       addHandler("updateEvent", em.updateCommand)
@@ -56,7 +52,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
           case e: Exception =>
             JsObject(Seq("error" -> JsString(e.getMessage)))
         }
-        Some(command.json(json))
+        command.json(json)
       }
 
        addHandler("openEvent") { command =>
@@ -65,7 +61,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         if (ret) {
           room.send(new CommandResponse("startEvent", JsNumber(id)))
         }
-        Some(command.json(JsBoolean(ret)))
+        command.json(JsBoolean(ret))
       }
       addHandler("closeEvent") { command =>
         val id = command.data.as[Int]
@@ -73,7 +69,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         if (ret) {
           room.send(new CommandResponse("finishEvent", JsNumber(id)))
         }
-        Some(command.json(JsBoolean(ret)))
+        command.json(JsBoolean(ret))
       }
 
       addHandler("member", room.memberCommand)
@@ -109,7 +105,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
 
   private def init = {
     addHandler("template", TemplateManager(session))
-    addHandler("noop") { c => None}
+    addHandler("noop") { c => CommandResponse.None}
     addHandler("makeRoom", RoomManager.createCommand)
     addHandler("updateRoom", RoomManager.updateCommand)
     addHandler("listRoom", RoomManager.listCommand)
@@ -136,7 +132,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
           }
         }
       }
-      None
+      CommandResponse.None
     }
   }
 }

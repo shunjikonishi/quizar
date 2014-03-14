@@ -22,7 +22,10 @@ object Ajax extends Controller {
       val sessionInfo = sm.get(sessionId);
       val engine = new QuizRoomEngine(sessionInfo)
       val ret = engine.handle(command)
-      ret.map(res => Ok(res.toJson).as("application/json")).getOrElse(NoContent)
+      ret.isNone match {
+        case true => NoContent
+        case false => Ok(ret.toJson)
+      }
     }.getOrElse(BadRequest)
   }
 
