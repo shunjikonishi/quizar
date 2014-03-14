@@ -31,7 +31,7 @@ $(function() {
 
 	//Common functions
 	function normalizeMultiline(str) {
-		value.split("\n").filter(function(v) { return v.length > 0}).join("\n");
+		return str.split("\n").filter(function(v) { return v.length > 0}).join("\n");
 	}
 	function copyIdToName($el) {
 		$el.each(function() {
@@ -585,7 +585,9 @@ $(function() {
 				}
 				data[name] = value;
 			});
+console.log("test1: " + data.answers);
 			data.answers = normalizeMultiline(data.answers);
+console.log("test2: " + data.answers);
 			return data;
 		}
 		function getParameterName($input) {
@@ -626,7 +628,7 @@ $(function() {
 								editQuestion = data;
 								if (eventId) {
 									$btnUpdate.text(MSG.update);
-									$publish.show();
+									$publish.show("slow");
 								} else {
 									app.showQuestionList("left");
 								}
