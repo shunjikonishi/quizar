@@ -31,46 +31,14 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("updateQuestion", qm.updateCommand)
       addHandler("createQuestion", qm.createCommand)
 
-      val em = EventManager(roomId)
+      val em = EventManager(roomId, room)
       addHandler("createEvent", em.createCommand)
       addHandler("updateEvent", em.updateCommand)
       addHandler("getEvent", em.getCommand)
       addHandler("getCurrentEvent", em.getCurrentCommand)
-      addHandler("entryEvent") { command =>
-        val userId = (command.data \ "userId").as[Int]
-        val eventId = (command.data \ "eventId").as[Int]
-        val passcode = (command.data \ "passcode").asOpt[String]
-        val json = try {
-          val userEventId = em.entry(userId, eventId, passcode)
-          session.user.foreach { user =>
-            room.send(new CommandResponse("newEntry", user.toJson))
-          }
-          JsObject(Seq("userEventId" -> JsNumber(userEventId)))
-        } catch {
-          case e: PasscodeRequireException =>
-            JsObject(Seq("requirePass" -> JsBoolean(true)))
-          case e: Exception =>
-            JsObject(Seq("error" -> JsString(e.getMessage)))
-        }
-        command.json(json)
-      }
-
-       addHandler("openEvent") { command =>
-        val id = command.data.as[Int]
-        val ret = em.open(id)
-        if (ret) {
-          room.send(new CommandResponse("startEvent", JsNumber(id)))
-        }
-        command.json(JsBoolean(ret))
-      }
-      addHandler("closeEvent") { command =>
-        val id = command.data.as[Int]
-        val ret = em.close(id)
-        if (ret) {
-          room.send(new CommandResponse("finishEvent", JsNumber(id)))
-        }
-        command.json(JsBoolean(ret))
-      }
+      addHandler("entryEvent", em.entryCommand)
+      addHandler("openEvent", em.openCommand)
+      addHandler("closeEvent", em.closeCommand)
 
       addHandler("member", room.memberCommand)
       room.incMember

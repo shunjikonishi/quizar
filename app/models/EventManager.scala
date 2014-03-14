@@ -10,8 +10,9 @@ import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
 import flect.websocket.CommandResponse
+import flect.websocket.CommandBroadcast
 
-class EventManager(roomId: Int) {
+class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
 
   implicit val autoSession = QuizEvent.autoSession
   private val (qe, que) = (QuizEvent.qe, QuizUserEvent.que)
@@ -163,8 +164,46 @@ class EventManager(roomId: Int) {
     command.json(data)
   }
 
+  val entryCommand = CommandHandler { command =>
+    val userId = (command.data \ "userId").as[Int]
+    val eventId = (command.data \ "eventId").as[Int]
+    val passcode = (command.data \ "passcode").asOpt[String]
+    val json = try {
+      val userEventId = entry(userId, eventId, passcode)
+      broadcast.foreach { b =>
+        val username = (command.data \ "username").as[String]
+        val img = (command.data \ "userImage").as[String]
+        b.send(new CommandResponse("newEntry", UserInfo(userId, username, img).toJson))
+      }
+      JsObject(Seq("userEventId" -> JsNumber(userEventId)))
+    } catch {
+      case e: PasscodeRequireException =>
+        JsObject(Seq("requirePass" -> JsBoolean(true)))
+      case e: Exception =>
+        JsObject(Seq("error" -> JsString(e.getMessage)))
+    }
+    command.json(json)
+  }
+
+  val openCommand = CommandHandler { command =>
+    val id = command.data.as[Int]
+    val ret = open(id)
+    if (ret) {
+      broadcast.foreach(_.send(new CommandResponse("startEvent", JsNumber(id))))
+    }
+    command.json(JsBoolean(ret))
+  }
+
+  val closeCommand = CommandHandler { command =>
+    val id = command.data.as[Int]
+    val ret = close(id)
+    if (ret) {
+      broadcast.foreach(_.send(new CommandResponse("finishEvent", JsNumber(id))))
+    }
+    command.json(JsBoolean(ret))
+  }
 }
 
 object EventManager {
-  def apply(roomId: Int) = new EventManager(roomId)
+  def apply(roomId: Int, broadcast: CommandBroadcast = null) = new EventManager(roomId, Option(broadcast))
 }

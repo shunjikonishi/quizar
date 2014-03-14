@@ -731,6 +731,8 @@ console.log("test2: " + data.answers);
 		function doEntry(passcode) {
 			var data = {
 				"userId" : params.userId,
+				"username" : params.username,
+				"userImage" : params.userImage,
 				"eventId" : params.eventId
 			};
 			if (passcode) {
