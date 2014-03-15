@@ -50,6 +50,11 @@ $(function() {
 		});
 		return $el;
 	}
+	function clearHash(hash) {
+		for (var name in hash) {
+			delete hash[name];
+		}
+	}
 	function optionControl($ctrl, $panel) {
 		if (!$panel) {
 			$panel = $ctrl.find(".option-panel");
@@ -116,12 +121,51 @@ $(function() {
 			"show" : show
 		});
 	}
+	function Context(hash) {
+		function isLogined() { return !!this.userId;}
+		function isEntryEvent() { return !!this.userEventId;}
+		function isEventRunning() { return this.eventStatus == EventStatus.Running;}
+		function isInRoom() { return !!this.roomId;}
+		function isRoomAdmin() { return !!this.roomAdmin;}
+		function isPostQuestionAllowed() { return !!this.userQuiz;}
+		function isDebug() { return !!this.debug;}
+		function openEvent(eventId) {
+			this.eventId = eventId;
+			this.eventStatus = EventStatus.Running;
+		}
+		function closeEvent() {
+			this.eventId = 0;
+			this.eventStatus = EventStatus.Prepared;
+			this.userEventId = 0;
+		}
+		function entryEvent(userEventId) {
+			this.userEventId = userEventId;
+		}
+		function canEntryEvent() {
+			return isLogined() && isInRoom() && !isRoomAdmin();
+		}
+
+		$.extend(this, hash, {
+			"isLogined" : isLogined,
+			"isEntryEvent" : isEntryEvent,
+			"isEventRunning" : isEventRunning,
+			"isInRoom" : isInRoom,
+			"isRoomAdmin" : isRoomAdmin,
+			"isPostQuestionAllowed" : isPostQuestionAllowed,
+			"isDebug" : isDebug,
+			"openEvent" : openEvent,
+			"closeEvent" : closeEvent,
+			"entryEvent" : entryEvent,
+			"canEntryEvent" : canEntryEvent
+		})
+	}
 	function User(hash) {
 		function getMiniImageUrl() { return this.imageUrl;}
 
 		$.extend(this, hash, {
 			"getMiniImageUrl" : getMiniImageUrl
 		});
+		clearHash(hash);
 	}
 	function Home(con) {
 		function bindEvent($el) {
@@ -409,6 +453,7 @@ $(function() {
 				if (users[q.createdBy]) {
 					$img.attr("src", users[q.createdBy].getMiniImageUrl());
 				} else {
+					//ToDo avoid multiple request
 					$img.attr("data-userId", q.createdBy);
 					con.request({
 						"command" : "getUser",
@@ -1206,7 +1251,7 @@ $(function() {
 			"log" : log
 		})
 	}
-	flect.QuizApp = function(params) {
+	flect.QuizApp = function(serverParams) {
 		var self = this;
 		function showStatic(id, sidr) {
 			function doShowStatic() {
@@ -1292,13 +1337,13 @@ $(function() {
 			debug = new DebuggerWrapper();
 			messageDialog = new flect.MessageDialog($("#msg-dialog"));
 			effectDialog = new EffectDialog($("#effect-dialog"));
-			con = new flect.Connection(params.uri, debug);
+			con = new flect.Connection(context.uri, debug);
 			home = new Home(con);
-			makeRoom = new MakeRoom(app, params.userId, con);
+			makeRoom = new MakeRoom(app, context.userId, con);
 			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 			$content = $("#content");
 
-			if (params.debug) {
+			if (context.isDebug()) {
 				debug.setImpl(new PageDebugger($("#debug"), con, messageDialog));
 				$("#btn-debug").click(function() {
 					showStatic("debug", true);
@@ -1309,24 +1354,24 @@ $(function() {
 					alert(data);
 				});
 			}
-			if (params.userId) {
-				users[params.userId] = new User({
-					"id" : params.userId,
-					"name" : params.username,
-					"imageUrl" : params.userImage
+			if (context.isLogined()) {
+				users[context.userId] = new User({
+					"id" : context.userId,
+					"name" : context.username,
+					"imageUrl" : context.userImage
 				});
 			}
 
-			if (params.roomId) {
+			if (context.isInRoom()) {
 				var $chat = $("#chat");
-				chat = new Chat($chat, params.userId, params.hashtag, con);
+				chat = new Chat($chat, context.userId, context.hashtag, con);
 				$(".menu-chat").click(function() {
 					showStatic("chat", $(this).parents("#sidr").length > 0);
 					return false;
 				});
 				con.addEventListener("chat", function(data) {
 					chat.append(data);
-					if (data.userId != params.userId && chat.isNotifyTweet()) {
+					if (data.userId != context.userId && chat.isNotifyTweet()) {
 						messageDialog.notifyTweet(data);
 					}
 				});
@@ -1345,10 +1390,9 @@ $(function() {
 				});
 				con.addEventListener("startEvent", function(data) {
 					effectDialog.show(MSG.start);
-					params.eventId = data;
-					params.eventStatus = EventStatus.Running;
+					context.openEvent(data);
 					if (makeQuestion) {
-						makeQuestion.openEvent(params.eventId);
+						makeQuestion.openEvent(context.eventId);
 					}
 					if (entryEvent) {
 						setTimeout(entryEvent.openEvent, 3000);
@@ -1356,9 +1400,7 @@ $(function() {
 				})
 				con.addEventListener("finishEvent", function(data) {
 					effectDialog.show(MSG.finish);
-					params.eventId = 0;
-					params.eventStatus = EventStatus.Prepared;
-					params.userEventId = 0;
+					context.closeEvent();
 					if (makeQuestion) {
 						makeQuestion.closeEvent();
 					}
@@ -1367,7 +1409,7 @@ $(function() {
 					}
 				});
 
-				publishQuestion = new PublishQuestion(self, params, con);
+				publishQuestion = new PublishQuestion(self, context, con);
 				con.addEventListener("question", function(data) {
 					showQuestion(data);
 				});
@@ -1377,15 +1419,15 @@ $(function() {
 					home.init($("#home"));
 				});
 			}
-			if (params.roomAdmin || params.userQuiz) {
-				makeQuestion = new MakeQuestion(self, params.roomId, params.userId, params.roomAdmin, con);
-				if (params.eventId && params.eventStatus == EventStatus.Running) {
-					makeQuestion.openEvent(params.eventId);
+			if (context.isRoomAdmin() || context.isPostQuestionAllowed()) {
+				makeQuestion = new MakeQuestion(self, context.roomId, context.userId, context.isRoomAdmin(), con);
+				if (context.isEventRunning()) {
+					makeQuestion.openEvent(context.eventId);
 				}
 			}
-			if (params.roomAdmin) {
-				questionList = new QuestionList(self, users, params.userId, con);
-				editEvent = new EditEvent(self, params.roomId, con);
+			if (context.isRoomAdmin()) {
+				questionList = new QuestionList(self, users, context.userId, con);
+				editEvent = new EditEvent(self, context.roomId, con);
 				con.addEventListener("postQuestion", function(data) {
 					var userId = data,
 						user = users[userId];
@@ -1407,8 +1449,8 @@ $(function() {
 				});
 				con.addEventListener("answer", publishQuestion.receiveAnswer);
 			}
-			if (params.userId && params.roomId && !params.roomAdmin) {
-				entryEvent = new EntryEvent(self, params, con);
+			if (context.canEntryEvent()) {
+				entryEvent = new EntryEvent(self, context, con);
 			}
 
 			$("#btn-menu").sidr({
@@ -1434,7 +1476,7 @@ $(function() {
 			})
 			con.polling(25000, {
 				"command" : "noop",
-				"log" : "user=" + (params.username ? params.username : "(Anonymous)")
+				"log" : "user=" + (context.isLogined() ? context.username : "(Anonymous)")
 			})
 			$("#sidr a.dynamic").click(function() {
 				var id = $(this).attr("href").substring(1),
@@ -1457,7 +1499,8 @@ $(function() {
 				return $a.attr("href") != "#";
 			})
 		}
-		var debug,
+		var context = new Context(serverParams),
+			debug,
 			messageDialog,
 			effectDialog,
 			con,
@@ -1473,7 +1516,7 @@ $(function() {
 			$content,
 			users = {};
 		init();
-		debug.log("params", params);
+		debug.log("params", context);
 
 		var TemplateLogic = {
 			"home" : {
@@ -1491,13 +1534,13 @@ $(function() {
 				"name" : "make-room",
 				"beforeShow" : function($el) {
 					makeRoom.clear();
-					makeRoom.edit(params.roomId);
+					makeRoom.edit(context.roomId);
 					makeRoom.init($el)
 				},
 				"afterHide" : makeRoom.clear
 			}
 		};
-		if (params.roomAdmin) {
+		if (context.isRoomAdmin()) {
 			$.extend(TemplateLogic, {
 				"edit-question" : {
 					"beforeShow" : questionList.init,
@@ -1510,7 +1553,7 @@ $(function() {
 					"afterHide" : editEvent.clear
 				}
 			})
-		} else if (params.userQuiz) {
+		} else if (context.isPostQuestionAllowed()) {
 			$.extend(TemplateLogic, {
 				"post-question" : {
 					"name" : "make-question",
