@@ -813,8 +813,18 @@ $(function() {
 			"edit" : function(q) { editQuestion = q;}
 		})
 	}
-	function PublishQuestion(app, params, con) {
-		var TIMELIMIT = 10000;
+	function PublishQuestion(app, context, con) {
+		var TIMELIMIT = 10000,
+			BUTTON_COUNT = 5;
+		function showAnswerCounts() {
+			if ($buttons) {
+				for (var i=0; i<BUTTON_COUNT; i++) {
+					var idx = "" + (i+1),
+						cnt = answerCounts[idx] || 0;
+					$("#answer-" + idx).find(".answer-cnt").text(cnt);
+				}
+			}
+		}
 		function answer() {
 			var time = new Date().getTime() - startTime,
 				$btn = $(this),
@@ -831,20 +841,23 @@ $(function() {
 			con.request({
 				"command" : "answer",
 				"data" : {
-					"userId" : params.userId,
+					"userId" : context.userId,
 					"publishId" : question.id,
-					"eventId" : params.eventId,
-					"userEventId" : params.userEventId,
+					"eventId" : context.eventId,
+					"userEventId" : context.userEventId,
 					"answer" : n,
 					"time" : time
 				}
 			});
+			showAnswerCounts();
 		}
 		function receiveAnswer(answer) {
-			var n = answer.answer,
-				$cnt = $("#answer-" + n).find(".answer-cnt"),
-				current = parseInt($cnt.text());
-			$cnt.text(current + 1);
+			var idx = "" + answer.answer,
+				current = (answerCounts[idx] || 0) + 1;
+			answerCounts[idx] = current;
+			if (context.isRoomAdmin() || answered) {
+				$("#answer-" + idx).find(".answer-cnt").text(current);
+			}
 		}
 		function progress() {
 			function doProgress() {
@@ -873,16 +886,16 @@ $(function() {
 		function init($el) {
 			$("#publish-question-seq").text(MSG.format(MSG.questionSeq, question.seq));
 			$buttons = $el.find(".btn-question").hide();
-			if (params.roomAdmin) {
+			if (context.isRoomAdmin()) {
 				$buttons.find(".answer-cnt").text("0");
-			} else if (params.userEventId) {
+			} else if (context.userEventId) {
 				$buttons.click(answer);
 			} else {
 				enableInput($buttons, false);
 			}
 
 			for (var i=0; i<question.answers.length; i++) {
-				var $btn = $("#answer-" + i).show();
+				var $btn = $("#answer-" + (i+1)).show();
 				$btn.find(".answer").text(question.answers[i]);
 			}
 			$text = $("#question-text").text(question.question).hide();
@@ -893,17 +906,17 @@ $(function() {
 			progress();
 		}
 		function clear() {
-			question = null;
 			$buttons = null;
 			$text = null;
 			startTime = 0;
 			answered = false;
-			console.log("a clear");
 		}
 		function setQuestion(q) {
 			question = q;
+			answerCounts = {};
 		}
 		var question = null,
+			answerCounts = {},
 			$buttons = null,
 			$text = null,
 			startTime = 0,
@@ -1413,6 +1426,7 @@ $(function() {
 				con.addEventListener("question", function(data) {
 					showQuestion(data);
 				});
+				con.addEventListener("answer", publishQuestion.receiveAnswer);
 			}
 			if ($("#home").length) {
 				con.ready(function() {
@@ -1447,7 +1461,6 @@ $(function() {
 						});
 					}
 				});
-				con.addEventListener("answer", publishQuestion.receiveAnswer);
 			}
 			if (context.canEntryEvent()) {
 				entryEvent = new EntryEvent(self, context, con);

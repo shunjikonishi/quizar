@@ -92,9 +92,9 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
   def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = {
     val randomList = Random.shuffle(q.answerList.zipWithIndex)
     val answers = randomList.map(_._1)
-    val answersIndex = randomList.map(_._2)
+    val answersIndex = randomList.map(_._2 + 1)
     val correctAnswer = q.answerType match {
-      case AnswerType.FirstRow => answersIndex.indexOf(0)
+      case AnswerType.FirstRow => answersIndex.indexOf(1) + 1
       case _ => 0
     }
     val now = new DateTime()

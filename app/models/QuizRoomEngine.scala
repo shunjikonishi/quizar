@@ -59,13 +59,8 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         None
       }
     }
-    def filterAnswer(res: CommandResponse) = {
-      room.filter(_.roomInfo.isAdmin(userId)).map(_ => res)
-    }
     if (res.name == "createQuestion") {
       filterCreateQuestion(res)
-    } else if (res.name == "answer") {
-      filterAnswer(res)
     } else {
       Some(res)
     }
