@@ -122,24 +122,25 @@ $(function() {
 		});
 	}
 	function Context(hash) {
-		function isLogined() { return !!this.userId;}
-		function isEntryEvent() { return !!this.userEventId;}
-		function isEventRunning() { return this.eventStatus == EventStatus.Running;}
-		function isInRoom() { return !!this.roomId;}
-		function isRoomAdmin() { return !!this.roomAdmin;}
-		function isPostQuestionAllowed() { return !!this.userQuiz;}
-		function isDebug() { return !!this.debug;}
+		var self = this;
+		function isLogined() { return !!self.userId;}
+		function isEntryEvent() { return !!self.userEventId;}
+		function isEventRunning() { return self.eventStatus == EventStatus.Running;}
+		function isInRoom() { return !!self.roomId;}
+		function isRoomAdmin() { return !!self.roomAdmin;}
+		function isPostQuestionAllowed() { return !!self.userQuiz;}
+		function isDebug() { return !!self.debug;}
 		function openEvent(eventId) {
-			this.eventId = eventId;
-			this.eventStatus = EventStatus.Running;
+			self.eventId = eventId;
+			self.eventStatus = EventStatus.Running;
 		}
 		function closeEvent() {
-			this.eventId = 0;
-			this.eventStatus = EventStatus.Prepared;
-			this.userEventId = 0;
+			self.eventId = 0;
+			self.eventStatus = EventStatus.Prepared;
+			self.userEventId = 0;
 		}
 		function entryEvent(userEventId) {
-			this.userEventId = userEventId;
+			self.userEventId = userEventId;
 		}
 		function canEntryEvent() {
 			return isLogined() && isInRoom() && !isRoomAdmin();
