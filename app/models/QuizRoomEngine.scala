@@ -20,6 +20,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
     session.roomId.map { roomId =>
       Await.result(rm.join(roomId), Duration.Inf)
       val room = rm.getRoom(roomId)
+      val roomAdmin = room.roomInfo.isAdmin(userId)
       val i = Iteratee.foreach[CommandResponse] { res =>
         filterRedisMessage(res).foreach(s => channel.push(s.toString))
       }
@@ -30,8 +31,6 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("countQuestion", qm.countCommand)
       addHandler("updateQuestion", qm.updateCommand)
       addHandler("createQuestion", qm.createCommand)
-      addHandler("publishQuestion", qm.publishCommand)
-      addHandler("answer", qm.answerCommand)
 
       val em = EventManager(roomId, room)
       addHandler("createEvent", em.createCommand)
@@ -41,6 +40,8 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("entryEvent", em.entryCommand)
       addHandler("openEvent", em.openCommand)
       addHandler("closeEvent", em.closeCommand)
+      addHandler("publishQuestion", em.publishCommand)
+      addHandler("answer", em.answerCommand)
 
       addHandler("member", room.memberCommand)
       room.incMember

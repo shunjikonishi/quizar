@@ -1,11 +1,20 @@
 package models
 
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.duration.DurationInt
+import scala.util.Random
+
 import play.api.libs.json._
 import play.api.i18n.Messages;
 import scalikejdbc._
 import scalikejdbc.SQLInterpolation._
 import models.entities.QuizEvent
+import models.entities.QuizPublish
 import models.entities.QuizUserEvent
+import models.entities.QuizQuestion
+import models.entities.QuizUserAnswer
 import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -14,8 +23,10 @@ import flect.websocket.CommandBroadcast
 
 class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
 
+  private var prevPublished: Option[PublishedQuestion] = None
+
   implicit val autoSession = QuizEvent.autoSession
-  private val (qe, que) = (QuizEvent.qe, QuizUserEvent.que)
+  private val (qe, que, qp, qua) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua)
 
   private def roundTime(d: DateTime) = {
     val hour = d.getHourOfDay
@@ -29,6 +40,11 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     println("roundTime: " + d + ", " + ret)
     ret
   }
+
+  def getQuestion(id: Int): Option[QuestionInfo] = {
+    QuizQuestion.find(id).map(QuestionInfo.create)
+  }
+
   def getEvent(id: Int): Option[EventInfo] = {
     QuizEvent.find(id).map(EventInfo.create(_))
   }
@@ -141,6 +157,80 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }
   }
 
+  def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = {
+    val randomList = Random.shuffle(q.answerList.zipWithIndex)
+    val answers = randomList.map(_._1)
+    val answersIndex = randomList.map(_._2 + 1)
+    val correctAnswer = q.answerType match {
+      case AnswerType.FirstRow => answersIndex.indexOf(1) + 1
+      case _ => 0
+    }
+    val now = new DateTime()
+    DB.localTx { implicit session =>
+      val entity = QuizPublish.create(
+        eventId=eventId,
+        questionId=q.id,
+        correctAnswer=correctAnswer,
+        answersIndex=answersIndex.mkString(""),
+        includeRanking=includeRanking,
+        created=now,
+        updated=now)
+      SQL("UPDATE QUIZ_QUESTION SET PUBLISH_COUNT = PUBLISH_COUNT + 1, UPDATED = ? " + 
+          "WHERE ID = ?")
+        .bind(now, q.id)
+        .update.apply();
+
+      val seq = QuizPublish.countBy(SQLSyntax.eq(qp.eventId, eventId))
+
+      PublishInfo(
+        entity.id,
+        eventId,
+        q.id,
+        seq.toInt,
+        q.question,
+        answers
+      )
+    }
+  }
+
+  def answer(answer: AnswerInfo) = {
+    val now = new DateTime()
+    AnswerInfo.fromEntity(QuizUserAnswer.create(
+      userId=answer.userId, 
+      publishId=answer.publishId,
+      eventId=answer.eventId, 
+      userEventId=answer.userEventId, 
+      answer=answer.answer, 
+      status=answer.status.code,
+      time=answer.time,
+      created=now,
+      updated=now
+    ))
+  }
+
+  def calcSummary(pq: PublishedQuestion) = {
+println("calcSummary1: " + pq.publishId)
+    DB.localTx { implicit session =>
+      val now = new DateTime()
+      val answers = withSQL {
+        select(sqls"answer, count(*)").from(QuizUserAnswer as qua)
+          .where.eq(qua.publishId, pq.publishId)
+          .groupBy(sqls"answer")
+      }.map(rs => (rs.int(1), rs.int(2))).list.apply()
+println("calcSummary2: " + answers)
+      val correctCount = pq.answerType match {
+        case AnswerType.Most => answers.map(_._2).max
+        case AnswerType.Least => answers.map(_._2).min
+      }
+println("calcSummary3: " + correctCount)
+      val correctAnswers = answers.filter(_._2 == correctCount).map(_._1)
+      sql"""UPDATE QUIZ_USER_ANSWER
+          SET STATUS = CASE WHEN ANSWER IN (${correctAnswers}) THEN 1 ELSE 2 END,
+              UPDATED = ${now}
+        WHERE PUBLISH_ID = ${pq.publishId}""".update.apply();
+    }
+  }
+
   val createCommand = CommandHandler { command =>
     val event = create(EventInfo.fromJson(command.data))
     command.json(event.toJson)
@@ -195,12 +285,58 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   }
 
   val closeCommand = CommandHandler { command =>
+    prevPublished.filter(_.isCalcRequired).foreach(calcSummary(_))
+    prevPublished = None
+
     val id = command.data.as[Int]
     val ret = close(id)
     if (ret) {
       broadcast.foreach(_.send(new CommandResponse("finishEvent", JsNumber(id))))
     }
     command.json(JsBoolean(ret))
+  }
+
+  val publishCommand = CommandHandler { command =>
+    prevPublished.filter(_.isCalcRequired).foreach(calcSummary(_))
+
+    val questionId = (command.data \ "questionId").as[Int]
+    val eventId = (command.data \ "eventId").as[Int]
+    val includeRanking = (command.data \ "includeRanking").as[Boolean]
+    val ret = getQuestion(questionId).map { q =>
+      try {
+        val pub = publish(eventId, q, includeRanking)
+        val pq = PublishedQuestion(pub.id, questionId, q.answerType)
+        prevPublished = Some(pq)
+
+        broadcast.foreach(_.send(new CommandResponse("question", pub.toJson)))
+        Akka.system.scheduler.scheduleOnce(10 seconds) {
+          broadcast.foreach(_.send(new CommandResponse("answerDetail", q.toJson)))
+println("calcSummary0: " + pq.isCalcRequired)
+          if (pq.isCalcRequired) {
+            calcSummary(pq)
+          }
+        }
+        "OK"
+      } catch {
+        case e: Exception =>
+          Messages("alreadyPublished")
+      }
+    }.getOrElse(throw new IllegalArgumentException("Question not found: " + questionId))
+    command.text(ret)
+  }
+
+  val answerCommand = CommandHandler { command =>
+    val ret = answer(AnswerInfo.fromJson(command.data))
+    broadcast.foreach(_.send(new CommandResponse("answer", ret.toJson)))
+    CommandResponse.None
+  }
+
+  case class PublishedQuestion(
+    publishId: Int,
+    questionId: Int,
+    answerType: AnswerType
+  ) {
+    def isCalcRequired = answerType == AnswerType.Most || answerType == AnswerType.Least
   }
 }
 

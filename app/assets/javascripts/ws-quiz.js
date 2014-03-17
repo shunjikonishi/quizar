@@ -850,6 +850,7 @@ $(function() {
 					"time" : time
 				}
 			});
+			$progress.text(time);
 			showAnswerCounts();
 		}
 		function receiveAnswer(answer) {
@@ -862,15 +863,17 @@ $(function() {
 		}
 		function progress() {
 			function doProgress() {
-				if (answered) {
-					return;
-				}
 				n--;
 				$progress.css("width", n + "%");
 				if (n < 20) {
 					$progress.removeClass("progress-bar-warning").addClass("progress-bar-danger");
 				} else if (n < 60) {
 					$progress.removeClass("progress-bar-success").addClass("progress-bar-warning");
+				}
+				if (answered) {
+					if (n2 == -1) n2 = n;
+console.log("n2: " + n2 + ", " + n);
+					$progressAnswered.css("width", (n2 - n) + "%");
 				}
 				if (n > 0) {
 					setTimeout(doProgress, interval);
@@ -879,9 +882,12 @@ $(function() {
 				}
 			}
 			var n = 100,
+				n2 = -1,
 				interval = TIMELIMIT / 100,
-				$progress = $("#progress");
+				$progress = $("#question-progress"),
+				$progressAnswered = $("#question-progress-answered");
 			$progress.css("width", "100%");
+			$progressAnswered.css("width", "0%");
 			setTimeout(doProgress, interval);
 		}
 		function init($el) {
@@ -931,9 +937,9 @@ $(function() {
 			"setQuestion" : setQuestion
 		})
 	}
-	function EntryEvent(app, params, con) {
+	function EntryEvent(app, context, con) {
 		function isEnable() {
-			return params.eventId && !params.userEventId && params.eventStatus == EventStatus.Running;
+			return context.isEventRunning() && !context.isEntryEvent();
 		}
 		function openEvent() {
 			if (isEnable()) {
@@ -945,10 +951,10 @@ $(function() {
 		}
 		function doEntry(passcode) {
 			var data = {
-				"userId" : params.userId,
-				"username" : params.username,
-				"userImage" : params.userImage,
-				"eventId" : params.eventId
+				"userId" : context.userId,
+				"username" : context.username,
+				"userImage" : context.userImage,
+				"eventId" : context.eventId
 			};
 			if (passcode) {
 				data.passcode = passcode;
@@ -962,7 +968,7 @@ $(function() {
 					} else if (data.requirePass) {
 						app.showPasscode();
 					} else if (data.userEventId) {
-						params.userEventId = data.userEventId;
+						context.userEventId = data.userEventId;
 						if (passcode) {
 							app.showChat();
 						}
