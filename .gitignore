@@ -16,4 +16,5 @@ dist
 *.sublime-*
 properties.bat
 env.sh
-
+node_modules
+public/javascripts/quizar.*
