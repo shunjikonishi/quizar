@@ -21,6 +21,7 @@ class TemplateManager(session: SessionInfo) extends CommandHandler {
       case "make-question" => views.html.makeQuestion(session)
       case "publish-question" => views.html.publishQuestion(session)
       case "passcode" => views.html.passcode(session)
+      case "ranking" => views.html.ranking(session)
       case _ => Html("NotFound")
     }
   }

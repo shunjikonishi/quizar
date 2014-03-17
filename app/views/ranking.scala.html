@@ -1,0 +1,56 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="ranking" class="worksopace">
+	<h1>@Messages("ranking")</h1>
+	<div class="tab-content" style="display:none;">
+		<ul>
+			<li><a href="#ranking-now">@Messages("rankingNow")</a></li>
+			<li><a href="#ranking-event">@Messages("rankingEvent")</a></li>
+			<li><a href="#ranking-total">@Messages("rankingTotal")</a></li>
+		</ul>
+		<div id="ranking-now">
+			<table class="table table-hover" id="tbl-ranking-current">
+				<thead>
+					<tr>
+						<th>@Messages("rank")</th>
+						<th>@Messages("username")</th>
+						<th>@Messages("correctCount")</th>
+						<th>@Messages("time")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="ranking-event">
+			<table class="table table-hover" id="tbl-ranking-current">
+				<thead>
+					<tr>
+						<th>@Messages("rank")</th>
+						<th>@Messages("username")</th>
+						<th>@Messages("correctCount")</th>
+						<th>@Messages("time")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="ranking-total">
+			<table class="table table-hover" id="tbl-ranking-current">
+				<thead>
+					<tr>
+						<th>@Messages("rank")</th>
+						<th>@Messages("username")</th>
+						<th>@Messages("correctCount")</th>
+						<th>@Messages("time")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div id="ranking-none">
+		@Messages("rankingNone")
+	</div>
+</div>

@@ -310,3 +310,26 @@ ui.correctAnswer[ja]=正解！
 ui.wrongAnswer=Incorrect!
 ui.wrongAnswer[ja]=不正解！
 
+rankingNow=Now!
+rankingNow[ja]=Now!
+
+rankingEvent=Event
+rankingEvent[ja]=イベント別
+
+rankingTotal=Total
+rankingTotal[ja]=通算
+
+rankingNone=This room has no events yet.
+rankingNone[ja]=このルームではまだイベントは開催されていません。
+
+rank=Rank
+rank[ja]=ランク
+
+username=Username
+username[ja]=ユーザー名
+
+correctCount=Correct
+correctCount[ja]=正答
+
+time=Time
+time[ja]=タイム

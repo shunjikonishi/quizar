@@ -17,6 +17,7 @@ $(function() {
 
 	var SUPPORTS_TOUCH = 'ontouchstart' in window,
 		EFFECT_TIME = 300,
+		DEFAULT_IMAGE = "/assets/images/twitter_default_profile.png",
 		AnswerType = {
 			"FirstRow" : 0,
 			"Most" : 1,
@@ -172,7 +173,7 @@ $(function() {
 		});
 		clearHash(hash);
 	}
-	function Home(con) {
+	function Home(con, users) {
 		function bindEvent($el) {
 			$el.find("tbody tr").click(function() {
 				var id = $(this).attr("data-room");
@@ -182,10 +183,14 @@ $(function() {
 			});
 		}
 		function buildTable($el, data) {
-			var $tbody = $el.find("tbody");
+			var $tbody = $el.find("tbody"),
+				cache = {};
+
 			for (var i=0; i<data.length; i++) {
 				var room = data[i],
-					$tr = $("<tr><td class='event-date'></td><td class='event-title'></td><td class='event-capacity'></td></tr>"),
+					$tr = $("<tr><td class='event-date'></td><td class='event-title'><img src='" + 
+						DEFAULT_IMAGE + "'/></td><td class='event-capacity'></td></tr>"),
+					$img = $tr.find("img"),
 					date = MSG.undecided,
 					title = room.name,
 					capacity = "";
@@ -204,8 +209,25 @@ $(function() {
 				}
 				$tr.attr("data-room", room.id);
 				$tr.find(".event-date").text(date);
-				$tr.find(".event-title").text(title);
+				$tr.find(".event-title").append(title);
 				$tr.find(".event-capacity").text(capacity);
+				if (users[room.owner]) {
+					$img.attr("src", users[room.owner].getMiniImageUrl());
+				} else if (cache[room.owner]) {
+					$img.attr("data-userId", room.owner);
+				} else {
+					cache[room.owner] = true;
+					$img.attr("data-userId", room.owner);
+					con.request({
+						"command" : "getUser",
+						"data" : room.owner,
+						"success" : function(data) {
+							var user = new User(data);
+							users[user.id] = user;
+							$el.find("[data-userId=" + user.id + "]").attr("src", user.getMiniImageUrl()).removeAttr("data-userId");
+						}
+					})
+				}
 				$tbody.append($tr);
 			}
 		}
@@ -449,7 +471,7 @@ $(function() {
 				return null;
 			}
 			function appendTr(q, cache) {
-				var $tr = $("<tr><td class='q-creator'><img src='/assets/images/twitter_default_profile.png'/></td>" +
+				var $tr = $("<tr><td class='q-creator'><img src='" + DEFAULT_IMAGE + "'/></td>" +
 					"<td class='q-text'></td></tr>"),
 					$img = $tr.find("img");
 
@@ -457,7 +479,9 @@ $(function() {
 				$tr.find(".q-text").text(q.question);
 				if (users[q.createdBy]) {
 					$img.attr("src", users[q.createdBy].getMiniImageUrl());
-				} else if (!cache[q.createdBy]) {
+				} else if (cache[q.createdBy]) {
+					$img.attr("data-userId", q.createdBy);
+				} else {
 					cache[q.createdBy] = true;
 					$img.attr("data-userId", q.createdBy);
 					con.request({
@@ -1497,7 +1521,7 @@ $(function() {
 			messageDialog = new flect.MessageDialog($("#msg-dialog"));
 			effectDialog = new EffectDialog($("#effect-dialog"));
 			con = new flect.Connection(context.uri, debug);
-			home = new Home(con);
+			home = new Home(con, users);
 			makeRoom = new MakeRoom(app, context.userId, con);
 			templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 			$content = $("#content");
