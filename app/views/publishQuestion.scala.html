@@ -1,42 +1,58 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
-<div id="publish-question">
-	<div id="publish-question-seq">問題</div>
-	<div class="progress">
-		<div id="question-progress" class="progress-bar progress-bar-success" role="progressbar" style="width: 100%">
+<div id="publish-question" class="workspace">
+	<div id="publish-q-default">
+		<div id="publish-q-seq">問題</div>
+		<div class="progress">
+			<div id="publish-q-progress" class="progress-bar progress-bar-success" role="progressbar" style="width: 100%">
+			</div>
+			<div id="publish-q-progress-answered" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%">
+			</div>
 		</div>
-		<div id="question-progress-answered" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%">
+		<p id="publish-q-text">
+		</p>
+		<div>
+			<button id="answer-1" class="btn btn-question">
+				<div style="float:left;" class="answer"></div>
+				<div style="float:right;" class="answer-cnt"></div>
+			</button>
+		</div>
+		<div>
+			<button id="answer-2" class="btn btn-question">
+				<div style="float:left;" class="answer"></div>
+				<div style="float:right;" class="answer-cnt"></div>
+			</button>
+		</div>
+		<div>
+			<button id="answer-3" class="btn btn-question">
+				<div style="float:left;" class="answer"></div>
+				<div style="float:right;" class="answer-cnt"></div>
+			</button>
+		</div>
+		<div>
+			<button id="answer-4" class="btn btn-question">
+				<div style="float:left;" class="answer"></div>
+				<div style="float:right;" class="answer-cnt"></div>
+			</button>
+		</div>
+		<div>
+			<button id="answer-5" class="btn btn-question">
+				<div style="float:left;" class="answer"></div>
+				<div style="float:right;" class="answer-cnt"></div>
+			</button>
+		</div>
+		<div id="publish-q-description" style="display:none;">
+			<h2>@Messages("description")</h2>
+			<textarea rows="5" class="form-control" readonly="readonly"></textarea>
+		</div>
+		<div id="publish-q-url" style="display:none;">
+			<h2>@Messages("relatedUrl")</h2>
+			<a href="#" target="_blank">#</a>
+		</div>
+		<div id="publish-q-ranking" style="display:none;margin-top:10px;">
+			<button class="btn">@Messages("ranking")</button>
 		</div>
 	</div>
-	<p id="question-text">
-	</p>
-	<div>
-		<button id="answer-1" class="btn btn-question">
-			<div style="float:left;" class="answer"></div>
-			<div style="float:right;" class="answer-cnt"></div>
-		</button>
-	</div>
-	<div>
-		<button id="answer-2" class="btn btn-question">
-			<div style="float:left;" class="answer"></div>
-			<div style="float:right;" class="answer-cnt"></div>
-		</button>
-	</div>
-	<div>
-		<button id="answer-3" class="btn btn-question">
-			<div style="float:left;" class="answer"></div>
-			<div style="float:right;" class="answer-cnt"></div>
-		</button>
-	</div>
-	<div>
-		<button id="answer-4" class="btn btn-question">
-			<div style="float:left;" class="answer"></div>
-			<div style="float:right;" class="answer-cnt"></div>
-		</button>
-	</div>
-	<div>
-		<button id="answer-5" class="btn btn-question">
-			<div style="float:left;" class="answer"></div>
-			<div style="float:right;" class="answer-cnt"></div>
-		</button>
+	<div id="publish-q-none">
+		@Messages("notPublishedYet")
 	</div>
 </div>

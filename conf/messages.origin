@@ -1,5 +1,5 @@
-application.title=Meet up!
-application.title[ja]=勉強会！
+application.title=Quizar
+application.title[ja]=Quizar
 
 signin=Sign in
 signin[ja]=サインイン
@@ -300,3 +300,13 @@ ui.questionSeq[ja]=第 {0} 問
 
 ui.timeLimitExceeded=Time limit exceeded.
 ui.timeLimitExceeded[ja]=制限時間を過ぎています
+
+notPublishedYet=There are no questions that published for you.
+notPublishedYet[ja]=あなたの参加後に出題された問題はまだありません。
+
+ui.correctAnswer=Good job!
+ui.correctAnswer[ja]=正解！
+
+ui.wrongAnswer=Incorrect!
+ui.wrongAnswer[ja]=不正解！
+

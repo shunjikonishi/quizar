@@ -81,7 +81,7 @@
 		@roomInfo.map { room =>
 			<li>@Messages("roomMenu")
 				<ul>
-					<li><a href="#question" class="dynamic">@Messages("questions")</a></li>
+					<li><a href="#publish-question" class="dynamic">@Messages("questions")</a></li>
 					<li><a href="#ranking" class="dynamic">@Messages("ranking")</a></li>
 					<li><a href="#chat" class="menu-chat">@Messages("chat")</a></li>
 					@userInfo.filter(u => room.userQuiz && !room.isAdmin(u.id)).map { user =>

@@ -112,9 +112,13 @@ $(function() {
 		})
 	}
 	function EffectDialog($el) {
-		function show(msg) {
+		function show(msg, second) {
+			if (!second) {
+				second = 3;
+			}
 			$el.animateDialog(msg, {
-				"name" : "rotateZoom"
+				"name" : "rotateZoom",
+				"duration" : second + "s"
 			});
 		}
 		$.extend(this, {
@@ -444,7 +448,7 @@ $(function() {
 				}
 				return null;
 			}
-			function appendTr(q) {
+			function appendTr(q, cache) {
 				var $tr = $("<tr><td class='q-creator'><img src='/assets/images/twitter_default_profile.png'/></td>" +
 					"<td class='q-text'></td></tr>"),
 					$img = $tr.find("img");
@@ -453,8 +457,8 @@ $(function() {
 				$tr.find(".q-text").text(q.question);
 				if (users[q.createdBy]) {
 					$img.attr("src", users[q.createdBy].getMiniImageUrl());
-				} else {
-					//ToDo avoid multiple request
+				} else if (!cache[q.createdBy]) {
+					cache[q.createdBy] = true;
 					$img.attr("data-userId", q.createdBy);
 					con.request({
 						"command" : "getUser",
@@ -481,14 +485,15 @@ $(function() {
 						"limit" : limit
 					},
 					"success" : function(data) {
-						var $table = $tbody.parents("table");
+						var $table = $tbody.parents("table"),
+							cache = {};
 						questions = data;
 						$tbody.empty();
 						if (slideDir) {
 							$table.hide();
 						}
 						for (var i=0; i<data.length; i++) {
-							appendTr(data[i]);
+							appendTr(data[i], cache);
 						}
 						if (slideDir) {
 							$table.show("slide", { "direction" : slideDir}, EFFECT_TIME);
@@ -833,8 +838,10 @@ $(function() {
 			if (answered) {
 				return;
 			}
+			$btn.addClass("btn-primary");
 			answered = true;
 			enableInput($buttons, false);
+			$answerBtn = $btn;
 			if (time > TIMELIMIT) {
 				app.showMessage("timeLimitExceeded");
 				return;
@@ -850,7 +857,6 @@ $(function() {
 					"time" : time
 				}
 			});
-			$progress.text(time);
 			showAnswerCounts();
 		}
 		function receiveAnswer(answer) {
@@ -859,6 +865,105 @@ $(function() {
 			answerCounts[idx] = current;
 			if (context.isRoomAdmin() || answered) {
 				$("#answer-" + idx).find(".answer-cnt").text(current);
+			}
+		}
+		function getCorrectAnswerButtons() {
+			function minCount() {
+				var ret = -1;
+				for (var name in answerCounts) {
+					var cnt = answerCounts[name] || 0;
+					if (cnt != 0 && (ret == -1 || cnt < ret)) {
+						ret = cnt;
+					}
+				}
+				return ret;
+			}
+			function maxCount() {
+				var ret = -1;
+				for (var name in answerCounts) {
+					var cnt = answerCounts[name] || 0;
+					if (cnt != 0 && cnt > ret) {
+						ret = cnt;
+					}
+				}
+				return ret;
+			}
+			switch (answerDetail.answerType) {
+				case AnswerType.FirstRow:
+					var text = answerDetail.answers.split("\n")[0];
+					for (var i=0; i<$buttons.length; i++) {
+						var $btn = $($buttons[i]);
+						if ($btn.find(".answer").text() == text) {
+							return $btn;
+						}
+					}
+					break;
+				case AnswerType.Most:
+				case AnswerType.Least:
+					var cnt = answerDetail.answerType == AnswerType.Most ? maxCount() : minCount();
+					if (cnt == -1) {
+						return null;
+					} else {
+						var ret = [];
+						$buttons.each(function() {
+							if ($(this).find(".answer-cnt").text() == cnt) {
+								ret.push(this);
+							}
+						})
+						return $(ret);
+					}
+					break;
+				case AnswerType.NoAnswer:
+					return null;
+			}
+			throw "IllegalState: " + answerDetail.answerType;
+		}
+		function buildAnswerDetail(effect) {
+			function isCorrect($ab, $cbs) {
+				var ret = false,
+					id = $ab.attr("id");
+				$cbs.each(function() {
+					if (id == $(this).attr("id")) {
+						ret = true;
+					}
+				})
+				return ret;
+			}
+			if (!$buttons) {
+				return;
+			}
+			var $correctBtns = getCorrectAnswerButtons();
+			if ($correctBtns) {
+				if ($answerBtn) {
+					$answerBtn.removeClass("btn-primary");
+					var correct = isCorrect($answerBtn, $correctBtns);
+						msg = correct ? MSG.correctAnswer : MSG.wrongAnswer;
+					if (!correct) {
+						$answerBtn.addClass("btn-danger");
+					}
+					if (effect) {
+						app.showEffect(msg, 1);
+					}
+				}
+				$correctBtns.addClass("btn-success");
+			}
+			if (answerDetail.description) {
+				var $desc = $("#publish-q-description");
+				$desc.find("textarea").val(answerDetail.description);
+				$desc.show();
+			}
+			if (answerDetail.relatedUrl) {
+				var $url = $("#publish-q-url"),
+					$a = $url.find("a");
+				$a.attr("href", answerDetail.relatedUrl).text(answerDetail.relatedUrl);
+				$url.show();
+			}
+			$("#publish-q-ranking").show();
+		}
+		function receiveAnswerDetail(data) {
+			answerDetail = data;
+			if (showAnswerDetail) {
+				buildAnswerDetail(true);
 			}
 		}
 		function progress() {
@@ -872,68 +977,99 @@ $(function() {
 				}
 				if (answered) {
 					if (n2 == -1) n2 = n;
-console.log("n2: " + n2 + ", " + n);
 					$progressAnswered.css("width", (n2 - n) + "%");
 				}
 				if (n > 0) {
 					setTimeout(doProgress, interval);
 				} else {
 					enableInput($buttons, false);
+					showAnswerDetail = true;
+					if (answerDetail) {
+						buildAnswerDetail(true);
+					}
 				}
 			}
 			var n = 100,
 				n2 = -1,
 				interval = TIMELIMIT / 100,
-				$progress = $("#question-progress"),
-				$progressAnswered = $("#question-progress-answered");
+				$progress = $("#publish-q-progress"),
+				$progressAnswered = $("#publish-q-progress-answered");
 			$progress.css("width", "100%");
 			$progressAnswered.css("width", "0%");
 			setTimeout(doProgress, interval);
 		}
 		function init($el) {
-			$("#publish-question-seq").text(MSG.format(MSG.questionSeq, question.seq));
+			var $seq = $("#publish-q-seq");
+			$text = $("#publish-q-text");
+			$("#publish-q-none").hide();
 			$buttons = $el.find(".btn-question").hide();
-			if (context.isRoomAdmin()) {
-				$buttons.find(".answer-cnt").text("0");
-			} else if (context.userEventId) {
-				$buttons.click(answer);
-			} else {
-				enableInput($buttons, false);
+			if (question) {
+				$seq.text(MSG.format(MSG.questionSeq, question.seq));
+				for (var i=0; i<question.answers.length; i++) {
+					var $btn = $("#answer-" + (i+1)).show();
+					$btn.find(".answer").text(question.answers[i]);
+				}
+				$text.text(question.question).hide();
 			}
 
-			for (var i=0; i<question.answers.length; i++) {
-				var $btn = $("#answer-" + (i+1)).show();
-				$btn.find(".answer").text(question.answers[i]);
+			if (answerDetail) {
+				showAnswerCounts();
+				enableInput($buttons, false);
+				buildAnswerDetail(false);
+			} else if (question) {
+				$seq.css({
+					"animation-name" : "inout",
+					"-webkit-animation-name" : "inout"
+				});
+				if (context.isRoomAdmin()) {
+					$buttons.find(".answer-cnt").text("0");
+				} else if (context.userEventId) {
+					$buttons.click(answer);
+				} else {
+					enableInput($buttons, false);
+				}
+				$text.hide();
+			} else {
+				$("#publish-q-default").hide();
+				$("#publish-q-none").show();
 			}
-			$text = $("#question-text").text(question.question).hide();
 		}
 		function afterShow() {
-			startTime = new Date().getTime();
-			$text.show("blind", { "direction" : "left"}, 1000);
-			progress();
+			if (!answerDetail) {
+				startTime = new Date().getTime();
+				$text.show("blind", { "direction" : "left"}, 1000);
+				progress();
+			}
 		}
 		function clear() {
 			$buttons = null;
+			$answerBtn = null;
 			$text = null;
-			startTime = 0;
-			answered = false;
 		}
 		function setQuestion(q) {
 			question = q;
 			answerCounts = {};
+			answerDetail = null;
+			answered = false;
+			startTime = 0;
+			showAnswerDetail = false;
 		}
 		var question = null,
 			answerCounts = {},
-			$buttons = null,
-			$text = null,
+			answerDetail = null,
+			answered = false,
 			startTime = 0,
-			answered = false;
+			showAnswerDetail = false,
+			$buttons = null,
+			$answerBtn = null;
+			$text = null;
 
 		$.extend(this, {
 			"init" : init,
 			"afterShow" : afterShow,
 			"clear" : clear,
 			"receiveAnswer" : receiveAnswer,
+			"receiveAnswerDetail" : receiveAnswerDetail,
 			"setQuestion" : setQuestion
 		})
 	}
@@ -1344,6 +1480,9 @@ console.log("n2: " + n2 + ", " + n);
 		function showMessage(msg, time) {
 			messageDialog.show(msg, time);
 		}
+		function showEffect(msg, time) {
+			effectDialog.show(msg, time);
+		}
 		function tweet(msg, withTwitter) {
 			if (chat) {
 				chat.tweet(msg, withTwitter);
@@ -1434,6 +1573,7 @@ console.log("n2: " + n2 + ", " + n);
 					showQuestion(data);
 				});
 				con.addEventListener("answer", publishQuestion.receiveAnswer);
+				con.addEventListener("answerDetail", publishQuestion.receiveAnswerDetail);
 			}
 			if ($("#home").length) {
 				con.ready(function() {
@@ -1582,12 +1722,22 @@ console.log("n2: " + n2 + ", " + n);
 				}
 			})
 		}
+		if (context.isInRoom()) {
+			$.extend(TemplateLogic, {
+				"publish-question" : {
+					"name" : "publish-question",
+					"beforeShow" : publishQuestion.init,
+					"afterHide" : publishQuestion.clear
+				}
+			})
+		}
 		$.extend(this, {
 			"showQuestionList" : showQuestionList,
 			"showMakeQuestion" : showMakeQuestion,
 			"showPasscode" : showPasscode,
 			"showChat" : showChat,
 			"showMessage" : showMessage,
+			"showEffect" : showEffect,
 			"tweet" : tweet
 		})
 	}
