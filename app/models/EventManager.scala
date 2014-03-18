@@ -16,6 +16,7 @@ import models.entities.QuizUserEvent
 import models.entities.QuizQuestion
 import models.entities.QuizUserAnswer
 import models.entities.QuizRanking
+import models.entities.QuizAnswerCount
 import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -26,9 +27,10 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   import EventManager._
 
   private var prevPublished: Option[PublishedQuestion] = None
+  private var openBySelf = false
 
   implicit val autoSession = QuizEvent.autoSession
-  private val (qe, que, qp, qua, qr) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua, QuizRanking.qr)
+  private val (qe, que, qp, qua, qr, qac) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua, QuizRanking.qr, QuizAnswerCount.qac)
 
   private def roundTime(d: DateTime) = {
     val hour = d.getHourOfDay
@@ -39,7 +41,6 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
       case _ => 45
     }
     val ret = d.withTime(hour, min, 0, 0)
-    println("roundTime: " + d + ", " + ret)
     ret
   }
 
@@ -160,12 +161,16 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   }
 
   def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = {
-    val randomList = Random.shuffle(q.answerList.zipWithIndex)
-    val answers = randomList.map(_._1)
-    val answersIndex = randomList.map(_._2 + 1)
-    val correctAnswer = q.answerType match {
-      case AnswerType.FirstRow => answersIndex.indexOf(1) + 1
-      case _ => 0
+    val zipList = q.answerList.zipWithIndex
+    val (answers, answersIndex, correctAnswer) = q.answerType match {
+      case AnswerType.FirstRow =>
+        val randomList = Random.shuffle(zipList)
+        val answers = randomList.map(_._1)
+        val answersIndex = randomList.map(_._2 + 1)
+        val correctAnswer = answersIndex.indexOf(1) + 1
+        (answers, answersIndex, correctAnswer)
+      case _ =>
+        (q.answerList, zipList.map(_._2 + 1), 0)
     }
     val now = new DateTime()
     DB.localTx { implicit session =>
@@ -226,27 +231,72 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     Nil
   }
 
-  private def calcSummary(pq: PublishedQuestion) = {
-println("calcSummary1: " + pq.publishId)
+  private def calcSummary(pq: PublishedQuestion, updateQuestion: Boolean) = {
+    if (pq.isCalcRequired || (updateQuestion && pq.isSummaryRequired)) {
+      DB.localTx { implicit session =>
+        val now = new DateTime()
+        if (pq.isCalcRequired) {
+          val answers = withSQL {
+            select(sqls"answer, count(*)").from(QuizUserAnswer as qua)
+              .where.eq(qua.publishId, pq.publishId)
+              .groupBy(sqls"answer")
+          }.map(rs => (rs.int(1), rs.int(2))).list.apply()
+          val correctCount = pq.answerType match {
+            case AnswerType.Most => answers.map(_._2).max
+            case AnswerType.Least => answers.map(_._2).min
+            case _ => throw new IllegalStateException()
+          }
+          val correctAnswers = answers.filter(_._2 == correctCount).map(_._1)
+          sql"""UPDATE QUIZ_USER_ANSWER
+              SET STATUS = CASE WHEN ANSWER IN (${correctAnswers}) THEN 1 ELSE 2 END,
+                  UPDATED = ${now}
+            WHERE PUBLISH_ID = ${pq.publishId}""".update.apply()
+        }
+        if (updateQuestion && pq.isSummaryRequired) {
+          QuizAnswerCount.find(pq.publishId).foreach { qac =>
+            sql"""UPDATE QUIZ_QUESTION
+                SET CORRECT_COUNT = CORRECT_COUNT + ${qac.correctCount},
+                    WRONG_COUNT = WRONG_COUNT + ${qac.wrongCount},
+                    UPDATED = ${now}
+              WHERE ID = ${qac.questionId}""".update.apply()
+          }
+        }
+      }
+    }
+  }
+
+  private def calcRanking(eventId: Int) = {
     DB.localTx { implicit session =>
       val now = new DateTime()
-      val answers = withSQL {
-        select(sqls"answer, count(*)").from(QuizUserAnswer as qua)
-          .where.eq(qua.publishId, pq.publishId)
-          .groupBy(sqls"answer")
-      }.map(rs => (rs.int(1), rs.int(2))).list.apply()
-println("calcSummary2: " + answers)
-      val correctCount = pq.answerType match {
-        case AnswerType.Most => answers.map(_._2).max
-        case AnswerType.Least => answers.map(_._2).min
+      sql"""UPDATE QUIZ_USER_EVENT A 
+               SET CORRECT_COUNT = B.CORRECT_COUNT,
+                   WRONG_COUNT = B.WRONG_COUNT,
+                   TIME = B.TIME,
+                   UPDATED = ${now}
+              FROM QUIZ_RANKING B
+             WHERE A.EVENT_ID = ${eventId}
+               AND A.USER_ID = B.USER_ID
+               AND A.EVENT_ID = B.EVENT_ID""".update.apply()
+      var point = 10
+      val pointSql = sql"""UPDATE QUIZ_USER_EVENT
+                              SET CORRECT_COUNT = ?,
+                                  WRONG_COUNT = ?,
+                                  TIME =?,
+                                  POINT = ?,
+                                  UPDATED = ?
+                            WHERE USER_ID = ?
+                              AND EVENT_ID = ?"""
+      getEventRanking(eventId, 10).foreach { rank =>
+        if (rank.correctCount > 0) {
+          pointSql.bind(rank.correctCount, rank.wrongCount, rank.time, point, now, rank.userId, rank.eventId).update.apply()
+          point -= 1
+        }
       }
-println("calcSummary3: " + correctCount)
-      val correctAnswers = answers.filter(_._2 == correctCount).map(_._1)
-      sql"""UPDATE QUIZ_USER_ANSWER
-          SET STATUS = CASE WHEN ANSWER IN (${correctAnswers}) THEN 1 ELSE 2 END,
-              UPDATED = ${now}
-        WHERE PUBLISH_ID = ${pq.publishId}""".update.apply();
     }
+  }
+
+  private def recalcQuestion(eventId: Int) = {
+    //ToDo
   }
 
   val createCommand = CommandHandler { command =>
@@ -303,11 +353,12 @@ println("calcSummary3: " + correctCount)
         "admin" -> JsNumber(admin)
       )))))
     }
+    openBySelf = true
     command.json(JsBoolean(ret))
   }
 
   val closeCommand = CommandHandler { command =>
-    prevPublished.filter(_.isCalcRequired).foreach(calcSummary(_))
+    prevPublished.foreach(calcSummary(_, true))
     prevPublished = None
 
     val id = command.data.as[Int]
@@ -315,11 +366,19 @@ println("calcSummary3: " + correctCount)
     if (ret) {
       broadcast.foreach(_.send(new CommandResponse("finishEvent", JsNumber(id))))
     }
+    val recalc = !openBySelf
+    openBySelf = false
+    Akka.system.scheduler.scheduleOnce(0 seconds) {
+      calcRanking(id)
+      if (recalc) {
+        recalcQuestion(id)
+      }
+    }
     command.json(JsBoolean(ret))
   }
 
   val publishCommand = CommandHandler { command =>
-    prevPublished.filter(_.isCalcRequired).foreach(calcSummary(_))
+    prevPublished.foreach(calcSummary(_, true))
 
     val questionId = (command.data \ "questionId").as[Int]
     val eventId = (command.data \ "eventId").as[Int]
@@ -333,10 +392,7 @@ println("calcSummary3: " + correctCount)
         broadcast.foreach(_.send(new CommandResponse("question", pub.toJson)))
         Akka.system.scheduler.scheduleOnce(10 seconds) {
           broadcast.foreach(_.send(new CommandResponse("answerDetail", q.toJson)))
-println("calcSummary0: " + pq.isCalcRequired)
-          if (pq.isCalcRequired) {
-            calcSummary(pq)
-          }
+          calcSummary(pq, false)
         }
         "OK"
       } catch {
@@ -380,6 +436,7 @@ println("calcSummary0: " + pq.isCalcRequired)
     answerType: AnswerType
   ) {
     def isCalcRequired = answerType == AnswerType.Most || answerType == AnswerType.Least
+    def isSummaryRequired = answerType != AnswerType.NoAnswer
   }
 }
 

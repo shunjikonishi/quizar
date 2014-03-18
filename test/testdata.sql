@@ -38,3 +38,5 @@ insert into quiz_user_answer (id, user_id, publish_id, event_id, user_event_id, 
 ;
 
 delete from quiz_user_answer where id > 1000;
+delete from quiz_user_answer where id > 1010;
+

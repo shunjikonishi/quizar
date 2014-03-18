@@ -1,6 +1,9 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="edit-question" class="workspace">
 	<h1>@Messages("questions")</h1>
+	<div >
+		<button id="edit-question-new" class="btn">@Messages("new")</button>
+	</div>
 	<div class="tab-content">
 		<ul id="edit-question-tab">
 			<li><a href="#edit-question-stock">@(Messages("stock"))(<span id="question-stock-count">-1</span>)</a></li>
@@ -11,11 +14,6 @@
 				<button class="btn" id="edit-question-left">
 					<i class="fa fa-chevron-circle-left fa-lg"></i>
 				</button>
-			</div>
-			<div style="display:inline-block; width: 240px;padding-left:10px;padding-top:5px;">
-				<i class="fa fa-search fa-lg"></i>
-				<input type="text" style="width:100px;">
-				<button id="edit-question-new">@Messages("new")</button>
 			</div>
 			<div style="float:right;">
 				<button class="btn" id="edit-question-right">

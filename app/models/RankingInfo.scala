@@ -9,6 +9,7 @@ case class EventRankingInfo(
   username: String,
   img: String,
   correctCount: Int,
+  wrongCount: Int,
   time: Long
 ) {
 
@@ -21,12 +22,13 @@ object EventRankingInfo {
   implicit val format = Json.format[EventRankingInfo]
 
   def create(ranking: QuizRanking) = EventRankingInfo(
-    eventId=ranking.eventId.get,
-    userId=ranking.userId.get,
-    username=ranking.username.get,
-    img=ranking.imageUrl.get,
-    correctCount=ranking.correctCount.get.toInt,
-    time=ranking.time.get
+    eventId=ranking.eventId,
+    userId=ranking.userId,
+    username=ranking.username,
+    img=ranking.imageUrl,
+    correctCount=ranking.correctCount,
+    wrongCount=ranking.wrongCount,
+    time=ranking.time
   )
 
   def fromJson(json: JsValue): EventRankingInfo = Json.fromJson[EventRankingInfo](json).get
