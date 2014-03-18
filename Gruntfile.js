@@ -28,6 +28,7 @@ module.exports = function(grunt) {
                     'app/scripts/quizar.publishQuestion.js' ,
                     'app/scripts/quizar.entryEvent.js' ,
                     'app/scripts/quizar.editEvent.js' ,
+                    'app/scripts/quizar.ranking.js' ,
                     'app/scripts/quizar.debug.js' ,
                     'app/scripts/quizar.app.js' ,
                     'app/scripts/outro.js' 

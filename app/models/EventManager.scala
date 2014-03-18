@@ -15,6 +15,7 @@ import models.entities.QuizPublish
 import models.entities.QuizUserEvent
 import models.entities.QuizQuestion
 import models.entities.QuizUserAnswer
+import models.entities.QuizRanking
 import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -22,11 +23,12 @@ import flect.websocket.CommandResponse
 import flect.websocket.CommandBroadcast
 
 class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
+  import EventManager._
 
   private var prevPublished: Option[PublishedQuestion] = None
 
   implicit val autoSession = QuizEvent.autoSession
-  private val (qe, que, qp, qua) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua)
+  private val (qe, que, qp, qua, qr) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua, QuizRanking.qr)
 
   private def roundTime(d: DateTime) = {
     val hour = d.getHourOfDay
@@ -97,12 +99,12 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }.getOrElse(false)
   }
 
-  def open(id: Int): Boolean = {
+  def open(id: Int, admin: Int): Boolean = {
     DB localTx { implicit session =>
       val now = new DateTime()
-      val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, EXEC_DATE = ?, UPDATED = ? " + 
+      val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, ADMIN = ?, EXEC_DATE = ?, UPDATED = ? " + 
           "WHERE ID = ? AND STATUS = ?")
-        .bind(EventStatus.Running.code, roundTime(now), now, id, EventStatus.Prepared.code)
+        .bind(EventStatus.Running.code, admin, roundTime(now), now, id, EventStatus.Prepared.code)
         .update.apply();
       ret == 1
     }
@@ -208,7 +210,23 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     ))
   }
 
-  def calcSummary(pq: PublishedQuestion) = {
+  def getEventRanking(eventId: Int, limit: Int): List[EventRankingInfo] = {
+    QuizRanking.findAllBy(
+      SQLSyntax.eq(qr.eventId, eventId)
+        .orderBy(sqls"correct_count desc, time asc")
+        .limit(limit)
+    ).map(EventRankingInfo.create)
+  }
+
+  def getEventWinners(roomId: Int, limit: Int): List[EventRankingInfo] = {
+    Nil
+  }
+
+  def getTotalRanking(roomId: Int, limit: Int): List[EventRankingInfo] = {
+    Nil
+  }
+
+  private def calcSummary(pq: PublishedQuestion) = {
 println("calcSummary1: " + pq.publishId)
     DB.localTx { implicit session =>
       val now = new DateTime()
@@ -276,10 +294,14 @@ println("calcSummary3: " + correctCount)
   }
 
   val openCommand = CommandHandler { command =>
-    val id = command.data.as[Int]
-    val ret = open(id)
+    val id = (command.data \ "id").as[Int]
+    val admin = (command.data \ "admin").as[Int]
+    val ret = open(id, admin)
     if (ret) {
-      broadcast.foreach(_.send(new CommandResponse("startEvent", JsNumber(id))))
+      broadcast.foreach(_.send(new CommandResponse("startEvent", JsObject(Seq(
+        "id" -> JsNumber(id),
+        "admin" -> JsNumber(admin)
+      )))))
     }
     command.json(JsBoolean(ret))
   }
@@ -331,6 +353,27 @@ println("calcSummary0: " + pq.isCalcRequired)
     CommandResponse.None
   }
 
+  val eventRankingCommand = CommandHandler { command =>
+    val eventId = (command.data \ "eventId").as[Int]
+    val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
+    val data = JsArray(getEventRanking(eventId, limit).map(_.toJson))
+    command.json(data)
+  }
+
+  val eventWinnersCommand = CommandHandler { command =>
+    val roomId = (command.data \ "roomId").as[Int]
+    val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
+    val data = JsArray(getEventWinners(roomId, limit).map(_.toJson))
+    command.json(data)
+  }
+
+  val totalRankingCommand = CommandHandler { command =>
+    val roomId = (command.data \ "roomId").as[Int]
+    val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
+    val data = JsArray(getTotalRanking(roomId, limit).map(_.toJson))
+    command.json(data)
+  }
+
   case class PublishedQuestion(
     publishId: Int,
     questionId: Int,
@@ -341,5 +384,7 @@ println("calcSummary0: " + pq.isCalcRequired)
 }
 
 object EventManager {
+  private val DEFAULT_RANKING_LIMIT = 10;
+
   def apply(roomId: Int, broadcast: CommandBroadcast = null) = new EventManager(roomId, Option(broadcast))
 }

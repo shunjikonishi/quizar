@@ -23,7 +23,9 @@ flect.QuizApp = function(serverParams) {
 				"name" : "publish-question",
 				"effect" : "none",
 				"beforeShow" : function($el) {
-					publishQuestion.setQuestion(data);
+					if (data) {
+						publishQuestion.setQuestion(data);
+					}
 					publishQuestion.init($el);
 				},
 				"afterShow" : publishQuestion.afterShow,
@@ -32,6 +34,10 @@ flect.QuizApp = function(serverParams) {
 			$content.children("div").hide();
 			templateManager.show(params);
 		}
+	}
+	function showRanking() {
+		$content.children("div").hide();
+		templateManager.show(TemplateLogic["ranking"]);
 	}
 	function showQuestionList(direction) {
 		if (questionList) {
@@ -119,6 +125,18 @@ flect.QuizApp = function(serverParams) {
 				showStatic("chat", $(this).parents("#sidr").length > 0);
 				return false;
 			});
+			$("#toolbar-ranking").click(function() {
+				showRanking();
+				return false;
+			})
+			$("#toolbar-question").click(function() {
+				if (context.isEventAdmin()) {
+					showQuestionList();
+				} else {
+					showQuestion();
+				}
+				return false;
+			})
 			con.addEventListener("chat", function(data) {
 				chat.append(data);
 				if (data.userId != context.userId && chat.isNotifyTweet()) {
@@ -139,8 +157,10 @@ flect.QuizApp = function(serverParams) {
 				}
 			});
 			con.addEventListener("startEvent", function(data) {
+				var eventId = data.id,
+					adminId = data.admin;
 				effectDialog.show(MSG.start);
-				context.openEvent(data);
+				context.openEvent(eventId, adminId == context.userId);
 				if (makeQuestion) {
 					makeQuestion.openEvent(context.eventId);
 				}
@@ -165,6 +185,8 @@ flect.QuizApp = function(serverParams) {
 			});
 			con.addEventListener("answer", publishQuestion.receiveAnswer);
 			con.addEventListener("answerDetail", publishQuestion.receiveAnswerDetail);
+
+			ranking = new Ranking(self, context, users, con);
 		}
 		if ($("#home").length) {
 			con.ready(function() {
@@ -172,14 +194,14 @@ flect.QuizApp = function(serverParams) {
 			});
 		}
 		if (context.isRoomAdmin() || context.isPostQuestionAllowed()) {
-			makeQuestion = new MakeQuestion(self, context.roomId, context.userId, context.isRoomAdmin(), con);
+			makeQuestion = new MakeQuestion(self, context, con);
 			if (context.isEventRunning()) {
 				makeQuestion.openEvent(context.eventId);
 			}
 		}
 		if (context.isRoomAdmin()) {
 			questionList = new QuestionList(self, users, context.userId, con);
-			editEvent = new EditEvent(self, context.roomId, con);
+			editEvent = new EditEvent(self, context, con);
 			con.addEventListener("postQuestion", function(data) {
 				var userId = data,
 					user = users[userId];
@@ -264,11 +286,12 @@ flect.QuizApp = function(serverParams) {
 		chat,
 		questionList,
 		publishQuestion,
+		ranking,
 		$content,
 		users = {};
 	init();
 	debug.log("params", context);
-
+console.log("eventAdmin: " + context.eventAdmin);
 	var TemplateLogic = {
 		"home" : {
 			"beforeShow" : home.init,
@@ -319,6 +342,12 @@ flect.QuizApp = function(serverParams) {
 				"name" : "publish-question",
 				"beforeShow" : publishQuestion.init,
 				"afterHide" : publishQuestion.clear
+			},
+			"ranking" : {
+				"name" : "ranking",
+				"beforeShow" : ranking.init,
+				"afterShow" : ranking.afterShow,
+				"afterHide" : ranking.clear
 			}
 		})
 	}
@@ -327,6 +356,8 @@ flect.QuizApp = function(serverParams) {
 		"showMakeQuestion" : showMakeQuestion,
 		"showPasscode" : showPasscode,
 		"showChat" : showChat,
+		"showRanking" : showRanking,
+		"showQuestion" : showQuestion,
 		"showMessage" : showMessage,
 		"showEffect" : showEffect,
 		"tweet" : tweet

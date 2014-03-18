@@ -137,7 +137,11 @@ function PublishQuestion(app, context, con) {
 			$a.attr("href", answerDetail.relatedUrl).text(answerDetail.relatedUrl);
 			$url.show();
 		}
-		$("#publish-q-ranking").show();
+		if (effect) {
+			$("#publish-q-detail").show("slow");
+		} else {
+			$("#publish-q-detail").show();
+		}
 	}
 	function receiveAnswerDetail(data) {
 		answerDetail = data;
@@ -212,6 +216,9 @@ function PublishQuestion(app, context, con) {
 			$("#publish-q-default").hide();
 			$("#publish-q-none").show();
 		}
+		$("#publish-q-ranking").click(function() {
+			app.showRanking();
+		});
 	}
 	function afterShow() {
 		if (!answerDetail) {

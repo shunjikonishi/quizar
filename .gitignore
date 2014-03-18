@@ -17,4 +17,5 @@ dist
 properties.bat
 env.sh
 node_modules
+bower_components
 public/javascripts/quizar.*

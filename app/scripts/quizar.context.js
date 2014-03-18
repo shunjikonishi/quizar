@@ -3,18 +3,21 @@ function Context(hash) {
 	function isLogined() { return !!self.userId;}
 	function isEntryEvent() { return !!self.userEventId;}
 	function isEventRunning() { return self.eventStatus == EventStatus.Running;}
+	function isEventAdmin() { return !!self.eventAdmin;}
 	function isInRoom() { return !!self.roomId;}
 	function isRoomAdmin() { return !!self.roomAdmin;}
 	function isPostQuestionAllowed() { return !!self.userQuiz;}
 	function isDebug() { return !!self.debug;}
-	function openEvent(eventId) {
+	function openEvent(eventId, admin) {
 		self.eventId = eventId;
 		self.eventStatus = EventStatus.Running;
+		self.eventAdmin = admin;
 	}
 	function closeEvent() {
 		self.eventId = 0;
 		self.eventStatus = EventStatus.Prepared;
 		self.userEventId = 0;
+		self.eventAdmin = false;
 	}
 	function entryEvent(userEventId) {
 		self.userEventId = userEventId;
@@ -27,6 +30,7 @@ function Context(hash) {
 		"isLogined" : isLogined,
 		"isEntryEvent" : isEntryEvent,
 		"isEventRunning" : isEventRunning,
+		"isEventAdmin" : isEventAdmin,
 		"isInRoom" : isInRoom,
 		"isRoomAdmin" : isRoomAdmin,
 		"isPostQuestionAllowed" : isPostQuestionAllowed,
@@ -35,5 +39,8 @@ function Context(hash) {
 		"closeEvent" : closeEvent,
 		"entryEvent" : entryEvent,
 		"canEntryEvent" : canEntryEvent
-	})
+	});
+	if (!this.eventStatus) {
+		this.eventStatus = EventStatus.Prepared;
+	}
 }

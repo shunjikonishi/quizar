@@ -40,16 +40,18 @@
 				<div style="float:right;" class="answer-cnt"></div>
 			</button>
 		</div>
-		<div id="publish-q-description" style="display:none;">
-			<h2>@Messages("description")</h2>
-			<textarea rows="5" class="form-control" readonly="readonly"></textarea>
-		</div>
-		<div id="publish-q-url" style="display:none;">
-			<h2>@Messages("relatedUrl")</h2>
-			<a href="#" target="_blank">#</a>
-		</div>
-		<div id="publish-q-ranking" style="display:none;margin-top:10px;">
-			<button class="btn">@Messages("ranking")</button>
+		<div id="publish-q-detail" style="display:none;">
+			<div id="publish-q-description" style="display:none;">
+				<h2>@Messages("description")</h2>
+				<textarea rows="5" class="form-control" readonly="readonly"></textarea>
+			</div>
+			<div id="publish-q-url" style="display:none;">
+				<h2>@Messages("relatedUrl")</h2>
+				<a href="#" target="_blank">#</a>
+			</div>
+			<div style="margin-top:10px;">
+				<button id="publish-q-ranking" class="btn">@Messages("ranking")</button>
+			</div>
 		</div>
 	</div>
 	<div id="publish-q-none">

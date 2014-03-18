@@ -11,6 +11,7 @@ case class PageParams(
   userImage: Option[String] = None,
   roomId: Option[Int] = None,
   roomAdmin: Option[Boolean] = None,
+  eventAdmin: Option[Boolean] = None,
   userQuiz: Option[Boolean] = None,
   hashtag: Option[String] = None,
   eventId : Option[Int] = None,
@@ -31,9 +32,13 @@ case class PageParams(
       userQuiz=Some(room.userQuiz),
       hashtag=room.hashtag
     )
+    room.event.foreach { e =>
+      println("!!!!!!!!!!!" + e.admin + "," + userId)
+    }
     room.event.map(e => ret.copy(
       eventId=Some(e.id),
-      eventStatus=Some(e.status.code)
+      eventStatus=Some(e.status.code),
+      eventAdmin=Some(userId == e.admin)
     )).getOrElse(ret)
   }
 

@@ -9,6 +9,7 @@ case class QuizEvent(
   roomId: Int, 
   title: Option[String] = None, 
   status: Short, 
+  admin: Option[Int] = None, 
   execDate: Option[DateTime] = None, 
   endDate: Option[DateTime] = None, 
   capacity: Int, 
@@ -28,13 +29,14 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
 
   override val tableName = "quiz_event"
 
-  override val columns = Seq("id", "room_id", "title", "status", "exec_date", "end_date", "capacity", "passcode", "description", "created", "updated")
+  override val columns = Seq("id", "room_id", "title", "status", "admin", "exec_date", "end_date", "capacity", "passcode", "description", "created", "updated")
 
   def apply(qe: ResultName[QuizEvent])(rs: WrappedResultSet): QuizEvent = new QuizEvent(
     id = rs.int(qe.id),
     roomId = rs.int(qe.roomId),
     title = rs.stringOpt(qe.title),
     status = rs.short(qe.status),
+    admin = rs.intOpt(qe.admin),
     execDate = rs.timestampOpt(qe.execDate).map(_.toDateTime),
     endDate = rs.timestampOpt(qe.endDate).map(_.toDateTime),
     capacity = rs.int(qe.capacity),
@@ -78,6 +80,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
     roomId: Int,
     title: Option[String] = None,
     status: Short,
+    admin: Option[Int] = None,
     execDate: Option[DateTime] = None,
     endDate: Option[DateTime] = None,
     capacity: Int,
@@ -90,6 +93,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
         column.roomId,
         column.title,
         column.status,
+        column.admin,
         column.execDate,
         column.endDate,
         column.capacity,
@@ -101,6 +105,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
         roomId,
         title,
         status,
+        admin,
         execDate,
         endDate,
         capacity,
@@ -116,6 +121,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
       roomId = roomId,
       title = title,
       status = status,
+      admin = admin,
       execDate = execDate,
       endDate = endDate,
       capacity = capacity,
@@ -132,6 +138,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
         column.roomId -> entity.roomId,
         column.title -> entity.title,
         column.status -> entity.status,
+        column.admin -> entity.admin,
         column.execDate -> entity.execDate,
         column.endDate -> entity.endDate,
         column.capacity -> entity.capacity,

@@ -1,4 +1,4 @@
-function EditEvent(app, roomId, con) {
+function EditEvent(app, context, con) {
 	function loadEvent(data) {
 		if (data) {
 			for (var name in data) {
@@ -12,9 +12,7 @@ function EditEvent(app, roomId, con) {
 				$("#event-date").val(d.dateStr());
 				$("#event-time").val(d.timeStr());
 			}
-			eventId = data.id;
-			eventStatus = data.status;
-			$toggleBtn.text(eventStatus == EventStatus.Prepared ? MSG.start : MSG.finish);;
+			$toggleBtn.text(data.status == EventStatus.Prepared ? MSG.start : MSG.finish);;
 		} else {
 			$toggleBtn.text(MSG.start);;
 		}
@@ -23,9 +21,9 @@ function EditEvent(app, roomId, con) {
 		var date = $("#event-date").val(),
 			time = $("#event-time").val(),
 			ret = {
-				"id" : eventId || 0,
-				"roomId" : roomId,
-				"status" : eventStatus
+				"id" : context.eventId || 0,
+				"roomId" : context.roomId,
+				"status" : context.eventStatus
 			};
 		$form.find(":input.auto-collect").each(function() {
 			var $input = $(this),
@@ -56,18 +54,20 @@ function EditEvent(app, roomId, con) {
 		});
 	}
 	function openEvent() {
-		if (eventStatus != EventStatus.Prepared) {
+		if (context.eventStatus != EventStatus.Prepared) {
 			return;
 		}
-		if (!eventId) {
+		if (!context.eventId) {
 			updateEvent(true);
 		} else {
 			con.request({
 				"command" : "openEvent",
-				"data" : eventId,
+				"data" : {
+					"id" : context.eventId,
+					"admin" : context.userId
+				},
 				"success" : function(data) {
 					if (data) {
-						eventStatus = EventStatus.Running;
 						$toggleBtn.text(MSG.finish);
 						app.showQuestionList();
 					} else {
@@ -78,16 +78,14 @@ function EditEvent(app, roomId, con) {
 		}
 	}
 	function closeEvent() {
-		if (!eventId || eventStatus != EventStatus.Running) {
+		if (!context.isEventRunning()) {
 			return;
 		}
 		con.request({
 			"command" : "closeEvent",
-			"data" : eventId,
+			"data" : context.eventId,
 			"success" : function(data) {
 				if (data) {
-					eventId = 0;
-					eventStatus = EventStatus.Prepared;
 					clearField();
 					$toggleBtn.text(MSG.start);
 				}
@@ -97,6 +95,7 @@ function EditEvent(app, roomId, con) {
 	function updateEvent(start) {
 		if (validator && validator.form()) {
 			var data = collectData();
+console.log("updateEvent: " + JSON.stringify(data));
 			if (data.id) {
 				con.request({
 					"command" : "updateEvent",
@@ -110,8 +109,8 @@ function EditEvent(app, roomId, con) {
 					"command" : "createEvent",
 					"data" : data,
 					"success" : function(data) {
-						eventId = data.id;
-						eventStatus = data.status;
+						context.eventId = data.id;
+						context.eventStatus = data.status;
 						if (start) {
 							openEvent();
 						} else {
@@ -151,9 +150,10 @@ function EditEvent(app, roomId, con) {
 		});
 		optionControl($el);
 		$toggleBtn = $("#event-toggle-btn").click(function() {
-			if (eventStatus == EventStatus.Prepared) {
+console.log("toggleBtn: " + context.eventStatus);
+			if (context.eventStatus == EventStatus.Prepared) {
 				openEvent();
-			} else if (eventStatus == EventStatus.Running) {
+			} else if (context.eventStatus == EventStatus.Running) {
 				closeEvent();
 			}
 		})
@@ -165,10 +165,6 @@ function EditEvent(app, roomId, con) {
 			"success" : loadEvent
 		})
 	}
-	function setEventStatus(id, status) {
-		eventId = id;
-		eventStatus = status;
-	}
 	function clear() {
 		$form = null;
 		validator = null;
@@ -176,9 +172,7 @@ function EditEvent(app, roomId, con) {
 	}
 	var $form = null,
 		validator = null,
-		$toggleBtn = null,
-		eventId = 0;
-		eventStatus = EventStatus.Prepared;
+		$toggleBtn = null;
 	$.extend(this, {
 		"init" : init,
 		"clear" : clear

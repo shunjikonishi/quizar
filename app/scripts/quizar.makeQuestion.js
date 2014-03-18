@@ -1,4 +1,4 @@
-function MakeQuestion(app, roomId, userId, admin, con) {
+function MakeQuestion(app, context, con) {
 	function clearField() {
 		$("#make-q-question").val("");
 		$("#make-q-answers").val("");
@@ -10,8 +10,8 @@ function MakeQuestion(app, roomId, userId, admin, con) {
 	function collectField() {
 		var data = {
 			"id" : 0,
-			"roomId" : roomId,
-			"createdBy" : userId
+			"roomId" : context.roomId,
+			"createdBy" : context.userId
 		};
 		if (editQuestion) {
 			data.id = editQuestion.id;
@@ -69,9 +69,9 @@ function MakeQuestion(app, roomId, userId, admin, con) {
 					"command" : "createQuestion",
 					"data" : q,
 					"success" : function(data) {
-						if (admin) {
+						if (context.isRoomAdmin()) {
 							editQuestion = data;
-							if (eventId) {
+							if (context.isEventAdmin()) {
 								app.showMessage(MSG.successUpdate);
 								$btnUpdate.text(MSG.update);
 								$publish.show("slow");
@@ -165,7 +165,7 @@ function MakeQuestion(app, roomId, userId, admin, con) {
 			var value = $(this).val();
 			enableIncludeRank(value != AnswerType.NoAnswer);
 		});
-		if (admin) {
+		if (context.isRoomAdmin()) {
 			$("#make-q-back-btn").click(function() {
 				app.showQuestionList("left");
 			}).show();

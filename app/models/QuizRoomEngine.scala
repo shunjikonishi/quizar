@@ -42,6 +42,9 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("closeEvent", em.closeCommand)
       addHandler("publishQuestion", em.publishCommand)
       addHandler("answer", em.answerCommand)
+      addHandler("getEventRanking", em.eventRankingCommand)
+      addHandler("getEventWinners", em.eventWinnersCommand)
+      addHandler("getTotalRanking", em.totalRankingCommand)
 
       addHandler("member", room.memberCommand)
       room.incMember
@@ -60,6 +63,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         None
       }
     }
+println("filterRedisMessage: " + res.name)
     if (res.name == "createQuestion") {
       filterCreateQuestion(res)
     } else {
