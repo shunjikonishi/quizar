@@ -2,6 +2,7 @@ package models
 
 import play.api.libs.json._
 import models.entities.QuizRanking
+import org.joda.time.{DateTime}
 
 case class EventRankingInfo(
   eventId: Int,
@@ -33,4 +34,24 @@ object EventRankingInfo {
 
   def fromJson(json: JsValue): EventRankingInfo = Json.fromJson[EventRankingInfo](json).get
   def fromJson(str: String): EventRankingInfo = fromJson(Json.parse(str))
+}
+
+case class EventWinnerInfo(
+  roomId: Int,
+  eventId: Int,
+  execDate: DateTime,
+  eventName: Option[String],
+  userId: Int,
+  username: String,
+  correctCount: Int,
+  time: Long
+) {
+
+  def toJson = Json.toJson(this)(EventWinnerInfo.format)
+  override def toString = toJson.toString
+}
+
+object EventWinnerInfo {
+
+  implicit val format = Json.format[EventWinnerInfo]
 }
