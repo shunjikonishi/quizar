@@ -39,32 +39,16 @@ object QuizAnswerCount extends SQLSyntaxSupport[QuizAnswerCount] {
 
   override val autoSession = AutoSession
 
-  def find(publishId: Int)(implicit session: DBSession = autoSession): Option[QuizAnswerCount] = {
+  def findByPublishId(publishId: Int)(implicit session: DBSession = autoSession): Option[QuizAnswerCount] = {
     withSQL { 
       select.from(QuizAnswerCount as qac).where.eq(qac.publishId, publishId)
     }.map(QuizAnswerCount(qac.resultName)).single.apply()
   }
 
-  def findAll(eventId: Int)(implicit session: DBSession = autoSession): List[QuizAnswerCount] = {
+  def findByEventId(eventId: Int)(implicit session: DBSession = autoSession): List[QuizAnswerCount] = {
     withSQL { 
       select.from(QuizAnswerCount as qac).where.eq(qac.eventId, eventId)
     }.map(QuizAnswerCount(qac.resultName)).list.apply()
   }
    
-  def countAll(eventId: Int)(implicit session: DBSession = autoSession): Long = {
-    withSQL(select(sqls"count(1)").from(QuizAnswerCount as qac).where.eq(qac.eventId, eventId)).map(rs => rs.long(1)).single.apply().get
-  }
-          
-  def findAllBy(where: SQLSyntax)(implicit session: DBSession = autoSession): List[QuizAnswerCount] = {
-    withSQL { 
-      select.from(QuizAnswerCount as qac).where.append(sqls"${where}")
-    }.map(QuizAnswerCount(qac.resultName)).list.apply()
-  }
-      
-  def countBy(where: SQLSyntax)(implicit session: DBSession = autoSession): Long = {
-    withSQL { 
-      select(sqls"count(1)").from(QuizAnswerCount as qac).where.append(sqls"${where}")
-    }.map(_.long(1)).single.apply().get
-  }
-  
 }

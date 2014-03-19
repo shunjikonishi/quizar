@@ -216,11 +216,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   }
 
   def getEventRanking(eventId: Int, limit: Int): List[EventRankingInfo] = {
-    QuizRanking.findAllBy(
-      SQLSyntax.eq(qr.eventId, eventId)
-        .orderBy(sqls"correct_count desc, time asc")
-        .limit(limit)
-    ).map(EventRankingInfo.create)
+    QuizRanking.findByEventId(eventId, limit).map(EventRankingInfo.create)
   }
 
   def getEventWinners(roomId: Int, limit: Int): List[EventRankingInfo] = {
@@ -253,7 +249,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
             WHERE PUBLISH_ID = ${pq.publishId}""".update.apply()
         }
         if (updateQuestion && pq.isSummaryRequired) {
-          QuizAnswerCount.find(pq.publishId).foreach { qac =>
+          QuizAnswerCount.findByPublishId(pq.publishId).foreach { qac =>
             sql"""UPDATE QUIZ_QUESTION
                 SET CORRECT_COUNT = CORRECT_COUNT + ${qac.correctCount},
                     WRONG_COUNT = WRONG_COUNT + ${qac.wrongCount},

@@ -33,26 +33,10 @@ object QuizRanking extends SQLSyntaxSupport[QuizRanking] {
 
   override val autoSession = AutoSession
 
-  def findAll(eventId: Int, limit: Int)(implicit session: DBSession = autoSession): List[QuizRanking] = {
+  def findByEventId(eventId: Int, limit: Int)(implicit session: DBSession = autoSession): List[QuizRanking] = {
     withSQL { 
       select.from(QuizRanking as qr).where.eq(qr.eventId, eventId).orderBy(sqls"correct_count desc, time asc").limit(limit)
     }.map(QuizRanking(qr.resultName)).list.apply()
   }
    
-  def countAll(eventId: Int)(implicit session: DBSession = autoSession): Long = {
-    withSQL(select(sqls"count(1)").from(QuizRanking as qr).where.eq(qr.eventId, eventId)).map(rs => rs.long(1)).single.apply().get
-  }
-          
-  def findAllBy(where: SQLSyntax)(implicit session: DBSession = autoSession): List[QuizRanking] = {
-    withSQL { 
-      select.from(QuizRanking as qr).where.append(sqls"${where}")
-    }.map(QuizRanking(qr.resultName)).list.apply()
-  }
-      
-  def countBy(where: SQLSyntax)(implicit session: DBSession = autoSession): Long = {
-    withSQL { 
-      select(sqls"count(1)").from(QuizRanking as qr).where.append(sqls"${where}")
-    }.map(_.long(1)).single.apply().get
-  }
-  
 }
