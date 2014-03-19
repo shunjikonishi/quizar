@@ -157,7 +157,7 @@ function PublishQuestion(app, context, con) {
 			$url.show();
 		}
 		if (effect) {
-			$("#publish-q-detail").show("slow");
+			$("#publish-q-detail").slideDown();
 		} else {
 			$("#publish-q-detail").show();
 		}
@@ -245,6 +245,10 @@ function PublishQuestion(app, context, con) {
 		}
 
 		if (answerDetail) {
+			$(".publish-q-animation").css({
+				"animation-name" : "",
+				"-webkit-animation-name" : ""
+			});
 			showAnswerCounts();
 			applyDisabled($buttons);
 			buildAnswerDetail(false);

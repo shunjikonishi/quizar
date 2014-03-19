@@ -1,12 +1,12 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="edit-event" class="workspace">
-	<h1>@Messages("manageEvent")</h1>
 	<div class="input-form">
 		<form id="event-form">
+			<header class="heading">
+				<p>@Messages("eventDescription")</p>
+			</header>
 			<div>
 				<label for="event-capacity">@Messages("capacity")</label>
-			</div>
-			<div>
 				<select id="event-capacity" class="form-control auto-collect">
 					<option value="20">20 @Messages("ui.people")</option>
 					<option value="50">50 @Messages("ui.people")</option>
@@ -15,34 +15,23 @@
 			</div>
 			<div class="form-group">
 				<label for="event-title">@Messages("title")</label>
-			</div>
-			<div>
 				<input id="event-title" class="form-control auto-collect">
 			</div>
 			<div class="option-ctrl">
 				@Messages("options") 
-				<span>
-					<i class="fa fa-toggle-down fa-lg"></i>
-					<i class="fa fa-toggle-up fa-lg" style="display:none;"></i>
-				</span>
+				<i class="fa fa-caret-down fa-lg"></i>
 			</div>
 			<div class="option-panel" style="display:none;">
 				<div>
 					<label for="event-date">@Messages("startDate")</label>
-				</div>
-				<div>
 					<input id="event-date" class="form-control" type="date" min="@(new org.joda.time.DateTime().toString("yyyy-MM-dd"))">
 				</div>
 				<div>
 					<label for="event-time">@Messages("startTime")</label>
-				</div>
-				<div>
 					<input id="event-time" class="form-control" type="time" step="900">
 				</div>
 				<div>
 					<label for="event-passcode">@Messages("passcode")</label>
-				</div>
-				<div>
 					<input id="event-passcode" class="form-control auto-collect">
 				</div>
 				<div>
@@ -51,9 +40,10 @@
 				</div>
 			</div>
 		</form>
+		<div class="box-button align-center">
+			<button id="event-toggle-btn" class="btn blue btn-small">@Messages("ui.start")</button>
+			<button id="event-update-btn" class="btn blue btn-small">@Messages("save")</button>
 		<div>
-			<button id="event-toggle-btn">@Messages("ui.start")</button>
-			<button id="event-update-btn">@Messages("save")</button>
 		</div>
 	</div>
 </div>

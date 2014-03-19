@@ -105,7 +105,16 @@ flect.QuizApp = function(serverParams) {
 				showStatic("debug", true);
 				return false;
 			})
-			con.onError(function(data) {
+			con.onOpen(function(event) {
+				console.log("onOpen");
+				console.log(event)
+			}).onClose(function(event) {
+				console.log("onClose");
+				console.log(event);
+			}).onSocketError(function(event) {
+				console.log("onSocketError");
+				console.log(event);
+			}).onServerError(function(data) {
 				console.log(data);
 				alert(data);
 			});

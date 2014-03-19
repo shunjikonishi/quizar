@@ -10,9 +10,10 @@ $(function() {
 	 * - onClose(event)
 	 * - onRequest(command, data)
 	 * - onMessage(data, startTime)
-	 * - onError(msg)
+	 * - onServerError(msg)
 	 */
 	flect.Connection = function(wsUri, logger) {
+		var MAX_RETRY = 5;
 		function useAjax() {
 			if (arguments.length == 0) {
 				return ajaxPrefix;
@@ -26,6 +27,13 @@ $(function() {
 			return self;
 		}
 		function request(params) {
+			if (!isConnected()) {
+				ready(function() {
+					request(params);
+				});
+				socket = createWebSocket();
+				return;
+			}
 			if (settings.onRequest) {
 				settings.onRequest(params.command, params.data);
 			}
@@ -73,8 +81,8 @@ $(function() {
 					return;
 				}
 				if (data.type == "error") {
-					if (settings.onError) {
-						settings.onError(data.data);
+					if (settings.onServerError) {
+						settings.onServerError(data.data);
 					}
 					return;
 				}
@@ -116,11 +124,11 @@ $(function() {
 			return self;
 		}
 		function onOpen(event) {
-			opened = true;
+			retryCount = 0;
 			for (var i=0; i<readyFuncs.length; i++) {
 				readyFuncs[i]();
 			}
-			readyFuncs = null;
+			readyFuncs = [];
 			if (settings.onOpen) {
 				settings.onOpen(event);
 			}
@@ -136,8 +144,8 @@ $(function() {
 				settings.onMessage(data, startTime);
 			}
 			if (data.type == "error") {
-				if (settings.onError) {
-					settings.onError(data.data);
+				if (settings.onServerError) {
+					settings.onServerError(data.data);
 				}
 				return;
 			}
@@ -157,6 +165,17 @@ $(function() {
 			if (settings.onClose) {
 				settings.onClose(event);
 			}
+			if (retryCount < MAX_RETRY) {
+				retryCount++;
+				setTimeout(function() {
+					socket = createWebSocket();
+				}, retryCount * 1000);
+			}
+		}
+		function onError(event) {
+			if (settings.onSocketError) {
+				settings.onSocketError(event);
+			}
 		}
 		function polling(interval, params) {
 			return setInterval(function() {
@@ -164,17 +183,28 @@ $(function() {
 			}, interval);
 		}
 		function ready(func) {
-			if (opened) {
+			if (isConnected()) {
 				func();
 			} else {
 				readyFuncs.push(func);
 			}
 		}
 		function close() {
-			if (opened) {
+			if (isConnected()) {
+				retryCount = MAX_RETRY;
 				socket.close();
-				opened = false;
 			}
+		}
+		function isConnected() {
+			return socket.readyState == 1;//OPEN
+		}
+		function createWebSocket() {
+			var socket = new WebSocket(wsUri);
+			socket.onopen = onOpen;
+			socket.onmessage = onMessage;
+			socket.onerror = onError;
+			socket.onclose = onClose;
+			return socket;
 		}
 		var self = this,
 			settings = {},
@@ -184,11 +214,9 @@ $(function() {
 			ajaxPrefix = null,
 			readyFuncs = [],
 			opened = false,
-			socket = new WebSocket(wsUri)
+			retryCount = 0;
+			socket = createWebSocket();
 
-		socket.onopen = onOpen;
-		socket.onmessage = onMessage;
-		socket.onclose = onClose;
 
 		$.extend(this, {
 			"useAjax" : useAjax,
@@ -198,11 +226,13 @@ $(function() {
 			"polling" : polling,
 			"ready" : ready,
 			"close" : close,
+			"isConnected" : isConnected,
 			"onOpen" : function(func) { settings.onOpen = func; return this},
 			"onClose" : function(func) { settings.onClose = func; return this},
 			"onRequest" : function(func) { settings.onRequest = func; return this},
 			"onMessage" : function(func) { settings.onMessage = func; return this},
-			"onError" : function(func) { settings.onError = func; return this}
+			"onSocketError" : function(func) { settings.onSocketError = func; return this},
+			"onServerError" : function(func) { settings.onServerError = func; return this}
 		})
 	}
 });
@@ -456,6 +486,9 @@ function optionControl($ctrl, $panel) {
 		$panel.slideToggle();
 	})
 }
+function roundTime(t) {
+	return Math.round(t / 10) / 100;
+}
 
 function DateTime() {
 	function dateStr() {
@@ -683,39 +716,37 @@ function Chat($el, userId, hashtag, con) {
 	}
 	function append(data) {
 		if (cnt > MAX_LOG) {
-			$tbody.find("tr:last").remove();
+			$ul.find("li:last").remove();
 		}
-		var clazz = cnt % 2 == 0 ? "chat-left" : "chat-right",
-			$tr = $("<tr style='display:none;'>" +
-				"<td class='chat-img'></td>" +
-				"<td class='chat-msg'></td>" +
-				"<td class='chat-img'></td></tr>"),
-			$img = $("<img/>"),
-			$tdMsg = $tr.find("td.chat-msg");
+		var clazz = (data.userId == userId ? "align-left" : "align-right"),
+			$li = $("<li style='display:none;'>" +
+				"<div class='contributor'><img/><span/></div>" +
+				"<div class='balloon'><div class='balloon-border'>" +
+					"<p class='text'></p>" +
+				"</div></div></li>"),
+			$img = $li.find("img"),
+			$username = $li.find(".contributor span"),
+			$msg = $li.find(".text");
 
-		$tdMsg.addClass(clazz);
-		$tdMsg.html(data.username + "<br>" + data.msg);
+		$li.addClass(clazz);
+		$username.text(data.username);
 		$img.attr("src", data.img);
-		if (clazz == "chat-left") {
-			$tr.find("td.chat-img:first").append($img);
-		} else {
-			$tr.find("td.chat-img:last").append($img);
-		}
-		$tbody.prepend($tr)
-		$tr.show("slow");
+		$msg.text(data.msg);
+		$ul.prepend($li)
+		$li.show("slow");
 		cnt++;
 	}
 	var cnt = 0,
 		$text = $("#chat-text"),
 		$twitter = $("#chat-twitter"),
 		$len = $("#chat-text-len"),
-		$tbody = $el.find("table tbody"),
+		$ul = $el.find(".tweet-box ul"),
 		$member = $("#room-member");
 	if (userId) {
 		$("#btn-tweet").click(function() {
 			var msg = $text.val(),
 				withTwitter = $twitter.is(":checked");
-			if (msg.length == 0 || msg.length > 140) {
+			if (msg.length == 0 || msg.length > 140 || msg == hashtag) {
 				return;
 			}
 			$text.val(hashtag);
@@ -1444,7 +1475,7 @@ function PublishQuestion(app, context, con) {
 			$url.show();
 		}
 		if (effect) {
-			$("#publish-q-detail").show("slow");
+			$("#publish-q-detail").slideDown();
 		} else {
 			$("#publish-q-detail").show();
 		}
@@ -1532,6 +1563,10 @@ function PublishQuestion(app, context, con) {
 		}
 
 		if (answerDetail) {
+			$(".publish-q-animation").css({
+				"animation-name" : "",
+				"-webkit-animation-name" : ""
+			});
 			showAnswerCounts();
 			applyDisabled($buttons);
 			buildAnswerDetail(false);
@@ -1851,15 +1886,37 @@ console.log("toggleBtn: " + context.eventStatus);
 
 function Ranking(app, context, users, con) {
 	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"],
-		WINNER_COLUMNS = ["title", "username", "correctCount", "time"],
-		TOTAL_COLUMNS = ["rank", "username", "point", "correctCount"];
-
+		WINNER_COLUMNS = ["title", ["username", "r-winners"], "correctCount", "time"],
+		TOTAL_COLUMNS = ["rank", "username", "point", "correctCount"],
+		CLASS_MAP = {
+			"username" : "r-name",
+			"correctCount" : "r-correct"
+		};
+	function buildRank($td, rank) {
+		if (rank <= 3) {
+			$td.html("<span class='badge circle rank-blue'>" + rank + "</span>");
+		} else {
+			$td.text(rank);
+		}
+		$td.attr("data-sortAs", rank);
+	}
 	function createTr(rowData, columns, rank) {
 		var $tr = $("<tr></tr>");
 		for (var i=0; i<columns.length; i++) {
 			var $td = $("<td></td>"),
-				colName = columns[i];
-			$td.addClass(colName);
+				colName = columns[i],
+				clazz = null;
+			if ($.isArray(colName)) {
+				clazz = colName[1];
+				colName = colName[0];
+			}
+			if (!clazz) {
+				clazz = CLASS_MAP[colName];
+			}
+			if (!clazz) {
+				clazz = "r-" + colName;
+			}
+			$td.addClass(clazz);
 			if (colName == "username" && rowData.username) {
 				var $img = $("<img/>");
 				$img.attr("src", rowData.imageUrl);
@@ -1868,9 +1925,9 @@ function Ranking(app, context, users, con) {
 			} else if (colName == "title") {
 				$td.text(rowData.title || new DateTime(rowData.execDate).datetimeStr());
 			} else if (colName == "rank") {
-				$td.text(rank);
+				buildRank($td, rank);
 			} else if (colName == "time" && rowData.time) {
-				$td.text(rowData.time + "ms");
+				$td.text(roundTime(rowData.time));
 			} else if (rowData[colName]) {
 				$td.text(rowData[colName]);
 			}
@@ -1901,9 +1958,9 @@ function Ranking(app, context, users, con) {
 			var rowData = data[i],
 				$tr = cache[rowData.userId];
 			if ($tr) {
-				$tr.find(".rank").text(i+1);
-				$tr.find(".correctCount").text(rowData.correctCount);
-				$tr.find(".time").text(rowData.time + "ms");
+				buildRank($tr.find(".r-rank"), i + 1);
+				$tr.find(".r-correct").text(rowData.correctCount);
+				$tr.find(".r-time").text(rowData.time + "ms");
 			} else {
 				$tr = createTr(rowData, EVENT_COLUMNS, i+1);
 				$tbody.append($tr);
@@ -1962,7 +2019,7 @@ function Ranking(app, context, users, con) {
 				}
 			})
 		} else {
-			$("#ranking-now").hide();
+			$(".ranking-now").hide();
 		}
 		con.request({
 			"command" : "getEventWinners",
@@ -1980,7 +2037,9 @@ function Ranking(app, context, users, con) {
 			},
 			"success" : buildTotal
 		})
-		$tab = $("#ranking-tab").tabs().show();
+		$tab = $("#ranking-tab").tabs({
+			"active" : context.isEventRunning() ? 0 : 1
+		}).show();
 	}
 	function afterShow() {
 		if (nextData) {
@@ -2196,7 +2255,16 @@ flect.QuizApp = function(serverParams) {
 				showStatic("debug", true);
 				return false;
 			})
-			con.onError(function(data) {
+			con.onOpen(function(event) {
+				console.log("onOpen");
+				console.log(event)
+			}).onClose(function(event) {
+				console.log("onClose");
+				console.log(event);
+			}).onSocketError(function(event) {
+				console.log("onSocketError");
+				console.log(event);
+			}).onServerError(function(data) {
 				console.log(data);
 				alert(data);
 			});

@@ -40,3 +40,6 @@ function optionControl($ctrl, $panel) {
 		$panel.slideToggle();
 	})
 }
+function roundTime(t) {
+	return Math.round(t / 10) / 100;
+}

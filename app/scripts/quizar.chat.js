@@ -24,39 +24,37 @@ function Chat($el, userId, hashtag, con) {
 	}
 	function append(data) {
 		if (cnt > MAX_LOG) {
-			$tbody.find("tr:last").remove();
+			$ul.find("li:last").remove();
 		}
-		var clazz = cnt % 2 == 0 ? "chat-left" : "chat-right",
-			$tr = $("<tr style='display:none;'>" +
-				"<td class='chat-img'></td>" +
-				"<td class='chat-msg'></td>" +
-				"<td class='chat-img'></td></tr>"),
-			$img = $("<img/>"),
-			$tdMsg = $tr.find("td.chat-msg");
+		var clazz = (data.userId == userId ? "align-left" : "align-right"),
+			$li = $("<li style='display:none;'>" +
+				"<div class='contributor'><img/><span/></div>" +
+				"<div class='balloon'><div class='balloon-border'>" +
+					"<p class='text'></p>" +
+				"</div></div></li>"),
+			$img = $li.find("img"),
+			$username = $li.find(".contributor span"),
+			$msg = $li.find(".text");
 
-		$tdMsg.addClass(clazz);
-		$tdMsg.html(data.username + "<br>" + data.msg);
+		$li.addClass(clazz);
+		$username.text(data.username);
 		$img.attr("src", data.img);
-		if (clazz == "chat-left") {
-			$tr.find("td.chat-img:first").append($img);
-		} else {
-			$tr.find("td.chat-img:last").append($img);
-		}
-		$tbody.prepend($tr)
-		$tr.show("slow");
+		$msg.text(data.msg);
+		$ul.prepend($li)
+		$li.show("slow");
 		cnt++;
 	}
 	var cnt = 0,
 		$text = $("#chat-text"),
 		$twitter = $("#chat-twitter"),
 		$len = $("#chat-text-len"),
-		$tbody = $el.find("table tbody"),
+		$ul = $el.find(".tweet-box ul"),
 		$member = $("#room-member");
 	if (userId) {
 		$("#btn-tweet").click(function() {
 			var msg = $text.val(),
 				withTwitter = $twitter.is(":checked");
-			if (msg.length == 0 || msg.length > 140) {
+			if (msg.length == 0 || msg.length > 140 || msg == hashtag) {
 				return;
 			}
 			$text.val(hashtag);

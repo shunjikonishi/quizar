@@ -151,9 +151,6 @@ ui.makeQuestion[ja]=問題の作成
 ui.postQuestion=Post question
 ui.postQuestion[ja]=問題の投稿
 
-question=Question
-question[ja]=問題文
-
 choices=Choices(Up to five values separated by newline)
 choices[ja]=選択肢(改行区切りで5つまで)
 
@@ -247,11 +244,11 @@ startEvent[ja]=イベント開始
 save=Save
 save[ja]=保存
 
-ui.start=Start!
-ui.start[ja]=開始!
+ui.start=Start
+ui.start[ja]=開始
 
-ui.finish=Finish!
-ui.finish[ja]=終了!
+ui.finish=Finish
+ui.finish[ja]=終了
 
 ui.question=Question
 ui.question[ja]=問題
@@ -349,3 +346,5 @@ ui.makeRoomDescForCreate[ja]=ルームを作成します。
 ui.makeRoomDescForEdit=Edit room.
 ui.makeRoomDescForEdit[ja]=ルームを変更します。
 
+eventDescription=Edit, start and finish event.
+eventDescription[ja]=イベントの編集、開始、終了を行います。

@@ -1,14 +1,36 @@
 function Ranking(app, context, users, con) {
 	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"],
-		WINNER_COLUMNS = ["title", "username", "correctCount", "time"],
-		TOTAL_COLUMNS = ["rank", "username", "point", "correctCount"];
-
+		WINNER_COLUMNS = ["title", ["username", "r-winners"], "correctCount", "time"],
+		TOTAL_COLUMNS = ["rank", "username", "point", "correctCount"],
+		CLASS_MAP = {
+			"username" : "r-name",
+			"correctCount" : "r-correct"
+		};
+	function buildRank($td, rank) {
+		if (rank <= 3) {
+			$td.html("<span class='badge circle rank-blue'>" + rank + "</span>");
+		} else {
+			$td.text(rank);
+		}
+		$td.attr("data-sortAs", rank);
+	}
 	function createTr(rowData, columns, rank) {
 		var $tr = $("<tr></tr>");
 		for (var i=0; i<columns.length; i++) {
 			var $td = $("<td></td>"),
-				colName = columns[i];
-			$td.addClass(colName);
+				colName = columns[i],
+				clazz = null;
+			if ($.isArray(colName)) {
+				clazz = colName[1];
+				colName = colName[0];
+			}
+			if (!clazz) {
+				clazz = CLASS_MAP[colName];
+			}
+			if (!clazz) {
+				clazz = "r-" + colName;
+			}
+			$td.addClass(clazz);
 			if (colName == "username" && rowData.username) {
 				var $img = $("<img/>");
 				$img.attr("src", rowData.imageUrl);
@@ -17,9 +39,9 @@ function Ranking(app, context, users, con) {
 			} else if (colName == "title") {
 				$td.text(rowData.title || new DateTime(rowData.execDate).datetimeStr());
 			} else if (colName == "rank") {
-				$td.text(rank);
+				buildRank($td, rank);
 			} else if (colName == "time" && rowData.time) {
-				$td.text(rowData.time + "ms");
+				$td.text(roundTime(rowData.time));
 			} else if (rowData[colName]) {
 				$td.text(rowData[colName]);
 			}
@@ -50,9 +72,9 @@ function Ranking(app, context, users, con) {
 			var rowData = data[i],
 				$tr = cache[rowData.userId];
 			if ($tr) {
-				$tr.find(".rank").text(i+1);
-				$tr.find(".correctCount").text(rowData.correctCount);
-				$tr.find(".time").text(rowData.time + "ms");
+				buildRank($tr.find(".r-rank"), i + 1);
+				$tr.find(".r-correct").text(rowData.correctCount);
+				$tr.find(".r-time").text(rowData.time + "ms");
 			} else {
 				$tr = createTr(rowData, EVENT_COLUMNS, i+1);
 				$tbody.append($tr);
@@ -111,7 +133,7 @@ function Ranking(app, context, users, con) {
 				}
 			})
 		} else {
-			$("#ranking-now").hide();
+			$(".ranking-now").hide();
 		}
 		con.request({
 			"command" : "getEventWinners",
@@ -129,7 +151,9 @@ function Ranking(app, context, users, con) {
 			},
 			"success" : buildTotal
 		})
-		$tab = $("#ranking-tab").tabs().show();
+		$tab = $("#ranking-tab").tabs({
+			"active" : context.isEventRunning() ? 0 : 1
+		}).show();
 	}
 	function afterShow() {
 		if (nextData) {

@@ -10,9 +10,10 @@ $(function() {
 	 * - onClose(event)
 	 * - onRequest(command, data)
 	 * - onMessage(data, startTime)
-	 * - onError(msg)
+	 * - onServerError(msg)
 	 */
 	flect.Connection = function(wsUri, logger) {
+		var MAX_RETRY = 5;
 		function useAjax() {
 			if (arguments.length == 0) {
 				return ajaxPrefix;
@@ -26,6 +27,13 @@ $(function() {
 			return self;
 		}
 		function request(params) {
+			if (!isConnected()) {
+				ready(function() {
+					request(params);
+				});
+				socket = createWebSocket();
+				return;
+			}
 			if (settings.onRequest) {
 				settings.onRequest(params.command, params.data);
 			}
@@ -73,8 +81,8 @@ $(function() {
 					return;
 				}
 				if (data.type == "error") {
-					if (settings.onError) {
-						settings.onError(data.data);
+					if (settings.onServerError) {
+						settings.onServerError(data.data);
 					}
 					return;
 				}
@@ -116,11 +124,11 @@ $(function() {
 			return self;
 		}
 		function onOpen(event) {
-			opened = true;
+			retryCount = 0;
 			for (var i=0; i<readyFuncs.length; i++) {
 				readyFuncs[i]();
 			}
-			readyFuncs = null;
+			readyFuncs = [];
 			if (settings.onOpen) {
 				settings.onOpen(event);
 			}
@@ -136,8 +144,8 @@ $(function() {
 				settings.onMessage(data, startTime);
 			}
 			if (data.type == "error") {
-				if (settings.onError) {
-					settings.onError(data.data);
+				if (settings.onServerError) {
+					settings.onServerError(data.data);
 				}
 				return;
 			}
@@ -157,6 +165,17 @@ $(function() {
 			if (settings.onClose) {
 				settings.onClose(event);
 			}
+			if (retryCount < MAX_RETRY) {
+				retryCount++;
+				setTimeout(function() {
+					socket = createWebSocket();
+				}, retryCount * 1000);
+			}
+		}
+		function onError(event) {
+			if (settings.onSocketError) {
+				settings.onSocketError(event);
+			}
 		}
 		function polling(interval, params) {
 			return setInterval(function() {
@@ -164,17 +183,28 @@ $(function() {
 			}, interval);
 		}
 		function ready(func) {
-			if (opened) {
+			if (isConnected()) {
 				func();
 			} else {
 				readyFuncs.push(func);
 			}
 		}
 		function close() {
-			if (opened) {
+			if (isConnected()) {
+				retryCount = MAX_RETRY;
 				socket.close();
-				opened = false;
 			}
+		}
+		function isConnected() {
+			return socket.readyState == 1;//OPEN
+		}
+		function createWebSocket() {
+			var socket = new WebSocket(wsUri);
+			socket.onopen = onOpen;
+			socket.onmessage = onMessage;
+			socket.onerror = onError;
+			socket.onclose = onClose;
+			return socket;
 		}
 		var self = this,
 			settings = {},
@@ -184,11 +214,9 @@ $(function() {
 			ajaxPrefix = null,
 			readyFuncs = [],
 			opened = false,
-			socket = new WebSocket(wsUri)
+			retryCount = 0;
+			socket = createWebSocket();
 
-		socket.onopen = onOpen;
-		socket.onmessage = onMessage;
-		socket.onclose = onClose;
 
 		$.extend(this, {
 			"useAjax" : useAjax,
@@ -198,11 +226,13 @@ $(function() {
 			"polling" : polling,
 			"ready" : ready,
 			"close" : close,
+			"isConnected" : isConnected,
 			"onOpen" : function(func) { settings.onOpen = func; return this},
 			"onClose" : function(func) { settings.onClose = func; return this},
 			"onRequest" : function(func) { settings.onRequest = func; return this},
 			"onMessage" : function(func) { settings.onMessage = func; return this},
-			"onError" : function(func) { settings.onError = func; return this}
+			"onSocketError" : function(func) { settings.onSocketError = func; return this},
+			"onServerError" : function(func) { settings.onServerError = func; return this}
 		})
 	}
 });
