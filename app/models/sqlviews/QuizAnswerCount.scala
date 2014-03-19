@@ -1,5 +1,6 @@
-package models.entities
+package models.sqlviews
 
+import play.api.libs.json._
 import scalikejdbc._
 import scalikejdbc.SQLInterpolation._
 
@@ -14,15 +15,21 @@ case class QuizAnswerCount(
   answer5: Int,
   correctCount: Int,
   wrongCount: Int
-)
+) {
+
+  def toJson = Json.toJson(this)(QuizAnswerCount.format)
+  override def toString = toJson.toString
+}
 
 object QuizAnswerCount extends SQLSyntaxSupport[QuizAnswerCount] {
+
+  implicit val format = Json.format[QuizAnswerCount]
 
   override val tableName = "quiz_answer_count"
 
   override val columns = Seq("event_id", "publish_id", "question_id", "answer1", "answer2", "answer3", "answer4", "answer5", "correct_count", "wrong_count")
 
-  def apply(qac: ResultName[QuizAnswerCount])(rs: WrappedResultSet): QuizAnswerCount = new QuizAnswerCount(
+  def create(qac: ResultName[QuizAnswerCount])(rs: WrappedResultSet): QuizAnswerCount = new QuizAnswerCount(
     eventId=rs.int(qac.eventId),
     publishId=rs.int(qac.publishId),
     questionId=rs.int(qac.questionId),
@@ -42,13 +49,13 @@ object QuizAnswerCount extends SQLSyntaxSupport[QuizAnswerCount] {
   def findByPublishId(publishId: Int)(implicit session: DBSession = autoSession): Option[QuizAnswerCount] = {
     withSQL { 
       select.from(QuizAnswerCount as qac).where.eq(qac.publishId, publishId)
-    }.map(QuizAnswerCount(qac.resultName)).single.apply()
+    }.map(create(qac.resultName)).single.apply()
   }
 
   def findByEventId(eventId: Int)(implicit session: DBSession = autoSession): List[QuizAnswerCount] = {
     withSQL { 
       select.from(QuizAnswerCount as qac).where.eq(qac.eventId, eventId)
-    }.map(QuizAnswerCount(qac.resultName)).list.apply()
+    }.map(create(qac.resultName)).list.apply()
   }
    
 }

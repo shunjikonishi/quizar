@@ -1,21 +1,26 @@
 function Ranking(app, context, users, con) {
-	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"];
+	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"],
+		WINNER_COLUMNS = ["title", "username", "correctCount", "time"],
+		TOTAL_COLUMNS = ["rank", "username", "point", "correctCount"];
+
 	function createTr(rowData, columns, rank) {
 		var $tr = $("<tr></tr>");
 		for (var i=0; i<columns.length; i++) {
 			var $td = $("<td></td>"),
 				colName = columns[i];
 			$td.addClass(colName);
-			if (colName == "username") {
+			if (colName == "username" && rowData.username) {
 				var $img = $("<img/>");
-				$img.attr("src", rowData.img);
+				$img.attr("src", rowData.imageUrl);
 				$td.append($img);
 				$td.append(rowData.username);
+			} else if (colName == "title") {
+				$td.text(rowData.title || new DateTime(rowData.execDate).datetimeStr());
 			} else if (colName == "rank") {
 				$td.text(rank);
-			} else if (colName == "time") {
+			} else if (colName == "time" && rowData.time) {
 				$td.text(rowData.time + "ms");
-			} else {
+			} else if (rowData[colName]) {
 				$td.text(rowData[colName]);
 			}
 			$tr.append($td);
@@ -24,7 +29,7 @@ function Ranking(app, context, users, con) {
 			users[rowData.userId] = new User({
 				"id" : rowData.userId,
 				"name" : rowData.username,
-				"imageUrl" : rowData.img
+				"imageUrl" : rowData.imageUrl
 			})
 		}
 		return $tr;
@@ -72,10 +77,22 @@ function Ranking(app, context, users, con) {
 		}
 	}
 	function buildWinners(data) {
-
+		var $tbody = $("#ranking-event-tbl").find("tbody");
+		$tbody.empty();
+		for (var i=0; i<data.length; i++) {
+			var rowData = data[i],
+				$tr = createTr(rowData, WINNER_COLUMNS);
+			$tbody.append($tr);
+		}
 	}
 	function buildTotal(data) {
-
+		var $tbody = $("#ranking-total-tbl").find("tbody");
+		$tbody.empty();
+		for (var i=0; i<data.length; i++) {
+			var rowData = data[i],
+				$tr = createTr(rowData, TOTAL_COLUMNS, i+1);
+			$tbody.append($tr);
+		}
 	}
 	function init($el) {
 		$tableNow = $("#ranking-now-tbl");

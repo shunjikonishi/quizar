@@ -15,8 +15,10 @@ import models.entities.QuizPublish
 import models.entities.QuizUserEvent
 import models.entities.QuizQuestion
 import models.entities.QuizUserAnswer
-import models.entities.QuizRanking
-import models.entities.QuizAnswerCount
+import models.sqlviews.QuizEventWinner
+import models.sqlviews.QuizRanking
+import models.sqlviews.QuizTotalRanking
+import models.sqlviews.QuizAnswerCount
 import org.joda.time.DateTime
 import flect.websocket.Command
 import flect.websocket.CommandHandler
@@ -215,16 +217,16 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     ))
   }
 
-  def getEventRanking(eventId: Int, limit: Int): List[EventRankingInfo] = {
-    QuizRanking.findByEventId(eventId, limit).map(EventRankingInfo.create)
+  def getEventRanking(eventId: Int, limit: Int): List[QuizRanking] = {
+    QuizRanking.findByEventId(eventId, limit)
   }
 
-  def getEventWinners(roomId: Int, limit: Int): List[EventRankingInfo] = {
-    Nil
+  def getEventWinners(roomId: Int): List[QuizEventWinner] = {
+    QuizEventWinner.findByRoomId(roomId)
   }
 
-  def getTotalRanking(roomId: Int, limit: Int): List[EventRankingInfo] = {
-    Nil
+  def getTotalRanking(roomId: Int, limit: Int): List[QuizTotalRanking] = {
+    QuizTotalRanking.findByRoomId(roomId, limit)
   }
 
   private def calcSummary(pq: PublishedQuestion, updateQuestion: Boolean) = {
@@ -414,8 +416,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
 
   val eventWinnersCommand = CommandHandler { command =>
     val roomId = (command.data \ "roomId").as[Int]
-    val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
-    val data = JsArray(getEventWinners(roomId, limit).map(_.toJson))
+    val data = JsArray(getEventWinners(roomId).map(_.toJson))
     command.json(data)
   }
 

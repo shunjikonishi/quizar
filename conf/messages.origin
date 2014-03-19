@@ -323,7 +323,7 @@ rankingNone=This room has no events yet.
 rankingNone[ja]=このルームではまだイベントは開催されていません。
 
 rank=Rank
-rank[ja]=ランク
+rank[ja]=順位
 
 username=Username
 username[ja]=ユーザー名
