@@ -200,7 +200,7 @@ flect.QuizApp = function(serverParams) {
 			}
 		}
 		if (context.isRoomAdmin()) {
-			questionList = new QuestionList(self, users, context.userId, con);
+			questionList = new QuestionList(self, users, context, con);
 			editEvent = new EditEvent(self, context, con);
 			con.addEventListener("postQuestion", function(data) {
 				var userId = data,

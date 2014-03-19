@@ -5,13 +5,20 @@ function PublishQuestion(app, context, con) {
 		$("#answer-" + idx).find(".answer-cnt .count").text(cnt);
 	}
 	function applyAnswered($btn) {
-		$btn.css("background-color", "#3276b1");
+		$btn.removeClass("white disabled").addClass("blue");
+		$btn.find("li:first").empty().append("<i class='fa fa-check fa-2x'></i>")
+	}
+	function applyDisabled($btn) {
+		enableInput($btn, false);
+		$btn.removeClass("white").addClass("disabled");
 	}
 	function applyCorrect($btn) {
-		$btn.css("background-color", "#5cb85c");
+		$btn.removeClass("white blue disabled").addClass("green");
+		$btn.find("li:first").empty().append("<i class='fa fa-circle-o fa-2x'></i>")
 	}
 	function applyWrong($btn) {
-		$btn.css("background-color", "#d2322d");
+		$btn.removeClass("white blue disabled").addClass("red");
+		$btn.find("li:first").empty().append("<i class='fa fa-times fa-2x'></i>")
 	}
 	function showAnswerCounts() {
 		if ($buttons) {
@@ -30,9 +37,9 @@ function PublishQuestion(app, context, con) {
 		if (answered) {
 			return;
 		}
-		applyAnswered($btn);
 		answered = true;
-		enableInput($buttons, false);
+		applyDisabled($buttons);
+		applyAnswered($btn);
 		$answerBtn = $btn;
 		if (time > TIMELIMIT) {
 			app.showMessage("timeLimitExceeded");
@@ -177,7 +184,7 @@ function PublishQuestion(app, context, con) {
 			if (n > 0) {
 				setTimeout(doProgress, interval);
 			} else {
-				enableInput($buttons, false);
+				applyDisabled($buttons);
 				showAnswerCounts();
 				showAnswerDetail = true;
 				if (answerDetail) {
@@ -216,7 +223,7 @@ function PublishQuestion(app, context, con) {
 				setTimeout(function() {
 					$span.hide();
 					clearInterval(curInterval);
-				}, 50 * i + 200);
+				}, 50 * i + 2000);
 			} else {
 				$span.delay(50*i).fadeIn(10);
 			}
@@ -238,9 +245,8 @@ function PublishQuestion(app, context, con) {
 		}
 
 		if (answerDetail) {
-			showText();
 			showAnswerCounts();
-			enableInput($buttons, false);
+			applyDisabled($buttons);
 			buildAnswerDetail(false);
 		} else if (question) {
 			$(".publish-q-animation").css({
@@ -252,7 +258,7 @@ function PublishQuestion(app, context, con) {
 			} else if (context.userEventId) {
 				$buttons.click(answer);
 			} else {
-				enableInput($buttons, false);
+				applyDisabled($buttons);
 			}
 		} else {
 			$("#publish-q-default").hide();

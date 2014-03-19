@@ -507,7 +507,7 @@ function DateTime() {
 function EffectDialog($el) {
 	function show(msg, second) {
 		if (!second) {
-			second = 3;
+			second = 5;
 		}
 		$el.animateDialog(msg, {
 			"name" : "rotateZoom",
@@ -863,7 +863,7 @@ function MakeRoom(app, userId, con) {
 	})
 }
 
-function QuestionList(app, users, userId, con) {
+function QuestionList(app, users, context, con) {
 	var ROWSIZE = 10;
 	function QuestionTable($el, published) {
 		function getQuestion(id) {
@@ -877,11 +877,15 @@ function QuestionList(app, users, userId, con) {
 		}
 		function appendTr(q, cache) {
 			var $tr = $("<tr><td class='q-creator'><img src='" + DEFAULT_IMAGE + "'/></td>" +
-				"<td class='q-text'></td><td class='q-publish'><button class='btn blue btn-info'>" +
-				MSG.publish + "</button></td></tr>"),
+				"<td class='q-text'></td>" +
+				(published ? 
+					"<td class='q-answerer'></td>" : 
+					"<td class='q-publish'><button class='btn blue'>" + MSG.publish + "</button></td>"
+				) + "</tr>"),
 				$img = $tr.find("img");
 
 			$tr.attr("data-id", q.id);
+			$tr.attr("data-at", q.answerType);
 			$tr.find(".q-text").text(q.question);
 			if (users[q.createdBy]) {
 				$img.attr("src", users[q.createdBy].getMiniImageUrl())
@@ -903,6 +907,32 @@ function QuestionList(app, users, userId, con) {
 							.after(user.name);
 					}
 				})
+			}
+			if (published) {
+				var answerer = q.correctCount + "/" + q.publishCount;
+				$tr.find(".q-answerer").text(answerer);
+			} else if (context.isEventRunning()) {
+				$tr.find("button").click(function() {
+					var $tr = $(this).parents("tr"),
+						id = parseInt($tr.attr("data-id")),
+						answerType = $tr.attr("data-at");
+					con.request({
+						"command" : "publishQuestion",
+						"data" : {
+							"questionId" : id,
+							"eventId" : context.eventId,
+							"includeRanking" : answerType != AnswerType.NoAnswer
+						},
+						"success" : function(data) {
+							if (data != "OK") {
+								app.showMessage(data);
+							}
+						}
+					})
+				})
+			} else {
+				$tr.find("button").attr("disabled", "disabled")
+					.removeClass("blue").addClass("disabled");
 			}
 			$tr.click(function() {
 				var id = $(this).attr("data-id");
@@ -1262,13 +1292,20 @@ function PublishQuestion(app, context, con) {
 		$("#answer-" + idx).find(".answer-cnt .count").text(cnt);
 	}
 	function applyAnswered($btn) {
-		$btn.css("background-color", "#3276b1");
+		$btn.removeClass("white disabled").addClass("blue");
+		$btn.find("li:first").empty().append("<i class='fa fa-check fa-2x'></i>")
+	}
+	function applyDisabled($btn) {
+		enableInput($btn, false);
+		$btn.removeClass("white").addClass("disabled");
 	}
 	function applyCorrect($btn) {
-		$btn.css("background-color", "#5cb85c");
+		$btn.removeClass("white blue disabled").addClass("green");
+		$btn.find("li:first").empty().append("<i class='fa fa-circle-o fa-2x'></i>")
 	}
 	function applyWrong($btn) {
-		$btn.css("background-color", "#d2322d");
+		$btn.removeClass("white blue disabled").addClass("red");
+		$btn.find("li:first").empty().append("<i class='fa fa-times fa-2x'></i>")
 	}
 	function showAnswerCounts() {
 		if ($buttons) {
@@ -1287,9 +1324,9 @@ function PublishQuestion(app, context, con) {
 		if (answered) {
 			return;
 		}
-		applyAnswered($btn);
 		answered = true;
-		enableInput($buttons, false);
+		applyDisabled($buttons);
+		applyAnswered($btn);
 		$answerBtn = $btn;
 		if (time > TIMELIMIT) {
 			app.showMessage("timeLimitExceeded");
@@ -1434,7 +1471,7 @@ function PublishQuestion(app, context, con) {
 			if (n > 0) {
 				setTimeout(doProgress, interval);
 			} else {
-				enableInput($buttons, false);
+				applyDisabled($buttons);
 				showAnswerCounts();
 				showAnswerDetail = true;
 				if (answerDetail) {
@@ -1473,7 +1510,7 @@ function PublishQuestion(app, context, con) {
 				setTimeout(function() {
 					$span.hide();
 					clearInterval(curInterval);
-				}, 50 * i + 200);
+				}, 50 * i + 2000);
 			} else {
 				$span.delay(50*i).fadeIn(10);
 			}
@@ -1495,9 +1532,8 @@ function PublishQuestion(app, context, con) {
 		}
 
 		if (answerDetail) {
-			showText();
 			showAnswerCounts();
-			enableInput($buttons, false);
+			applyDisabled($buttons);
 			buildAnswerDetail(false);
 		} else if (question) {
 			$(".publish-q-animation").css({
@@ -1509,7 +1545,7 @@ function PublishQuestion(app, context, con) {
 			} else if (context.userEventId) {
 				$buttons.click(answer);
 			} else {
-				enableInput($buttons, false);
+				applyDisabled($buttons);
 			}
 		} else {
 			$("#publish-q-default").hide();
@@ -2255,7 +2291,7 @@ flect.QuizApp = function(serverParams) {
 			}
 		}
 		if (context.isRoomAdmin()) {
-			questionList = new QuestionList(self, users, context.userId, con);
+			questionList = new QuestionList(self, users, context, con);
 			editEvent = new EditEvent(self, context, con);
 			con.addEventListener("postQuestion", function(data) {
 				var userId = data,

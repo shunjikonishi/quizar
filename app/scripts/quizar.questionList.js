@@ -1,4 +1,4 @@
-function QuestionList(app, users, userId, con) {
+function QuestionList(app, users, context, con) {
 	var ROWSIZE = 10;
 	function QuestionTable($el, published) {
 		function getQuestion(id) {
@@ -12,11 +12,15 @@ function QuestionList(app, users, userId, con) {
 		}
 		function appendTr(q, cache) {
 			var $tr = $("<tr><td class='q-creator'><img src='" + DEFAULT_IMAGE + "'/></td>" +
-				"<td class='q-text'></td><td class='q-publish'><button class='btn blue btn-info'>" +
-				MSG.publish + "</button></td></tr>"),
+				"<td class='q-text'></td>" +
+				(published ? 
+					"<td class='q-answerer'></td>" : 
+					"<td class='q-publish'><button class='btn blue'>" + MSG.publish + "</button></td>"
+				) + "</tr>"),
 				$img = $tr.find("img");
 
 			$tr.attr("data-id", q.id);
+			$tr.attr("data-at", q.answerType);
 			$tr.find(".q-text").text(q.question);
 			if (users[q.createdBy]) {
 				$img.attr("src", users[q.createdBy].getMiniImageUrl())
@@ -38,6 +42,32 @@ function QuestionList(app, users, userId, con) {
 							.after(user.name);
 					}
 				})
+			}
+			if (published) {
+				var answerer = q.correctCount + "/" + q.publishCount;
+				$tr.find(".q-answerer").text(answerer);
+			} else if (context.isEventRunning()) {
+				$tr.find("button").click(function() {
+					var $tr = $(this).parents("tr"),
+						id = parseInt($tr.attr("data-id")),
+						answerType = $tr.attr("data-at");
+					con.request({
+						"command" : "publishQuestion",
+						"data" : {
+							"questionId" : id,
+							"eventId" : context.eventId,
+							"includeRanking" : answerType != AnswerType.NoAnswer
+						},
+						"success" : function(data) {
+							if (data != "OK") {
+								app.showMessage(data);
+							}
+						}
+					})
+				})
+			} else {
+				$tr.find("button").attr("disabled", "disabled")
+					.removeClass("blue").addClass("disabled");
 			}
 			$tr.click(function() {
 				var id = $(this).attr("data-id");

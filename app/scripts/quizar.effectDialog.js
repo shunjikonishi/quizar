@@ -1,7 +1,7 @@
 function EffectDialog($el) {
 	function show(msg, second) {
 		if (!second) {
-			second = 3;
+			second = 5;
 		}
 		$el.animateDialog(msg, {
 			"name" : "rotateZoom",

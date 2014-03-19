@@ -112,8 +112,8 @@ questionFrom[ja]=作成者
 new=New
 new[ja]=新規作成
 
-answerer=Panel
-answerer[ja]=解答者
+answerer=Corr./Pub.
+answerer[ja]=正答／出題
 
 noQuestions=No questions
 noQuestions[ja]=問題はまだありません
