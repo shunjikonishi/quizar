@@ -68,6 +68,15 @@ function PageDebugger($el, con, messageDialog) {
 		$("#effect-dialog").animateDialog("Start!", {
 			"name" : "rotateZoom"
 		})
+		var $el = $(".publish-q-animation");
+		$el.css({
+			"animation-name" : "inout",
+			"-webkit-animation-name" : "inout"
+		});
+		$el.hide();
+		setTimeout(function() {
+			$el.show();
+		}, 0);
 	});
 	$.extend(this, {
 		"log" : log

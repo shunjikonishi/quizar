@@ -42,6 +42,9 @@ case class PageParams(
     )).getOrElse(ret)
   }
 
+  def isLogined = userId.isDefined
+  def isInRoom = roomId.isDefined
+
   def toJson = {
     Json.toJson(this)(PageParams.format)
   }

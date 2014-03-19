@@ -29,7 +29,14 @@ function optionControl($ctrl, $panel) {
 		$ctrl = $ctrl.find(".option-ctrl");
 	}
 	$ctrl.click(function() {
-		$(this).find("i").toggle();
-		$panel.toggle();
+		var $i = $ctrl.find("i");
+		if ($i.hasClass("fa-caret-down")) {
+			$i.removeClass("fa-caret-down").addClass("fa-caret-up");
+			$ctrl.addClass("active");
+		} else {
+			$i.removeClass("fa-caret-up").addClass("fa-caret-down");
+			$ctrl.removeClass("active");
+		}
+		$panel.slideToggle();
 	})
 }

@@ -1,48 +1,40 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="make-room" class="workspace">
-	<h1 id="make-room-h1">@Messages("makeRoom")</h1>
 	<div class="input-form">
 		<form id="make-room-form">
+			<header class="heading">
+				<p id="make-room-desc">@Messages("ui.makeRoomDescForCreate")</p>
+			</header>
 			<div>
 				<label for="room-name">@Messages("roomName")</label>
-			</div>
-			<div>
-				<input id="room-name" class="form-control"/>
+				<input id="room-name" class="form-control" />
 			</div>
 			<div class="checkbox">
-				<label>
-					<input id="room-userQuiz" type="checkbox"> @Messages("allowUserQuestion")
+				<label for="room-userQuiz" class="btn">
+					<input id="room-userQuiz" type="checkbox" />
+					@Messages("allowUserQuestion")
 				</label>
 			</div>
 			<div class="option-ctrl">
 				@Messages("options") 
-				<span>
-					<i class="fa fa-toggle-down fa-lg"></i>
-					<i class="fa fa-toggle-up fa-lg" style="display:none;"></i>
-				</span>
+				<i class="fa fa-caret-down fa-lg"></i>
 			</div>
 			<div class="option-panel" style="display:none;">
 				<div>
 						<label for="room-tags">@Messages("tags")</label>
-				</div>
-				<div>
 						<input id="room-tags" class="form-control"/>
 				</div>
 				<div>
 						<label for="room-hashtag">@Messages("hashtag")</label>
-				</div>
-				<div>
 						<input id="room-hashtag" class="form-control"/>
 				</div>
 				<div>
 						<label for="room-description">@Messages("description")</label>
-				</div>
-				<div>
 						<textarea id="room-description" rows="5" class="form-control"></textarea>
 				</div>
 			</div>
-			<div>
-				<button type="button" id="btn-make-room">@Messages("ui.create")</button>
+			<div class="box-button align-center">
+				<button type="button" id="btn-make-room" class="btn blue btn-info btn-small" name="btn-make-room">@Messages("ui.create")</button>
 			</div>
 		</form>
 	</div>

@@ -1,43 +1,53 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="publish-question" class="workspace">
 	<div id="publish-q-default">
-		<div id="publish-q-seq">問題</div>
 		<div class="progress">
 			<div id="publish-q-progress" class="progress-bar progress-bar-success" role="progressbar" style="width: 100%">
 			</div>
 			<div id="publish-q-progress-answered" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%">
 			</div>
 		</div>
-		<p id="publish-q-text">
-		</p>
-		<div>
-			<button id="answer-1" class="btn btn-question">
-				<div style="float:left;" class="answer"></div>
-				<div style="float:right;" class="answer-cnt"></div>
-			</button>
+		<div class="publish-q-animation">
+			<span id="publish-q-seq">問題</span>
 		</div>
 		<div>
-			<button id="answer-2" class="btn btn-question">
-				<div style="float:left;" class="answer"></div>
-				<div style="float:right;" class="answer-cnt"></div>
-			</button>
+			<p id="publish-q-text"></p>
 		</div>
-		<div>
-			<button id="answer-3" class="btn btn-question">
-				<div style="float:left;" class="answer"></div>
-				<div style="float:right;" class="answer-cnt"></div>
+		<div class="buttons">
+			<button id="answer-1" class="btn blue btn-info btn-block btn-question">
+				<ul class="inline-block clear-fix">
+					<li class="answer-seq"></li>
+					<li class="text-inner answer"></li>
+					<li class="answer-cnt" style="display:none;"><span class="badge circle count"></span></li>
+				</ul>
 			</button>
-		</div>
-		<div>
-			<button id="answer-4" class="btn btn-question">
-				<div style="float:left;" class="answer"></div>
-				<div style="float:right;" class="answer-cnt"></div>
+			<button id="answer-2" class="btn blue btn-info btn-block btn-question">
+				<ul class="inline-block clear-fix">
+					<li class="answer-seq"></li>
+					<li class="text-inner answer"></li>
+					<li class="answer-cnt" style="display:none;"><span class="badge circle count"></span></li>
+				</ul>
 			</button>
-		</div>
-		<div>
-			<button id="answer-5" class="btn btn-question">
-				<div style="float:left;" class="answer"></div>
-				<div style="float:right;" class="answer-cnt"></div>
+			<button id="answer-3" class="btn blue btn-info btn-block btn-question">
+				<ul class="inline-block clear-fix">
+					<li class="answer-seq"></li>
+					<li class="text-inner answer"></li>
+					<li class="answer-cnt" style="display:none;"><span class="badge circle count"></span></li>
+				</ul>
+			</button>
+			<button id="answer-4" class="btn blue btn-info btn-block btn-question">
+				<ul class="inline-block clear-fix">
+					<li class="answer-seq"></li>
+					<li class="text-inner answer"></li>
+					<li class="answer-cnt" style="display:none;"><span class="badge circle count"></span></li>
+				</ul>
+			</button>
+			<button id="answer-5" class="btn blue btn-info btn-block btn-question">
+				<ul class="inline-block clear-fix">
+					<li class="answer-seq"></li>
+					<li class="text-inner answer"></li>
+					<li class="answer-cnt" style="display:none;"><span class="badge circle count"></span></li>
+				</ul>
 			</button>
 		</div>
 		<div id="publish-q-detail" style="display:none;">

@@ -16,39 +16,36 @@
 			</div>
 		}
 	</div>
-	<div>
-		<h2>イベント</h2>
-		<div class="tab-content" style="display:none;">
-			<ul>
-				<li><a href="#event-future">@Messages("upcoming")</a></li>
-				<li><a href="#event-yours">@Messages("yourEvents")</a></li>
-			</ul>
-			<div id="event-future">
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th class="event-date">@Messages("scheduledDate")</th>
-							<th class="event-title">@Messages("title")</th>
-							<th class="event-capacity">@Messages("capacity")</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
-			<div id="event-yours">
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th class="event-date">@Messages("datetime")</th>
-							<th class="event-title">@Messages("title")</th>
-							<th class="event-capacity">@Messages("capacity")</th>
-						</tr>
-					</thead>
-					<tbody>
-					</tbody>
-				</table>
-			</div>
+	<div class="tab-content" style="display:none;">
+		<ul class="clear-fix">
+			<li><a href="#event-future">@Messages("upcoming")</a></li>
+			<li><a href="#event-yours">@Messages("yourEvents")</a></li>
+		</ul>
+		<div id="event-future">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="event-date">@Messages("scheduledDate")</th>
+						<th class="event-title">@Messages("title")</th>
+						<th class="event-capacity">@Messages("capacity")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="event-yours">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="event-date">@Messages("datetime")</th>
+						<th class="event-title">@Messages("title")</th>
+						<th class="event-capacity">@Messages("capacity")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>

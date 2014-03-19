@@ -106,11 +106,11 @@ stock[ja]=ストック
 published=Published
 published[ja]=出題済み
 
-questionFrom=From
-questionFrom[ja]=作成
+questionFrom=Creator
+questionFrom[ja]=作成者
 
 new=New
-new[ja]=作成
+new[ja]=新規作成
 
 answerer=Panel
 answerer[ja]=解答者
@@ -175,8 +175,8 @@ lessFrequentAnswer[ja]=最も少なかった回答
 noCorrectAnswer=No correct answer
 noCorrectAnswer[ja]=正解なし
 
-publish=Publish
-publish[ja]=出題
+ui.publish=Publish
+ui.publish[ja]=出題
 
 includeToRanking=Include to ranking
 includeToRanking[ja]=ランキングに含める
@@ -206,16 +206,19 @@ ui.test=Test
 ui.test[ja]=Test
 
 relatedUrl=Related URL
-relatedUrl[ja]=関連URL
+relatedUrl[ja]=参考リンク
 
 options=Options
 options[ja]=オプション
 
-ui.editQuestion=Edit question
-ui.editQuestion[ja]=問題の編集
+ui.editQuestion=Edit question.
+ui.editQuestion[ja]=問題を変更します。
 
-ui.editAndPublishQuestion=Edit and publish question
-ui.editAndPublishQuestion[ja]=問題の編集／出題
+ui.editAndPublishQuestion=Edit and publish question.
+ui.editAndPublishQuestion[ja]=問題の変更または出題します。
+
+ui.createQuestion=Create question.
+ui.createQuestion[ja]=問題を作成します。
 
 back=Back
 back[ja]=戻る
@@ -339,3 +342,10 @@ winner[ja]=優勝者
 
 point=Point
 point[ja]=ポイント
+
+ui.makeRoomDescForCreate=Create room.
+ui.makeRoomDescForCreate[ja]=ルームを作成します。
+
+ui.makeRoomDescForEdit=Edit room.
+ui.makeRoomDescForEdit[ja]=ルームを変更します。
+

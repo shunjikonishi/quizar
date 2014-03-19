@@ -151,7 +151,7 @@ function MakeQuestion(app, context, con) {
 		$btnPublish = $("#make-q-publish-btn").click(publish);
 		optionControl($el);
 		if (editQuestion) {
-			$("#make-q-h1").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
+			$("#make-q-desc").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
 			$btnUpdate.text(MSG.update);
 			if (editQuestion.publishCount > 0) {
 				enableInput($form.find(":input"), false);

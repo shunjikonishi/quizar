@@ -84,14 +84,14 @@ function MakeRoom(app, userId, con) {
 			"focusInvalid" : true
 		});
 		var $btnUpdate = $("#btn-make-room").click(update),
-			$h1 = $("#make-room-h1");
+			$desc = $("#make-room-desc");
 		if (editRoom) {
 			$("#room-admin").show();
-			$h1.text(MSG.editRoom);
+			$desc.text(MSG.makeRoomDescForEdit);
 			$btnUpdate.text(MSG.update);
 		} else {
 			$("#room-admin").hide();
-			$h1.text(MSG.makeRoom);
+			$desc.text(MSG.makeRoomDescForCreate);
 			$btnUpdate.text(MSG.create);
 		}
 		optionControl($el);

@@ -34,20 +34,22 @@
 			</ul>
 		</div>
 	}
-	<div class="toolbar-content">
-		@roomInfo.map { room =>
-			<div id="room-icons">
-				<button type="button" id="toolbar-question">
-					<i class="fa fa-check-circle fa-lg"></i>
-				</button>
-				<button type="button" id="toolbar-ranking">
-					<i class="fa fa-star fa-lg"></i>
-				</button>
-				<button type="button" id="btn-chat" class="menu-chat">
-					<i class="fa fa-comment fa-lg"></i>
-				</button>
-			</div>
-		}.getOrElse {
+	<div class="toolbar-content align-center">
+		@if(params.isLogined && params.isInRoom) {
+			@roomInfo.map { room =>
+				<div id="room-icons">
+					<button type="button" id="toolbar-question">
+						<i class="fa fa-check-circle fa-lg"></i>
+					</button>
+					<button type="button" id="toolbar-ranking">
+						<i class="fa fa-star fa-lg"></i>
+					</button>
+					<button type="button" id="btn-chat" class="menu-chat">
+						<i class="fa fa-comment fa-lg"></i>
+					</button>
+				</div>
+			}
+		} else {
 			<div id="title" class="toolbar-title">@Messages("application.title")</div>
 		}
 	</div>

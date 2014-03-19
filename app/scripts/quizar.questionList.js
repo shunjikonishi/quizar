@@ -12,13 +12,15 @@ function QuestionList(app, users, userId, con) {
 		}
 		function appendTr(q, cache) {
 			var $tr = $("<tr><td class='q-creator'><img src='" + DEFAULT_IMAGE + "'/></td>" +
-				"<td class='q-text'></td></tr>"),
+				"<td class='q-text'></td><td class='q-publish'><button class='btn blue btn-info'>" +
+				MSG.publish + "</button></td></tr>"),
 				$img = $tr.find("img");
 
 			$tr.attr("data-id", q.id);
 			$tr.find(".q-text").text(q.question);
 			if (users[q.createdBy]) {
-				$img.attr("src", users[q.createdBy].getMiniImageUrl());
+				$img.attr("src", users[q.createdBy].getMiniImageUrl())
+					.after(users[q.createdBy].name);
 			} else if (cache[q.createdBy]) {
 				$img.attr("data-userId", q.createdBy);
 			} else {
@@ -30,7 +32,10 @@ function QuestionList(app, users, userId, con) {
 					"success" : function(data) {
 						var user = new User(data);
 						users[user.id] = user;
-						$el.find("[data-userId=" + user.id + "]").attr("src", user.getMiniImageUrl()).removeAttr("data-userId");
+						$el.find("[data-userId=" + user.id + "]")
+							.attr("src", user.getMiniImageUrl())
+							.removeAttr("data-userId")
+							.after(user.name);
 					}
 				})
 			}

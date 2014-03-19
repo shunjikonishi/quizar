@@ -1,14 +1,27 @@
 function PublishQuestion(app, context, con) {
 	var TIMELIMIT = 10000,
 		BUTTON_COUNT = 5;
+	function setButtonCount(idx, cnt) {
+		$("#answer-" + idx).find(".answer-cnt .count").text(cnt);
+	}
+	function applyAnswered($btn) {
+		$btn.css("background-color", "#3276b1");
+	}
+	function applyCorrect($btn) {
+		$btn.css("background-color", "#5cb85c");
+	}
+	function applyWrong($btn) {
+		$btn.css("background-color", "#d2322d");
+	}
 	function showAnswerCounts() {
 		if ($buttons) {
 			for (var i=0; i<BUTTON_COUNT; i++) {
 				var idx = "" + (i+1),
 					cnt = answerCounts[idx] || 0;
-				$("#answer-" + idx).find(".answer-cnt").text(cnt);
+				setButtonCount(idx, cnt);
 			}
 		}
+		$buttons.find(".answer-cnt").show();
 	}
 	function answer() {
 		var time = new Date().getTime() - startTime,
@@ -17,7 +30,7 @@ function PublishQuestion(app, context, con) {
 		if (answered) {
 			return;
 		}
-		$btn.addClass("btn-primary");
+		applyAnswered($btn);
 		answered = true;
 		enableInput($buttons, false);
 		$answerBtn = $btn;
@@ -42,8 +55,8 @@ function PublishQuestion(app, context, con) {
 		var idx = "" + answer.answer,
 			current = (answerCounts[idx] || 0) + 1;
 		answerCounts[idx] = current;
-		if (context.isRoomAdmin() || answered) {
-			$("#answer-" + idx).find(".answer-cnt").text(current);
+		if (context.isEventAdmin() || answered) {
+			setButtonCount(idx, current);
 		}
 	}
 	function getCorrectAnswerButtons() {
@@ -85,7 +98,7 @@ function PublishQuestion(app, context, con) {
 				} else {
 					var ret = [];
 					$buttons.each(function() {
-						if ($(this).find(".answer-cnt").text() == cnt) {
+						if ($(this).find(".answer-cnt count").text() == cnt) {
 							ret.push(this);
 						}
 					})
@@ -114,17 +127,16 @@ function PublishQuestion(app, context, con) {
 		var $correctBtns = getCorrectAnswerButtons();
 		if ($correctBtns) {
 			if ($answerBtn) {
-				$answerBtn.removeClass("btn-primary");
 				var correct = isCorrect($answerBtn, $correctBtns);
 					msg = correct ? MSG.correctAnswer : MSG.wrongAnswer;
 				if (!correct) {
-					$answerBtn.addClass("btn-danger");
+					applyWrong($answerBtn);
 				}
 				if (effect) {
 					app.showEffect(msg, 1);
 				}
 			}
-			$correctBtns.addClass("btn-success");
+			applyCorrect($correctBtns);
 		}
 		if (answerDetail.description) {
 			var $desc = $("#publish-q-description");
@@ -159,13 +171,14 @@ function PublishQuestion(app, context, con) {
 				$progress.removeClass("progress-bar-success").addClass("progress-bar-warning");
 			}
 			if (answered) {
-				if (n2 == -1) n2 = n;
+				if (n2 == -1) n2 = n + 1;
 				$progressAnswered.css("width", (n2 - n) + "%");
 			}
 			if (n > 0) {
 				setTimeout(doProgress, interval);
 			} else {
 				enableInput($buttons, false);
+				showAnswerCounts();
 				showAnswerDetail = true;
 				if (answerDetail) {
 					buildAnswerDetail(true);
@@ -176,10 +189,38 @@ function PublishQuestion(app, context, con) {
 			n2 = -1,
 			interval = TIMELIMIT / 100,
 			$progress = $("#publish-q-progress"),
-			$progressAnswered = $("#publish-q-progress-answered");
+			$progressAnswered = $("#publish-q-progress-answered"),
+			$cur = null,
+			curInterval = 0,
+			len = 0;
 		$progress.css("width", "100%");
 		$progressAnswered.css("width", "0%");
 		setTimeout(doProgress, interval);
+
+		//Text
+		$text.contents().each(function() {
+			$(this).replaceWith($(this).text()
+				.replace(/(\S)/g, '<span>$1</span>'));
+		});
+		$text.append('<span class="cur">_</span>');
+		$cur = $text.find(".cur");
+		curInterval = setInterval(function() {
+			if ($cur) {
+				$cur.toggle();
+			}
+		}, 200);
+		len = $text.children().size();
+		for (var i=0; i<len; i++) {
+			var $span = $text.children('span:eq('+i+')');
+			if (i == len - 1) {
+				setTimeout(function() {
+					$span.hide();
+					clearInterval(curInterval);
+				}, 50 * i + 200);
+			} else {
+				$span.delay(50*i).fadeIn(10);
+			}
+		}
 	}
 	function init($el) {
 		var $seq = $("#publish-q-seq");
@@ -190,28 +231,29 @@ function PublishQuestion(app, context, con) {
 			$seq.text(MSG.format(MSG.questionSeq, question.seq));
 			for (var i=0; i<question.answers.length; i++) {
 				var $btn = $("#answer-" + (i+1)).show();
+				$btn.find(".answer-seq").text((i+1) + ".");
 				$btn.find(".answer").text(question.answers[i]);
 			}
-			$text.text(question.question).hide();
+			$text.text(question.question);
 		}
 
 		if (answerDetail) {
+			showText();
 			showAnswerCounts();
 			enableInput($buttons, false);
 			buildAnswerDetail(false);
 		} else if (question) {
-			$seq.css({
+			$(".publish-q-animation").css({
 				"animation-name" : "inout",
 				"-webkit-animation-name" : "inout"
 			});
-			if (context.isRoomAdmin()) {
-				$buttons.find(".answer-cnt").text("0");
+			if (context.isEventAdmin()) {
+				showAnswerCounts();
 			} else if (context.userEventId) {
 				$buttons.click(answer);
 			} else {
 				enableInput($buttons, false);
 			}
-			$text.hide();
 		} else {
 			$("#publish-q-default").hide();
 			$("#publish-q-none").show();
@@ -223,7 +265,6 @@ function PublishQuestion(app, context, con) {
 	function afterShow() {
 		if (!answerDetail) {
 			startTime = new Date().getTime();
-			$text.show("blind", { "direction" : "left"}, 1000);
 			progress();
 		}
 	}
@@ -247,7 +288,7 @@ function PublishQuestion(app, context, con) {
 		startTime = 0,
 		showAnswerDetail = false,
 		$buttons = null,
-		$answerBtn = null;
+		$answerBtn = null,
 		$text = null;
 
 	$.extend(this, {
