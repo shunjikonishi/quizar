@@ -33,11 +33,9 @@ object Application extends Controller {
     sm.set(sessionId, sessionInfo)
     val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
     val params = PageParams.create(request, sessionInfo)
-    val rooms = rm.list(0, 10)
-    println("rooms: " + rooms)
 
     Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)
-      (views.html.index(sessionInfo, twitterUrl, rooms))).withSession(
+      (views.html.index(sessionInfo, twitterUrl))).withSession(
         "sessionId" -> sessionId
       )
   }

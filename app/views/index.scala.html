@@ -1,4 +1,4 @@
-@(sessionInfo: SessionInfo, twitterUrl: String, rooms: List[RoomInfo] = Nil, yours: List[RoomInfo] = Nil)(implicit lang: Lang)
+@(sessionInfo: SessionInfo, twitterUrl: String)(implicit lang: Lang)
 <div id="home" class="workspace">
 	<div>
 		@if(sessionInfo.user.isEmpty) {
