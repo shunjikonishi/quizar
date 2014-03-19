@@ -269,7 +269,7 @@ entry=Entry
 entry[ja]=参加
 
 notEntry=No
-notEntry=参加しない
+notEntry[ja]=参加しない
 
 entryEvent=Entry event
 entryEvent[ja]=イベントに参加

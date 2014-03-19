@@ -41,6 +41,7 @@ new=新規作成
 noCorrectAnswer=正解なし
 noLimit=無制限(手動)
 noQuestions=問題はまだありません
+notEntry=参加しない
 notPublishedYet=あなたの参加後に出題された問題はまだありません。
 notifyTweet=チャットメッセージを通知する
 oneMin=1分
