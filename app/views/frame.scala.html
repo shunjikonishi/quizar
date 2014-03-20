@@ -20,19 +20,6 @@
 				<li><a href="/signout"><i class="fa fa-sign-out"></i> @Messages("signout")</a></li>
 			</ul>
 		</div>
-	}.getOrElse {
-		<div class="btn-group pull-right">
-			<button type="button" class="dropdown-button">
-				<i class="fa fa-sign-in"></i> @Messages("signin")
-				<i class="fa fa-caret-down"></i>
-			</button>
-			<ul class="dropdown-menu">
-				<li><a href="@twitterUrl"><i class="fa fa-twitter"></i> Twitter</a></li>
-@*
-				<li><a href="#"><i class="fa fa-facebook"></i> Facebook</a></li>
-*@
-			</ul>
-		</div>
 	}
 	<div class="toolbar-content align-center">
 		<div id="title" class="toolbar-title">@roomInfo.map(_.name).getOrElse(Messages("application.title"))</div>
