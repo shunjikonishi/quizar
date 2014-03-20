@@ -45,6 +45,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("getEventRanking", em.eventRankingCommand)
       addHandler("getEventWinners", em.eventWinnersCommand)
       addHandler("getTotalRanking", em.totalRankingCommand)
+      addHandler("getUserEvent", em.userEventCommand)
 
       addHandler("member", room.memberCommand)
       room.incMember

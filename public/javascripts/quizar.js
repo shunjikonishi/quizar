@@ -444,6 +444,7 @@ var SUPPORTS_TOUCH = 'ontouchstart' in window,
 		"Finished" : 2
 	};
 
+var EFFECT_TIME = 300;
 function enableInput($input, b) {
 	if (b) {
 		$input.removeAttr("disabled");
@@ -601,9 +602,13 @@ function Context(hash) {
 
 function User(hash) {
 	function getMiniImageUrl() { return this.imageUrl;}
+	function getNormalImageUrl() { return this.imageUrl.replace("_mini", "_normal");}
+	function getBiggerImageUrl() { return this.imageUrl.replace("_mini", "_bigger");}
 
 	$.extend(this, hash, {
-		"getMiniImageUrl" : getMiniImageUrl
+		"getMiniImageUrl" : getMiniImageUrl,
+		"getNormalImageUrl" : getNormalImageUrl,
+		"getBiggerImageUrl" : getBiggerImageUrl
 	});
 	clearHash(hash);
 }
@@ -716,7 +721,7 @@ function Chat($el, userId, hashtag, con) {
 	}
 	function append(data) {
 		if (cnt > MAX_LOG) {
-			$ul.find("li:last").remove();
+			$ul.find("li:first").remove();
 		}
 		var clazz = (data.userId == userId ? "align-left" : "align-right"),
 			$li = $("<li style='display:none;'>" +
@@ -732,7 +737,7 @@ function Chat($el, userId, hashtag, con) {
 		$username.text(data.username);
 		$img.attr("src", data.img);
 		$msg.text(data.msg);
-		$ul.prepend($li)
+		$ul.append($li)
 		$li.show("slow");
 		cnt++;
 	}
@@ -1888,6 +1893,7 @@ function Ranking(app, context, users, con) {
 	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"],
 		WINNER_COLUMNS = ["title", ["username", "r-winners"], "correctCount", "time"],
 		TOTAL_COLUMNS = ["rank", "username", "point", "correctCount"],
+		USER_COLUMNS = ["title", "rank", "point", "correctCount"],
 		CLASS_MAP = {
 			"username" : "r-name",
 			"correctCount" : "r-correct"
@@ -1899,6 +1905,44 @@ function Ranking(app, context, users, con) {
 			$td.text(rank);
 		}
 		$td.attr("data-sortAs", rank);
+	}
+	function showEventRanking() {
+		var $tr = $(this),
+			eventId = parseInt($tr.attr("data-eventId"));
+		con.request({
+			"command" : "getEventRanking",
+			"data" : {
+				"eventId" : eventId,
+				"limit" : 10
+			},
+			"success" : function(data) {
+				buildRanking($("#ranking-event-detail-tbl"), data);
+				$tab.find(".tab-pane").hide();
+				$("#ranking-event-detail").show("slide", { "direction" : "right"}, EFFECT_TIME);
+			}
+		})
+	}
+	function showUserEvent() {
+		var $tr = $(this),
+			userId = parseInt($tr.attr("data-userId")),
+			user = users[userId];
+
+		con.request({
+			"command" : "getUserEvent",
+			"data" : {
+				"roomId" : context.roomId,
+				"userId" : userId
+			},
+			"success" : function(data) {
+				buildUserEvent(data);
+				$("#ranking-user-img").attr("src", user.getBiggerImageUrl());
+				$("#ranking-user-name").text(user.name);
+				$("#ranking-user-point").text($tr.attr("data-point"));
+
+				$tab.find(".tab-pane").hide();
+				$("#ranking-user").show("slide", { "direction" : "right"}, EFFECT_TIME);
+			}
+		})
 	}
 	function createTr(rowData, columns, rank) {
 		var $tr = $("<tr></tr>");
@@ -1960,7 +2004,7 @@ function Ranking(app, context, users, con) {
 			if ($tr) {
 				buildRank($tr.find(".r-rank"), i + 1);
 				$tr.find(".r-correct").text(rowData.correctCount);
-				$tr.find(".r-time").text(rowData.time + "ms");
+				$tr.find(".r-time").text(roundTime(rowData.time));
 			} else {
 				$tr = createTr(rowData, EVENT_COLUMNS, i+1);
 				$tbody.append($tr);
@@ -1989,7 +2033,13 @@ function Ranking(app, context, users, con) {
 		$tbody.empty();
 		for (var i=0; i<data.length; i++) {
 			var rowData = data[i],
-				$tr = createTr(rowData, WINNER_COLUMNS);
+				$tr = null;
+			if (rowData.eventId == context.eventId) {
+				continue;
+			}
+			$tr = createTr(rowData, WINNER_COLUMNS);
+			$tr.attr("data-eventId", rowData.eventId);
+			$tr.click(showEventRanking);
 			$tbody.append($tr);
 		}
 	}
@@ -1999,6 +2049,34 @@ function Ranking(app, context, users, con) {
 		for (var i=0; i<data.length; i++) {
 			var rowData = data[i],
 				$tr = createTr(rowData, TOTAL_COLUMNS, i+1);
+			$tr.attr("data-userId", rowData.userId);
+			$tr.attr("data-point", rowData.point);
+			$tr.click(showUserEvent);
+			$tbody.append($tr);
+		}
+	}
+	function buildUserEvent(data) {
+		function getEventTitle(eventId) {
+			for (var i=0; i<$events.length; i++) {
+				var $tr = $($events[i]);
+				if ($tr.attr("data-eventId") == eventId) {
+					return $tr.find(".r-title").text();
+				}
+			}
+			return "Unknown";
+		}
+		var $tbody = $("#ranking-user-tbl").find("tbody"),
+			$events = $("#ranking-event-tbl").find("tbody tr");
+		$tbody.empty();
+		for (var i=0; i<data.length; i++) {
+			var rowData = data[i],
+				$tr = null,
+				rank = rowData.point > 0 ? 10 - rowData.point + 1 : "-";
+			if (rowData.eventId == context.eventId) {
+				continue;
+			}
+			rowData.title = getEventTitle(rowData.eventId);
+			$tr = createTr(rowData, USER_COLUMNS, rank);
 			$tbody.append($tr);
 		}
 	}
@@ -2014,7 +2092,6 @@ function Ranking(app, context, users, con) {
 				"success" : function(data) {
 					if (data.length) {
 						nextData = data;
-						$tab.show();
 					}
 				}
 			})
@@ -2037,8 +2114,19 @@ function Ranking(app, context, users, con) {
 			},
 			"success" : buildTotal
 		})
+		$("#ranking-event-detail-back").click(function() {
+			$tab.find(".tab-pane").hide();
+			$("#ranking-event").show("slide", { "direction" : "left"}, EFFECT_TIME);
+		});
+		$("#ranking-user-back").click(function() {
+			$tab.find(".tab-pane").hide();
+			$("#ranking-total").show("slide", { "direction" : "left"}, EFFECT_TIME);
+		});
 		$tab = $("#ranking-tab").tabs({
-			"active" : context.isEventRunning() ? 0 : 1
+			"active" : context.isEventRunning() ? 0 : 1,
+			"beforeActivate" : function() {
+				$tab.find(".tab-pane").hide();
+			}
 		}).show();
 	}
 	function afterShow() {

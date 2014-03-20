@@ -1,6 +1,6 @@
 @(userInfo: Option[UserInfo], twitterUrl: String)(implicit lang: Lang)
 <div id="chat" class="workspace">
-    @if(userInfo.isEmpty) {
+	@if(userInfo.isEmpty) {
 		<div>
 			<header class="heading">
 				<p>@Messages("loginRequiredToChat")</p>
@@ -10,34 +10,34 @@
 				@Messages("loginWithTwitter")
 			</a>
 		</div>
-    }
+	}
+	<div class="checkbox">
+		<label class="btn">
+			<input type="checkbox" id="chat-notify"> 
+			@Messages("notifyTweet")
+		</label>
+	</div>
 	<div>@Html(Messages("html.roomMember"))</div>
-    <div class="input-box">
-        <form role="form">
-            <div class="checkbox">
-                <label class="btn">
-					<input type="checkbox" id="chat-notify"> 
-					@Messages("notifyTweet")
-                </label>
-            </div>
-			@userInfo.map { u =>
-	            <div class="checkbox">
-	                <label class="btn">
-						<input id="chat-twitter" type="checkbox" checked="checked">
-						@Messages("postTwitter")
-	                </label>
-	            </div>
-	            <div class="form-group">
-	                <textarea id="chat-text" class="form-control"></textarea>
-	            </div>
-				<div id="chat-text-len">140</div>
-	            <div class="align-center">
-					<button id="btn-tweet" type="button" class="btn blue">@Messages("tweet")</button>
-	            </div>
-			}
-        </form>
-    </div>
 	<div class="tweet-box">
 		<ul></ul>
+	</div>
+	<div class="input-box">
+		<form role="form">
+			@userInfo.map { u =>
+				<div class="checkbox">
+					<label class="btn">
+						<input id="chat-twitter" type="checkbox" checked="checked">
+						@Messages("postTwitter")
+					</label>
+				</div>
+				<div class="form-group">
+					<textarea id="chat-text" class="form-control"></textarea>
+				</div>
+				<div id="chat-text-len">140</div>
+				<div class="align-center">
+					<button id="btn-tweet" type="button" class="btn blue">@Messages("tweet")</button>
+				</div>
+			}
+		</form>
 	</div>
 </div>

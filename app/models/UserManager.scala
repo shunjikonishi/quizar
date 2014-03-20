@@ -24,6 +24,11 @@ class UserManager {
   def getUserById(id: Int) = QuizUser.find(id).getOrElse(throw new IllegalArgumentException())
 
   def getUserByTwitter(tu: TwitterUser): QuizUser = {
+println(tu.getProfileImageURL)
+println(tu.getBiggerProfileImageURL)
+println(tu.getOriginalProfileImageURL)
+println(tu.getProfileBackgroundImageURL)
+println(tu.getProfileImageURL)
     val now = new DateTime()
     findByTwitterId(tu.getId).map { u =>
       val user = u.copy(

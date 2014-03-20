@@ -1,3 +1,4 @@
+var EFFECT_TIME = 300;
 function enableInput($input, b) {
 	if (b) {
 		$input.removeAttr("disabled");

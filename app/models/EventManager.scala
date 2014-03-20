@@ -229,6 +229,11 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     QuizTotalRanking.findByRoomId(roomId, limit)
   }
 
+  def getUserEvent(roomId: Int, userId: Int): List[UserEventInfo] = {
+    QuizUserEvent.findAllBy(sqls"room_id = ${roomId} AND user_id = ${userId} order by event_id desc")
+      .map(UserEventInfo.create(_))
+  }
+
   private def calcSummary(pq: PublishedQuestion, updateQuestion: Boolean) = {
     if (pq.isCalcRequired || (updateQuestion && pq.isSummaryRequired)) {
       DB.localTx { implicit session =>
@@ -426,6 +431,13 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     val roomId = (command.data \ "roomId").as[Int]
     val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
     val data = JsArray(getTotalRanking(roomId, limit).map(_.toJson))
+    command.json(data)
+  }
+
+  val userEventCommand = CommandHandler { command =>
+    val roomId = (command.data \ "roomId").as[Int]
+    val userId = (command.data \ "userId").as[Int]
+    val data = JsArray(getUserEvent(roomId, userId).map(_.toJson))
     command.json(data)
   }
 

@@ -1,5 +1,5 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
-<div id="ranking" class="worksopace">
+<div id="ranking" class="workspace">
 	<div id="ranking-tab" class="tab-content" style="display:none;">
 		<ul>
 			<li class="ranking-now"><a href="#ranking-now">@Messages("rankingNow")</a></li>
@@ -49,13 +49,16 @@
 			</table>
 		</div>
 		<div id="ranking-event-detail" style="display:none;" class="tab-pane">
+			<div>
+				<button id="ranking-event-detail-back" class="btn gray btn-small">@Messages("back")</button>
+			</div>
 			<table class="table table-hover" id="ranking-event-detail-tbl">
 				<thead>
 					<tr>
-						<th class="rank">@Messages("rank")</th>
-						<th class="username">@Messages("username")</th>
-						<th class="correctCount">@Messages("correctCount")</th>
-						<th class="time">@Messages("time")</th>
+						<th class="r-rank">@Messages("rank")</th>
+						<th class="r-name">@Messages("username")</th>
+						<th class="r-correct">@Messages("correctCount")</th>
+						<th class="r-time">@Messages("time")</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -63,12 +66,25 @@
 			</table>
 		</div>
 		<div id="ranking-user" style="display:none;" class="tab-pane">
-			<table class="table table-hover" id="ranking-event-detail-tbl">
+			<div>
+				<button id="ranking-user-back" class="btn gray btn-small">@Messages("back")</button>
+			</div>
+			<div>
+				<div class="pull-left">
+					<img id="ranking-user-img" src="#"/>
+				</div>
+				<div>
+					<div id="ranking-user-name"></div>
+					<div><span id="ranking-user-point"></span>Point</div>
+				</div>
+				<div class="clearFix"></div>
+			</div>
+			<table class="table table-hover" id="ranking-user-tbl">
 				<thead>
 					<tr>
-						<th class="date">@Messages("date")</th>
-						<th class="eventName">@Messages("eventName")</th>
-						<th class="rank">@Messages("rank")</th>
+						<th class="r-title">@Messages("title")</th>
+						<th class="r-rank">@Messages("rank")</th>
+						<th class="r-point">@Messages("point")</th>
 						<th class="correctCount">@Messages("correctCount")</th>
 					</tr>
 				</thead>

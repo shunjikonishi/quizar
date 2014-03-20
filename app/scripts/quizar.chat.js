@@ -24,7 +24,7 @@ function Chat($el, userId, hashtag, con) {
 	}
 	function append(data) {
 		if (cnt > MAX_LOG) {
-			$ul.find("li:last").remove();
+			$ul.find("li:first").remove();
 		}
 		var clazz = (data.userId == userId ? "align-left" : "align-right"),
 			$li = $("<li style='display:none;'>" +
@@ -40,7 +40,7 @@ function Chat($el, userId, hashtag, con) {
 		$username.text(data.username);
 		$img.attr("src", data.img);
 		$msg.text(data.msg);
-		$ul.prepend($li)
+		$ul.append($li)
 		$li.show("slow");
 		cnt++;
 	}

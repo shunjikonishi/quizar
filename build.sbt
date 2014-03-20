@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc-interpolation" % "[1.7,)",
   "postgresql" % "postgresql" % "9.1-901.jdbc4",
   "net.debasishg" % "redisclient_2.10" % "2.11",
-  "org.twitter4j" % "twitter4j-core" % "4.0.0"
+  "org.twitter4j" % "twitter4j-core" % "4.0.1"
 )
 
 play.Project.playScalaSettings
