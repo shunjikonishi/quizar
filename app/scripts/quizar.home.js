@@ -1,4 +1,4 @@
-function Home(con, users) {
+function Home(con, users, userId) {
 	function enterRoom() {
 		var id = $(this).attr("data-id");
 		if (id) {
@@ -107,6 +107,20 @@ function Home(con, users) {
 				$tab = $el.find(".tab-content").tabs().show();
 			}
 		});
+		if (userId) {
+			con.request({
+				"command" : "listRoom",
+				"data" : {
+					"limit" : 10,
+					"offset" : 0,
+					"userId" : userId
+				},
+				"success" : function(data) {
+					buildTable($yours, data);
+					bindEvent($yours);
+				}
+			})
+		}
 		$("#room-detail-enter").click(enterRoom);
 		$("#room-detail-back").click(backToList);
 	}

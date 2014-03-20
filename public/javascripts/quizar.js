@@ -616,7 +616,7 @@ function User(hash) {
 	clearHash(hash);
 }
 
-function Home(con, users) {
+function Home(con, users, userId) {
 	function enterRoom() {
 		var id = $(this).attr("data-id");
 		if (id) {
@@ -725,6 +725,20 @@ function Home(con, users) {
 				$tab = $el.find(".tab-content").tabs().show();
 			}
 		});
+		if (userId) {
+			con.request({
+				"command" : "listRoom",
+				"data" : {
+					"limit" : 10,
+					"offset" : 0,
+					"userId" : userId
+				},
+				"success" : function(data) {
+					buildTable($yours, data);
+					bindEvent($yours);
+				}
+			})
+		}
 		$("#room-detail-enter").click(enterRoom);
 		$("#room-detail-back").click(backToList);
 	}
@@ -2391,7 +2405,7 @@ flect.QuizApp = function(serverParams) {
 		messageDialog = new flect.MessageDialog($("#msg-dialog"));
 		effectDialog = new EffectDialog($("#effect-dialog"));
 		con = new flect.Connection(context.uri, debug);
-		home = new Home(con, users);
+		home = new Home(con, users, context.userId);
 		makeRoom = new MakeRoom(app, context.userId, con);
 		templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 		$content = $("#content");

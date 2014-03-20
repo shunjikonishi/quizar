@@ -78,11 +78,17 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.getOrElse(false)
   }
 
-  def list(offset: Int, limit: Int): List[RoomInfo] = {
+  def list(offset: Int, limit: Int, userId: Option[Int]): List[RoomInfo] = {
+    val where = userId.map(n => sqls""" where exists(
+      select * from quiz_user_event que
+              where que.room_id = qr.id
+                and que.user_id = ${n}) or qr.owner = ${n}"""
+    ).getOrElse(sqls"")
     withSQL { 
       select
         .from(QuizRoom as qr)
         .leftJoin(QuizEvent as qe).on(sqls"qr.id = qe.room_id and qe.status in (0, 1)")
+        .append(where)
         .orderBy(sqls"COALESCE(qe.exec_date, qr.updated)").desc
         .limit(limit).offset(offset)
     }.map { rs =>
@@ -112,7 +118,8 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   val listCommand = CommandHandler { command =>
     val limit = (command.data \ "limit").as[Int]
     val offset = (command.data \ "offset").as[Int]
-    val data = list(offset, limit).map(_.toJson)
+    val userId = (command.data \ "userId").asOpt[Int]
+    val data = list(offset, limit, userId).map(_.toJson)
     command.json(JsArray(data))
   }
 }
