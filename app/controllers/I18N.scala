@@ -24,7 +24,8 @@ object I18N extends Controller {
     
     val map = Play.current.plugin[MessagesPlugin]
       .map(_.api.messages).getOrElse(Map.empty);
-    Ok(views.html.messages(map.getOrElse(lang, map("default")).filterKeys(_.startsWith("ui."))))
+    val langMap = map("default") ++ map.getOrElse(lang, Map.empty)
+    Ok(views.html.messages(langMap.filterKeys(_.startsWith("ui."))))
       .as("text/javascript;charset=\"utf-8\"");
   }
   

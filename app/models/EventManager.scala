@@ -239,16 +239,18 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
               .where.eq(qua.publishId, pq.publishId)
               .groupBy(sqls"answer")
           }.map(rs => (rs.int(1), rs.int(2))).list.apply()
-          val correctCount = pq.answerType match {
-            case AnswerType.Most => answers.map(_._2).max
-            case AnswerType.Least => answers.map(_._2).min
-            case _ => throw new IllegalStateException()
+          if (answers.size > 0) {
+            val correctCount = pq.answerType match {
+              case AnswerType.Most => answers.map(_._2).max
+              case AnswerType.Least => answers.map(_._2).min
+              case _ => throw new IllegalStateException()
+            }
+            val correctAnswers = answers.filter(_._2 == correctCount).map(_._1)
+            sql"""UPDATE QUIZ_USER_ANSWER
+                SET STATUS = CASE WHEN ANSWER IN (${correctAnswers}) THEN 1 ELSE 2 END,
+                    UPDATED = ${now}
+              WHERE PUBLISH_ID = ${pq.publishId}""".update.apply()
           }
-          val correctAnswers = answers.filter(_._2 == correctCount).map(_._1)
-          sql"""UPDATE QUIZ_USER_ANSWER
-              SET STATUS = CASE WHEN ANSWER IN (${correctAnswers}) THEN 1 ELSE 2 END,
-                  UPDATED = ${now}
-            WHERE PUBLISH_ID = ${pq.publishId}""".update.apply()
         }
         if (updateQuestion && pq.isSummaryRequired) {
           QuizAnswerCount.findByPublishId(pq.publishId).foreach { qac =>
