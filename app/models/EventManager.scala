@@ -217,6 +217,11 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     ))
   }
 
+  def getPublishedQuestions(eventId: Int): List[Int] = {
+    sql"select question_id from quiz_publish where event_id = ${eventId}"
+      .map(_.int(1)).list.apply
+  }
+
   def getEventRanking(eventId: Int, limit: Int): List[QuizRanking] = {
     QuizRanking.findByEventId(eventId, limit)
   }
@@ -438,6 +443,12 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     val roomId = (command.data \ "roomId").as[Int]
     val userId = (command.data \ "userId").as[Int]
     val data = JsArray(getUserEvent(roomId, userId).map(_.toJson))
+    command.json(data)
+  }
+
+  val publishedQuestionsCommand = CommandHandler { command =>
+    val eventId = command.data.as[Int]
+    val data = JsArray(getPublishedQuestions(eventId).map(JsNumber(_)))
     command.json(data)
   }
 

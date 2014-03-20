@@ -947,6 +947,9 @@ function QuestionList(app, users, context, con) {
 			if (published) {
 				var answerer = q.correctCount + "/" + q.publishCount;
 				$tr.find(".q-answerer").text(answerer);
+				if (publishedQuestions[q.id]) {
+					$tr.addClass("q-published");
+				}
 			} else if (context.isEventRunning()) {
 				$tr.find("button").click(function() {
 					var $tr = $(this).parents("tr"),
@@ -1082,6 +1085,17 @@ function QuestionList(app, users, context, con) {
 			}
 		});
 		countQuestions(true);
+		if (context.isEventRunning()) {
+			con.request({
+				"command" : "getPublishedQuestions",
+				"data" : context.eventId,
+				"success" : function(data) {
+					for (var i=0; i<data.length; i++) {
+						publishedQuestions[data[i]] = true;
+					}
+				}
+			})
+		}
 		stockTable.load(0, ROWSIZE);
 		publishedTable.load(0, ROWSIZE);
 		$("#edit-question-new").click(function() {
@@ -1106,12 +1120,14 @@ function QuestionList(app, users, context, con) {
 		$tab = null;
 		$btnPrev = null;
 		$btnNext = null;
+		publishedQuestions = {};
 	}
 	var stockTable = null;
 		publishedTable = null,
 		$tab = null,
 		$btnPrev = null,
-		$btnNext = null;
+		$btnNext = null,
+		publishedQuestions = {};
 
 	$.extend(this, {
 		"init" : init,
