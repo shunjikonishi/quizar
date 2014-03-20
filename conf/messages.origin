@@ -259,6 +259,9 @@ ui.failOpenEvent[ja]=このイベントを開始することができません�
 scheduledDate=Scheduled date
 scheduledDate[ja]=開催予定
 
+executedDate=Excecuted date
+executedDate[ja]=開催日
+
 ui.eventRunning=In session
 ui.eventRunning[ja]=開催中
 
@@ -348,3 +351,10 @@ ui.makeRoomDescForEdit[ja]=ルームを変更します。
 
 eventDescription=Edit, start and finish event.
 eventDescription[ja]=イベントの編集、開始、終了を行います。
+
+enterRoom=Enter
+enterRoom[ja]=入室する
+
+nextEventInformation=Next event information
+nextEventInformation[ja]=次回イベント情報
+

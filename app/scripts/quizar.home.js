@@ -1,9 +1,44 @@
 function Home(con, users) {
+	function enterRoom() {
+		var id = $(this).attr("data-id");
+		if (id) {
+			location.href = "/room/" + id;
+		}
+	}
+	function backToList() {
+		var idx = $tab.tabs("option", "active"),
+			$el = idx == 0 ? $("#event-future") : $("#event-yours");
+		$("#event-detail").hide();
+		slideIn($el, "left");
+	}
+	function showRoomInfo(room) {
+		$("#room-detail-enter").attr("data-id", room.id);
+		$("#room-detail-name").text(room.name);
+		if (room.userQuiz) {
+			$("#room-detail-userQuiz").attr("checked", "checked");
+		}
+		$("#room-detail-description").val(room.description || "");
+		if (room.event) {
+			$("#room-detail-event").show();
+			$("#room-detail-title").text(room.event.title || "-");
+			$("#room-detail-date").text(
+				room.event.exceDate ? 
+					new DateTime(room.event.execDate).datetimeStr() : 
+					"-"
+			);
+			$("#room-detail-capacity").text(room.event.capacity);
+			$("#room-detail-description2").val(room.event.description || "");
+		} else {
+			$("#room-detail-event").hide();
+		}
+		$tab.find(".tab-pane").hide();
+		slideIn($("#event-detail"), "right");
+	}
 	function bindEvent($el) {
 		$el.find("tbody tr").click(function() {
-			var id = $(this).attr("data-room");
-			if (id) {
-				location.href = "/room/" + id;
+			var room = $.data(this, "room");
+			if (room) {
+				showRoomInfo(room);
 			}
 		});
 	}
@@ -53,6 +88,7 @@ function Home(con, users) {
 					}
 				})
 			}
+			$.data($tr[0], "room", room);
 			$tbody.append($tr);
 		}
 	}
@@ -68,12 +104,16 @@ function Home(con, users) {
 			"success" : function(data) {
 				buildTable($futures, data);
 				bindEvent($futures);
-				$el.find(".tab-content").tabs().show();
+				$tab = $el.find(".tab-content").tabs().show();
 			}
-		})
+		});
+		$("#room-detail-enter").click(enterRoom);
+		$("#room-detail-back").click(backToList);
 	}
 	function clear() {
+		$tab = null;
 	}
+	var $tab = null;
 	$.extend(this, {
 		"init" : init,
 		"clear" : clear
