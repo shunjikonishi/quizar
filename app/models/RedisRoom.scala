@@ -14,6 +14,9 @@ class RedisRoom(val roomInfo: RoomInfo, redis: RedisService) extends Room("room.
 
   val roomId = roomInfo.id
 
+  lazy val eventManager = EventManager(roomId, this)
+  lazy val questionManager = QuestionManager(roomId, this)
+
   val commandOut = {
     val (cout, cchannel) = Concurrent.broadcast[CommandResponse]
     val i = Iteratee.foreach[String] { msg =>

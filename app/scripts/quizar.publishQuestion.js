@@ -105,7 +105,7 @@ function PublishQuestion(app, context, con) {
 				} else {
 					var ret = [];
 					$buttons.each(function() {
-						if ($(this).find(".answer-cnt count").text() == cnt) {
+						if ($(this).find(".answer-cnt .count").text() == cnt) {
 							ret.push(this);
 						}
 					})

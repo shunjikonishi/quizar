@@ -262,10 +262,16 @@ $(function() {
 					"name" : params
 				}
 			}
-			var template = storage.getItem("template." + params.name);
+			var name = params.name;
+console.log("name1: " + name + ", " + typeof(name));
+			if (typeof(name) === "function") {
+				name = name();
+			}
+console.log("name2: " + name + ", " + typeof(name));
+			var template = storage.getItem("template." + name);
 			if (!template) {
-				loadTemplate(params.name, function(data) {
-					storage.setItem("template." + params.name, data);
+				loadTemplate(name, function(data) {
+					storage.setItem("template." + name, data);
 					showTemplate(data, params);
 				});
 			} else {
@@ -541,6 +547,70 @@ function DateTime() {
 	})
 }
 
+function PagingBar($el, count, func, rowSize) {
+	function prev() {
+		if (offset > 0) {
+			offset -= rowSize;
+			func(offset, rowSize, false);
+			buttonControl();
+		}
+	}
+	function next() {
+		if (offset + rowSize < count) {
+			offset += rowSize;
+			func(offset, rowSize, true);
+			buttonControl();
+		}
+	}
+	function buttonControl() {
+		enableInput($btnPrev, offset > 0);
+		enableInput($btnNext, offset + rowSize < count);
+	}
+	function recordCount() {
+		if (arguments.length == 0) {
+			return count;
+		} else {
+			count = arguments[0];
+			return this;
+		}
+	}
+	function swipeParams() {
+		return {
+			"swipeLeft": function(e) {
+				next();
+				e.stopImmediatePropagation();
+			},
+			"swipeRight": function(e) {
+				prev();
+				e.stopImmediatePropagation();
+			},
+			"tap": function (event, target) {
+				if (SUPPORTS_TOUCH) {
+					$(target).click();
+				}
+			}
+		};
+	}
+	function release() {
+		$btnPrev = null;
+		$btnNext = null;
+	}
+	var offset = 0,
+		$btnPrev = $el.find(".paging-bar-left"),
+		$btnNext = $el.find(".paging-bar-right");
+	rowSize = rowSize || 10;
+	$btnPrev.click(prev);
+	$btnNext.click(next);
+	buttonControl();
+
+	$.extend(this, {
+		"prev" : prev,
+		"next" : next,
+		"recordCount" : recordCount,
+		"swipeParams" : swipeParams,
+		"release" : release
+	})
+}
 function EffectDialog($el) {
 	function show(msg, second) {
 		if (!second) {
@@ -1501,7 +1571,7 @@ function PublishQuestion(app, context, con) {
 				} else {
 					var ret = [];
 					$buttons.each(function() {
-						if ($(this).find(".answer-cnt count").text() == cnt) {
+						if ($(this).find(".answer-cnt .count").text() == cnt) {
 							ret.push(this);
 						}
 					})
@@ -1795,9 +1865,6 @@ function EditEvent(app, context, con) {
 				$("#event-date").val(d.dateStr());
 				$("#event-time").val(d.timeStr());
 			}
-			$toggleBtn.text(data.status == EventStatus.Prepared ? MSG.start : MSG.finish);;
-		} else {
-			$toggleBtn.text(MSG.start);;
 		}
 	}
 	function collectData() {
@@ -1851,7 +1918,6 @@ function EditEvent(app, context, con) {
 				},
 				"success" : function(data) {
 					if (data) {
-						$toggleBtn.text(MSG.finish);
 						app.showQuestionList();
 					} else {
 						app.showMessage(MSG.failOpenEvent);
@@ -1860,25 +1926,9 @@ function EditEvent(app, context, con) {
 			})
 		}
 	}
-	function closeEvent() {
-		if (!context.isEventRunning()) {
-			return;
-		}
-		con.request({
-			"command" : "closeEvent",
-			"data" : context.eventId,
-			"success" : function(data) {
-				if (data) {
-					clearField();
-					$toggleBtn.text(MSG.start);
-				}
-			}
-		})
-	}
 	function updateEvent(start) {
 		if (validator && validator.form()) {
 			var data = collectData();
-console.log("updateEvent: " + JSON.stringify(data));
 			if (data.id) {
 				con.request({
 					"command" : "updateEvent",
@@ -1932,14 +1982,7 @@ console.log("updateEvent: " + JSON.stringify(data));
 			"focusInvalid" : true
 		});
 		optionControl($el);
-		$toggleBtn = $("#event-toggle-btn").click(function() {
-console.log("toggleBtn: " + context.eventStatus);
-			if (context.eventStatus == EventStatus.Prepared) {
-				openEvent();
-			} else if (context.eventStatus == EventStatus.Running) {
-				closeEvent();
-			}
-		})
+		$("#event-start-btn").click(openEvent);
 		$("#event-update-btn").click(function() {
 			updateEvent(false);
 		});
@@ -1951,17 +1994,96 @@ console.log("toggleBtn: " + context.eventStatus);
 	function clear() {
 		$form = null;
 		validator = null;
-		$toggleBtn = null;
 	}
 	var $form = null,
-		validator = null,
-		$toggleBtn = null;
+		validator = null;
 	$.extend(this, {
 		"init" : init,
 		"clear" : clear
 	});
 }
 
+function EventMembers(app, context, con) {
+	function buildMembers($tbody, data, offset) {
+		for (var i=0; i<data.length; i++) {
+			var rowData = data[i],
+				$tr = $("<tr><td class='r-rank'/><td class='r-name'/>" +
+					"<td class='r-correct'/><td class='r-time'/></tr>"),
+				$rank = $tr.find(".r-rank"),
+				$name = $tr.find(".r-name"),
+				$img = $("<img/>");
+
+			$rank.text(rowData.correctCount > 0 ? offset + i + 1 : "-");
+			$img.attr("src", rowData.imageUrl);
+			$name.append($img);
+			$name.append(rowData.username);
+			if (rowData.correctCount) {
+				$tr.find(".r-correct").text(rowData.correctCount);
+				$tr.find(".r-time").text(roundTime(rowData.time));
+			}
+			$tbody.append($tr);
+		}
+	}
+	function loadData(offset, rowSize, next) {
+		var slideDir;
+		if (typeof(next) === "boolean") {
+			slideDir = next ? "right" : "left";
+		}
+		con.request({
+			"command" : "getEventRanking",
+			"data" : {
+				"eventId" : context.eventId,
+				"limit" : 10
+			},
+			"success" : function(data) {
+				var $table = $("#event-members-tbl"),
+					$tbody = $table.find("tbody");
+				$tbody.empty();
+				if (slideDir) {
+					$table.hide();
+				}
+				buildMembers($tbody, data, offset);
+				if (slideDir) {
+					$table.show("slide", { "direction" : slideDir}, EFFECT_TIME);
+				}
+			}
+		})
+
+	}
+	function closeEvent() {
+		if (!context.isEventRunning()) {
+			return;
+		}
+		con.request({
+			"command" : "closeEvent",
+			"data" : context.eventId,
+			"success" : function(data) {
+				if (data) {
+					app.showRanking();
+				}
+			}
+		})
+	}
+	function init($el) {
+		$("#event-finish-btn").click(closeEvent);
+		con.request({
+			"command" : "getMemberCount",
+			"data" : context.eventId,
+			"success" : function(data) {
+				pagingBar = new PagingBar($el.find(".paging-bar"), data, loadData, 10);
+				loadData(0, 10);
+			}
+		})
+	}	
+	function clear() {
+		pagingBar = null;
+	}
+	var pagingBar = null;
+	$.extend(this, {
+		"init" : init,
+		"clear" : clear
+	})
+}
 function Ranking(app, context, users, con) {
 	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"],
 		WINNER_COLUMNS = ["title", ["username", "r-winners"], "correctCount", "time"],
@@ -2430,6 +2552,9 @@ flect.QuizApp = function(serverParams) {
 				alert(data);
 			});
 		}
+		con.addEventListener("redirect", function(data) {
+			location.href = data;
+		})
 		if (context.isLogined()) {
 			users[context.userId] = new User({
 				"id" : context.userId,
@@ -2541,6 +2666,7 @@ flect.QuizApp = function(serverParams) {
 					});
 				}
 			});
+			eventMembers = new EventMembers(self, context, con);
 		}
 		if (context.canEntryEvent()) {
 			entryEvent = new EntryEvent(self, context, con);
@@ -2601,6 +2727,7 @@ flect.QuizApp = function(serverParams) {
 		makeQuestion,
 		makeRoom,
 		editEvent,
+		eventMembers,
 		entryEvent,
 		templateManager,
 		chat,
@@ -2611,7 +2738,6 @@ flect.QuizApp = function(serverParams) {
 		users = {};
 	init();
 	debug.log("params", context);
-console.log("eventAdmin: " + context.eventAdmin);
 	var TemplateLogic = {
 		"home" : {
 			"beforeShow" : home.init,
@@ -2643,8 +2769,23 @@ console.log("eventAdmin: " + context.eventAdmin);
 		})
 		$.extend(TemplateLogic, {
 			"edit-event" : {
-				"beforeShow" : editEvent.init,
-				"afterHide" : editEvent.clear
+				"beforeShow" : function($el) {
+					if (context.isEventRunning()) {
+						eventMembers.init($el);
+					} else {
+						editEvent.init($el);
+					}
+				},
+				"name" : function() {
+					return context.isEventRunning() ? "event-members" : "edit-event";
+				},
+				"afterHide" : function() {
+					if (context.isEventRunning()) {
+						eventMembers.clear();
+					} else {
+						editEvent.clear();
+					}
+				}
 			}
 		})
 	} else if (context.isPostQuestionAllowed()) {

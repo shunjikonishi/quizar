@@ -17,6 +17,7 @@ correctCount=正答
 datetime=日時
 debug=デバッグ
 description=説明
+duringEvent=イベント開催中!
 editEvent=イベントの編集
 editQuestion=問題の編集／出題
 enterRoom=入室する

@@ -24,10 +24,16 @@ $(function() {
 					"name" : params
 				}
 			}
-			var template = storage.getItem("template." + params.name);
+			var name = params.name;
+console.log("name1: " + name + ", " + typeof(name));
+			if (typeof(name) === "function") {
+				name = name();
+			}
+console.log("name2: " + name + ", " + typeof(name));
+			var template = storage.getItem("template." + name);
 			if (!template) {
-				loadTemplate(params.name, function(data) {
-					storage.setItem("template." + params.name, data);
+				loadTemplate(name, function(data) {
+					storage.setItem("template." + name, data);
 					showTemplate(data, params);
 				});
 			} else {

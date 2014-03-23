@@ -26,13 +26,13 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       }
       room.commandOut(i)
 
-      val qm = QuestionManager(roomId, room)
+      val qm = room.questionManager
       addHandler("listQuestion", qm.listCommand)
       addHandler("countQuestion", qm.countCommand)
       addHandler("updateQuestion", qm.updateCommand)
       addHandler("createQuestion", qm.createCommand)
 
-      val em = EventManager(roomId, room)
+      val em = room.eventManager
       addHandler("createEvent", em.createCommand)
       addHandler("updateEvent", em.updateCommand)
       addHandler("getEvent", em.getCommand)
@@ -47,6 +47,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("getTotalRanking", em.totalRankingCommand)
       addHandler("getUserEvent", em.userEventCommand)
       addHandler("getPublishedQuestions", em.publishedQuestionsCommand)
+      addHandler("getMemberCount", em.memberCountCommand)
 
       addHandler("member", room.memberCommand)
       room.incMember

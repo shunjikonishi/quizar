@@ -20,6 +20,7 @@ import models.QuizRoomEngine
 import models.TemplateManager
 import models.PageParams
 import flect.websocket.CommandInvoker
+import flect.websocket.CommandResponse
 
 import java.util.UUID
 
@@ -67,7 +68,11 @@ object Application extends Controller {
     val sm = SessionManager
     val handler = session.get("sessionId").map { sessionId =>
       new QuizRoomEngine(sm.get(sessionId))
-    }.getOrElse(new CommandInvoker())
+    }.getOrElse(new CommandInvoker() {
+      addHandler("noop") { command =>
+        new CommandResponse("redirect", "/")
+      }
+    })
     (handler.in, handler.out)
   }
 

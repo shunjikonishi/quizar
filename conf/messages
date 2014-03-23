@@ -17,6 +17,7 @@ correctCount=Correct
 datetime=Datetime
 debug=Debug
 description=Description
+duringEvent=During the event!
 editEvent=Edit event
 editQuestion=Edit and publish questions
 enterRoom=Enter

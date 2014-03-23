@@ -217,13 +217,18 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     ))
   }
 
+  def getMemberCount(eventId: Int): Int = {
+    sql"select count(*) from quiz_user_event where event_id = ${eventId}"
+      .map(_.int(1)).single.apply.getOrElse(0)
+  }
+
   def getPublishedQuestions(eventId: Int): List[Int] = {
     sql"select question_id from quiz_publish where event_id = ${eventId}"
       .map(_.int(1)).list.apply
   }
 
-  def getEventRanking(eventId: Int, limit: Int): List[QuizRanking] = {
-    QuizRanking.findByEventId(eventId, limit)
+  def getEventRanking(eventId: Int, limit: Int, offset: Int): List[QuizRanking] = {
+    QuizRanking.findByEventId(eventId, limit, offset)
   }
 
   def getEventWinners(roomId: Int): List[QuizEventWinner] = {
@@ -296,7 +301,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
                                   UPDATED = ?
                             WHERE USER_ID = ?
                               AND EVENT_ID = ?"""
-      getEventRanking(eventId, 10).foreach { rank =>
+      getEventRanking(eventId, 10, 0).foreach { rank =>
         if (rank.correctCount > 0) {
           pointSql.bind(rank.correctCount, rank.wrongCount, rank.time, point, now, rank.userId, rank.eventId).update.apply()
           point -= 1
@@ -378,11 +383,9 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }
     val recalc = !openBySelf
     openBySelf = false
-    Akka.system.scheduler.scheduleOnce(0 seconds) {
-      calcRanking(id)
-      if (recalc) {
-        recalcQuestion(id)
-      }
+    calcRanking(id)
+    if (recalc) {
+      recalcQuestion(id)
     }
     command.json(JsBoolean(ret))
   }
@@ -422,7 +425,8 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   val eventRankingCommand = CommandHandler { command =>
     val eventId = (command.data \ "eventId").as[Int]
     val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
-    val data = JsArray(getEventRanking(eventId, limit).map(_.toJson))
+    val offset = (command.data \ "offset").asOpt[Int].getOrElse(0)
+    val data = JsArray(getEventRanking(eventId, limit, offset).map(_.toJson))
     command.json(data)
   }
 
@@ -443,6 +447,12 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     val roomId = (command.data \ "roomId").as[Int]
     val userId = (command.data \ "userId").as[Int]
     val data = JsArray(getUserEvent(roomId, userId).map(_.toJson))
+    command.json(data)
+  }
+
+  val memberCountCommand = CommandHandler { command =>
+    val eventId = command.data.as[Int]
+    val data = JsNumber(getMemberCount(eventId))
     command.json(data)
   }
 

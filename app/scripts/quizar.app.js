@@ -119,6 +119,9 @@ flect.QuizApp = function(serverParams) {
 				alert(data);
 			});
 		}
+		con.addEventListener("redirect", function(data) {
+			location.href = data;
+		})
 		if (context.isLogined()) {
 			users[context.userId] = new User({
 				"id" : context.userId,
@@ -230,6 +233,7 @@ flect.QuizApp = function(serverParams) {
 					});
 				}
 			});
+			eventMembers = new EventMembers(self, context, con);
 		}
 		if (context.canEntryEvent()) {
 			entryEvent = new EntryEvent(self, context, con);
@@ -290,6 +294,7 @@ flect.QuizApp = function(serverParams) {
 		makeQuestion,
 		makeRoom,
 		editEvent,
+		eventMembers,
 		entryEvent,
 		templateManager,
 		chat,
@@ -300,7 +305,6 @@ flect.QuizApp = function(serverParams) {
 		users = {};
 	init();
 	debug.log("params", context);
-console.log("eventAdmin: " + context.eventAdmin);
 	var TemplateLogic = {
 		"home" : {
 			"beforeShow" : home.init,
@@ -332,8 +336,23 @@ console.log("eventAdmin: " + context.eventAdmin);
 		})
 		$.extend(TemplateLogic, {
 			"edit-event" : {
-				"beforeShow" : editEvent.init,
-				"afterHide" : editEvent.clear
+				"beforeShow" : function($el) {
+					if (context.isEventRunning()) {
+						eventMembers.init($el);
+					} else {
+						editEvent.init($el);
+					}
+				},
+				"name" : function() {
+					return context.isEventRunning() ? "event-members" : "edit-event";
+				},
+				"afterHide" : function() {
+					if (context.isEventRunning()) {
+						eventMembers.clear();
+					} else {
+						editEvent.clear();
+					}
+				}
 			}
 		})
 	} else if (context.isPostQuestionAllowed()) {

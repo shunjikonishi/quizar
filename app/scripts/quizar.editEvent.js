@@ -12,9 +12,6 @@ function EditEvent(app, context, con) {
 				$("#event-date").val(d.dateStr());
 				$("#event-time").val(d.timeStr());
 			}
-			$toggleBtn.text(data.status == EventStatus.Prepared ? MSG.start : MSG.finish);;
-		} else {
-			$toggleBtn.text(MSG.start);;
 		}
 	}
 	function collectData() {
@@ -68,7 +65,6 @@ function EditEvent(app, context, con) {
 				},
 				"success" : function(data) {
 					if (data) {
-						$toggleBtn.text(MSG.finish);
 						app.showQuestionList();
 					} else {
 						app.showMessage(MSG.failOpenEvent);
@@ -77,25 +73,9 @@ function EditEvent(app, context, con) {
 			})
 		}
 	}
-	function closeEvent() {
-		if (!context.isEventRunning()) {
-			return;
-		}
-		con.request({
-			"command" : "closeEvent",
-			"data" : context.eventId,
-			"success" : function(data) {
-				if (data) {
-					clearField();
-					$toggleBtn.text(MSG.start);
-				}
-			}
-		})
-	}
 	function updateEvent(start) {
 		if (validator && validator.form()) {
 			var data = collectData();
-console.log("updateEvent: " + JSON.stringify(data));
 			if (data.id) {
 				con.request({
 					"command" : "updateEvent",
@@ -149,14 +129,7 @@ console.log("updateEvent: " + JSON.stringify(data));
 			"focusInvalid" : true
 		});
 		optionControl($el);
-		$toggleBtn = $("#event-toggle-btn").click(function() {
-console.log("toggleBtn: " + context.eventStatus);
-			if (context.eventStatus == EventStatus.Prepared) {
-				openEvent();
-			} else if (context.eventStatus == EventStatus.Running) {
-				closeEvent();
-			}
-		})
+		$("#event-start-btn").click(openEvent);
 		$("#event-update-btn").click(function() {
 			updateEvent(false);
 		});
@@ -168,11 +141,9 @@ console.log("toggleBtn: " + context.eventStatus);
 	function clear() {
 		$form = null;
 		validator = null;
-		$toggleBtn = null;
 	}
 	var $form = null,
-		validator = null,
-		$toggleBtn = null;
+		validator = null;
 	$.extend(this, {
 		"init" : init,
 		"clear" : clear

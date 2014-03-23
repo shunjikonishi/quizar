@@ -358,3 +358,5 @@ enterRoom[ja]=入室する
 nextEventInformation=Next event information
 nextEventInformation[ja]=次回イベント情報
 
+duringEvent=During the event!
+duringEvent[ja]=イベント開催中!
