@@ -95,7 +95,6 @@ flect.QuizApp = function(serverParams) {
 		effectDialog = new EffectDialog($("#effect-dialog"));
 		con = new flect.Connection(context.uri, debug);
 		home = new Home(con, users, context.userId);
-		makeRoom = new MakeRoom(app, context.userId, con);
 		templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 		$content = $("#content");
 
@@ -128,6 +127,8 @@ flect.QuizApp = function(serverParams) {
 				"name" : context.username,
 				"imageUrl" : context.userImage
 			});
+			mypage = new Mypage(self, context, users, con);
+			makeRoom = new MakeRoom(app, context.userId, con);
 		}
 
 		if (context.isInRoom()) {
@@ -291,6 +292,7 @@ flect.QuizApp = function(serverParams) {
 		effectDialog,
 		con,
 		home,
+		mypage,
 		makeQuestion,
 		makeRoom,
 		editEvent,
@@ -309,24 +311,32 @@ flect.QuizApp = function(serverParams) {
 		"home" : {
 			"beforeShow" : home.init,
 			"afterHide" : home.clear
-		},
-		"make-room" : {
-			"beforeShow" : function($el) {
-				makeRoom.clear();
-				makeRoom.init($el);
-			},
-			"afterHide" : makeRoom.clear
-		},
-		"edit-room" : {
-			"name" : "make-room",
-			"beforeShow" : function($el) {
-				makeRoom.clear();
-				makeRoom.edit(context.roomId);
-				makeRoom.init($el)
-			},
-			"afterHide" : makeRoom.clear
 		}
-	};
+	}
+	if (context.isLogined()) {
+		$.extend(TemplateLogic, {
+			"mypage" : {
+				"beforeShow" : mypage.init,
+				"afterHide" : mypage.clear
+			},
+			"make-room" : {
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.init($el);
+				},
+				"afterHide" : makeRoom.clear
+			},
+			"edit-room" : {
+				"name" : "make-room",
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.edit(context.roomId);
+					makeRoom.init($el)
+				},
+				"afterHide" : makeRoom.clear
+			}
+		});
+	}
 	if (context.isRoomAdmin()) {
 		$.extend(TemplateLogic, {
 			"edit-question" : {

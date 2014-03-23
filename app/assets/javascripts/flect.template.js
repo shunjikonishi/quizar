@@ -25,11 +25,9 @@ $(function() {
 				}
 			}
 			var name = params.name;
-console.log("name1: " + name + ", " + typeof(name));
 			if (typeof(name) === "function") {
 				name = name();
 			}
-console.log("name2: " + name + ", " + typeof(name));
 			var template = storage.getItem("template." + name);
 			if (!template) {
 				loadTemplate(name, function(data) {

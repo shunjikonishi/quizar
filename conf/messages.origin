@@ -124,6 +124,12 @@ upcoming[ja]=近日開催
 yourEvents=Your events
 yourEvents[ja]=参加イベント
 
+entriedRooms=Entried rooms
+entriedRooms[ja]=参加ルーム
+
+yourRooms=Your rooms
+yourRooms=主催ルーム
+
 datetime=Datetime
 datetime[ja]=日時
 
@@ -360,3 +366,6 @@ nextEventInformation[ja]=次回イベント情報
 
 duringEvent=During the event!
 duringEvent[ja]=イベント開催中!
+
+mypage=My page
+mypage[ja]=マイページ

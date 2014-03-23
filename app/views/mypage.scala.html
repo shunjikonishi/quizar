@@ -1,0 +1,31 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="mypage" class="workspace">
+	<div class="tab-content" style="display:none;">
+		<ul class="clear-fix">
+			<li><a href="#mypage-entries">@Messages("entriedRooms")</a></li>
+			<li><a href="#mypage-owners">@Messages("yourRooms")</a></li>
+		</ul>
+		<div id="mypage-entries" class="tab-pane">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="event-title">@Messages("title")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="mypage-owners" class="tab-pane">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="event-title">@Messages("title")</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
