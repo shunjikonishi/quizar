@@ -17,6 +17,31 @@ flect.QuizApp = function(serverParams) {
 	function showChat() {
 		showStatic("chat", false);
 	}
+	function backToMypage() {
+		var params = {
+			"name" : "mypage",
+			"direction" : "left",
+			"beforeShow" : mypage.init,
+			"afterHide" : mypage.clear
+		};
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
+	function showLookback(qa) {
+		var params = {
+			"name" : "publish-question",
+			"beforeShow" : function($el) {
+				publishQuestion.setLookback(qa);
+				publishQuestion.init($el);
+			},
+			"afterHide" : function() {
+				publishQuestion.clear();
+				publishQuestion.setLookback(null);
+			}
+		};
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
 	function showQuestion(data) {
 		if (publishQuestion) {
 			var params = {
@@ -96,6 +121,7 @@ flect.QuizApp = function(serverParams) {
 		con = new flect.Connection(context.uri, debug);
 		home = new Home(con, users, context.userId);
 		templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
+		publishQuestion = new PublishQuestion(self, context, con);
 		$content = $("#content");
 
 		if (context.isDebug()) {
@@ -192,7 +218,6 @@ flect.QuizApp = function(serverParams) {
 				}
 			});
 
-			publishQuestion = new PublishQuestion(self, context, con);
 			con.addEventListener("question", function(data) {
 				showQuestion(data);
 			});
@@ -316,7 +341,10 @@ flect.QuizApp = function(serverParams) {
 	if (context.isLogined()) {
 		$.extend(TemplateLogic, {
 			"mypage" : {
-				"beforeShow" : mypage.init,
+				"beforeShow" : function($el) {
+					mypage.reset();
+					mypage.init($el);
+				},
 				"afterHide" : mypage.clear
 			},
 			"make-room" : {
@@ -325,6 +353,11 @@ flect.QuizApp = function(serverParams) {
 					makeRoom.init($el);
 				},
 				"afterHide" : makeRoom.clear
+			},
+			"publish-question" : {
+				"name" : "publish-question",
+				"beforeShow" : publishQuestion.init,
+				"afterHide" : publishQuestion.clear
 			},
 			"edit-room" : {
 				"name" : "make-room",
@@ -376,11 +409,6 @@ flect.QuizApp = function(serverParams) {
 	}
 	if (context.isInRoom()) {
 		$.extend(TemplateLogic, {
-			"publish-question" : {
-				"name" : "publish-question",
-				"beforeShow" : publishQuestion.init,
-				"afterHide" : publishQuestion.clear
-			},
 			"ranking" : {
 				"name" : "ranking",
 				"beforeShow" : ranking.init,
@@ -396,8 +424,10 @@ flect.QuizApp = function(serverParams) {
 		"showChat" : showChat,
 		"showRanking" : showRanking,
 		"showQuestion" : showQuestion,
+		"showLookback" : showLookback,
 		"showMessage" : showMessage,
 		"showEffect" : showEffect,
+		"backToMypage" : backToMypage,
 		"tweet" : tweet
 	})
 }

@@ -1,13 +1,16 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="publish-question" class="workspace">
+	<div id="publish-q-back" style="display:none;">
+		<button id="publish-q-back-btn" class="btn gray btn-small">@Messages("back")</button>
+	</div>
 	<div id="publish-q-default">
-		<div class="progress">
+		<div class="progress" id="publish-q-progress">
 			<div id="publish-q-progress" class="progress-bar progress-bar-success" role="progressbar" style="width: 100%">
 			</div>
 			<div id="publish-q-progress-answered" class="progress-bar progress-bar-info" role="progressbar" style="width: 0%">
 			</div>
 		</div>
-		<div class="publish-q-animation">
+		<div class="publish-q-animation" id="publish-q-animation">
 			<span id="publish-q-seq">問題</span>
 		</div>
 		<div>
@@ -66,7 +69,7 @@
 			</div>
 		</div>
 	</div>
-	<div id="publish-q-none">
+	<div id="publish-q-none" style="display:none;">
 		@Messages("notPublishedYet")
 	</div>
 </div>

@@ -92,6 +92,7 @@ println("filterRedisMessage: " + res.name)
     addHandler("getPublishedQuestions", RoomManager.publishedQuestionsCommand)
     addHandler("getEventQuestions", RoomManager.eventQuestionsCommand)
     addHandler("getMemberCount", RoomManager.memberCountCommand)
+    addHandler("getLookback", RoomManager.lookbackCommand)
     addHandler("getUser", UserManager.getCommand)
     addHandler("tweet") { c =>
       room.foreach { room =>

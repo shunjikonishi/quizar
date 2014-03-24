@@ -204,10 +204,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
 
   def getEventQuestions(eventId: Int, userId: Int): List[UserQuestionInfo] = {
     sql"""
-      select A.question_id, B.question, 
-             case when C.user_id is null then false
-                  else true
-             end,
+      select A.id, B.question, C.answer,
              case when C.status is null then false
                   when C.status = 1 then true
                   when C.status = 2 then false
@@ -222,9 +219,9 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     order by A.id
     """.map { rs =>
       UserQuestionInfo(
-        questionId=rs.int(1),
+        publishId=rs.int(1),
         question=rs.string(2),
-        answered=rs.boolean(3),
+        userAnswer=rs.intOpt(3),
         correct=rs.boolean(4)
       )
     }.list.apply
@@ -252,6 +249,52 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
         point=rs.int("point")
       )
     }.list.apply
+  }
+
+  def getLookback(publishId: Int): Option[LookbackInfo] = {
+    sql"""
+      select A.id, B.question, B.answers, B.answer_type,
+             B.description, B.related_url,
+             A.correct_answer, A.answers_index,
+             SUM(CASE WHEN C.answer = 1 THEN 1 ELSE 0 END) as answer1,
+             SUM(CASE WHEN C.answer = 2 THEN 1 ELSE 0 END) as answer2,
+             SUM(CASE WHEN C.answer = 3 THEN 1 ELSE 0 END) as answer3,
+             SUM(CASE WHEN C.answer = 4 THEN 1 ELSE 0 END) as answer4,
+             SUM(CASE WHEN C.answer = 5 THEN 1 ELSE 0 END) as answer5
+        from quiz_publish A
+  inner join quiz_question B on (A.question_id = B.id)
+   left join quiz_user_answer C on (A.id = C.publish_id)
+       where A.id = ${publishId}
+    group by A.id, B.question, B.answers, B.answer_type,
+             B.description, B.related_url,
+             A.correct_answer, A.answers_index
+    """.map { rs =>
+      val question = rs.string("question")
+      val answers = rs.string("answers").split("\n").toList
+      val answerType = AnswerType.fromCode(rs.short("answer_type"))
+      val description = rs.stringOpt("description")
+      val relatedUrl = rs.stringOpt("related_url")
+      val correctAnswer = rs.int("correct_answer")
+      val answersIndex = rs.string("answers_index").toCharArray.toList.map(_.toInt)
+      val answerCounts = Map(
+        "1" -> rs.int("answer1"),
+        "2" -> rs.int("answer2"),
+        "3" -> rs.int("answer3"),
+        "4" -> rs.int("answer4"),
+        "5" -> rs.int("answer5")
+      )
+      val answerList = answers.zip(answersIndex).sortBy(_._2).map(_._1)
+      LookbackInfo(
+        publishId=publishId,
+        question=question,
+        answers=answerList,
+        answerType=answerType,
+        description=description,
+        relatedUrl=relatedUrl,
+        correctAnswer=correctAnswer,
+        answerCounts=answerCounts
+      )
+    }.single.apply
   }
 
   val createCommand = CommandHandler { command =>
@@ -348,6 +391,13 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     val data = JsArray(getEventQuestions(eventId, userId).map(_.toJson))
     command.json(data)
   }
+
+  val lookbackCommand = CommandHandler { command =>
+    val publishId = command.data.as[Int]
+    val data = getLookback(publishId).map(_.toJson).getOrElse(JsNull)
+    command.json(data)
+  }
+
 }
 
 object RoomManager extends RoomManager(MyRedisService)

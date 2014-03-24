@@ -41,7 +41,7 @@ function Mypage(app, context, users, con) {
 				} else if (clazz == "q-text") {
 					$td.text(rowData.question);
 				} else if (clazz == "q-correct") {
-					if (rowData.answered) {
+					if (rowData.userAnswer) {
 						var icon = rowData.correct ? "fa-circle-o" : "fa-times",
 							$i = $("<i class='fa'></i>");
 						$i.addClass(icon);
@@ -66,9 +66,11 @@ function Mypage(app, context, users, con) {
 		location.href = "/room/" + room.roomId;
 	}
 	function buildEvents(roomInfo, events) {
+		var $tbody = $("#mypage-events tbody");
 		$("#mypage-events-roomName").text(roomInfo.name);
 		$("#mypage-events-total").text(roomInfo.rank ? roomInfo.rank : "-");
-		buildTable($("#mypage-events tbody"), EVENT_COLUMNS, events);
+		buildTable($tbody, EVENT_COLUMNS, events);
+		$tbody.find("tr").click(showQuestions);
 	}
 	function showEvents() {
 		var room = $.data(this, "obj"),
@@ -110,9 +112,13 @@ function Mypage(app, context, users, con) {
 			}
 		})
 	}
+	function buildQuestions(questions) {
+		var $tbody = $("#mypage-questions tbody");
+		buildTable($tbody, QUESTION_COLUMNS, questions);
+		$tbody.find("tr").click(showLookback);
+	}
 	function showQuestions() {
 		var event = $.data(this, "obj");
-console.log(event);
 		con.request({
 			"command" : "getEventQuestions",
 			"data" : {
@@ -125,12 +131,29 @@ console.log(event);
 				
 				questions = data;
 				buildTable($tbody, QUESTION_COLUMNS, data);
+				$tbody.find("tr").click(showLookback);
 				$tab.find(".tab-pane").hide();
 				slideIn($pane, "right");
 			}
 		});
 	}
+	function showLookback() {
+		var q = $.data(this, "obj");
+		con.request({
+			"command" : "getLookback",
+			"data" : q.publishId,
+			"success" : function(data) {
+				data.userAnswer = q.userAnswer;
+				app.showLookback(data);
+			}
+		})
+	}
 	function init($el) {
+		$tab = $el.find(".tab-content").tabs({
+			"beforeActivate" : function() {
+				$tab.find(".tab-pane").hide();
+			}
+		});
 		con.request({
 			"command" : "entriedRooms",
 			"data" : {
@@ -142,11 +165,7 @@ console.log(event);
 				var $tbody = $("#mypage-entries tbody");
 				buildTable($tbody, ENTRY_COLUMNS, data);
 				$tbody.find("tr").click(showEvents);
-				$tab = $el.find(".tab-content").tabs({
-					"beforeActivate" : function() {
-						$tab.find(".tab-pane").hide();
-					}
-				}).show();
+				$tab.show();
 			}
 		});
 		con.request({
@@ -173,9 +192,24 @@ console.log(event);
 			$tab.find(".tab-pane").hide();
 			slideIn($("#mypage-events"), "left");
 		})
+		if (roomInfo && events) {
+			$tab.find(".tab-pane").hide();
+			buildEvents(roomInfo, events);
+			if (questions) {
+				buildQuestions(questions);
+				$("#mypage-questions").show();
+			} else {
+				$("#mypage-events").show();
+			}
+		}
 	}
 	function clear() {
 		$tab = null;
+	}
+	function reset() {
+		roomInfo = null;
+		events = null;
+		questions = null;
 	}
 	var $tab = null,
 		roomInfo = null,
@@ -183,6 +217,7 @@ console.log(event);
 		questions = null;
 	$.extend(this, {
 		"init" : init,
-		"clear" : clear
+		"clear" : clear,
+		"reset" : reset
 	})
 }
