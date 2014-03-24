@@ -44,7 +44,7 @@ ol, ul                  { list-style: none; }
 -----------------------------------------------------------------------------*/
 *                       { margin: 0; padding: 0;
                           -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
-html                    { font-size: 62.5%;
+html                    { height: 100%; font-size: 62.5%;
                           -webkit-tap-highlight-color: rgba(0, 0, 0, 0); }
 body                    { height: 100%; line-height: 1.428571429; font-family: 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','モトヤLシーダ3等幅','Helvetica Neue',Helvetica,Arial,sans-serif; font-size: 14px; color: #333; background-color: #fff; }
 input,
@@ -76,7 +76,7 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { height: auto; }
 header                  { margin-top: 10px; padding: 10px; background: #f5f5f5; }
 
-#content                { width: 100%; height: 100%; }
+#content                { width: 100%; }
 #content-dynamic        { height: 100%; }
 
 #publish-question a     { vertical-align: middle; }
@@ -101,18 +101,24 @@ header                  { margin-top: 10px; padding: 10px; background: #f5f5f5; 
 
 #ranking h3             { margin-bottom: 20px; color: #333; }
 
-#chat                  { height: 100%; min-height: 100%; }
-#chat .form-group      { margin-top: 15px; margin-bottom: 15px; }
-#chat .tweet-box       { min-height: 40px; padding: 10px 10px 15px; border-radius: 5px; background: #f0f0f0; }
-#chat .tweet-box li    { display: block; margin-top: 10px; }
-#chat .tweet-box p     { word-break: break-word; }
-#chat .text            { margin-top: 5px; margin-bottom: 5px; color: #fff; }
-#chat .timestamp       { text-align: right; color: #f5f5f5; font-size: 10px; }
-#chat .input-box       { margin-top: 20px; }
+#chat                   { height: 100%; }
+#chat .heading ul       { display: table; width: 100%; }
+#chat .heading li       { display: table-cell; }
+#chat .form-group       { margin-top: 5px; margin-bottom: 15px; }
+#chat .tweet-box        { overflow-x: hidden; overflow-y: auto; height: auto; padding: 10px 10px 219px; border-radius: 5px; background: #f0f0f0; }
+#chat .tweet-box li     { display: block; margin-top: 10px; }
+#chat .tweet-box p      { word-break: break-word; }
+#chat .text             { margin-top: 5px; margin-bottom: 5px; color: #fff; }
+#chat .timestamp        { text-align: right; color: #f5f5f5; font-size: 10px; }
+#chat .input-box        { position: absolute; bottom: 46px; left: 0; display: block; width: 100%; margin-top: 20px; padding-bottom: 20px; border-top: 1px solid #ccc; background: #e5e5e5; }
+#chat .input-box .container { padding-top: 10px; }
 #chat .align-left .text { color: #333; }
 #chat .align-left .timestamp { color: #aaa; }
+#chat-text-len span     { display: inline-block; padding: 5px; border-radius: 5px; color: #5bc0de; background: #fff; }
 
-.balloon-border         { position: relative; z-index: 0; display: inline-block; width: 70%; margin-top: 15px; padding: 5px 10px 5px; border: 1px solid #5bc0de; border-radius: 5px; background: #5bc0de; }
+
+.contributor img        { margin-right: 5px; }
+.balloon-border         { position: relative; z-index: 0; display: inline-block; min-width: 20%; max-width: 70%; margin-top: 15px; padding: 5px 10px 5px; border: 1px solid #5bc0de; border-radius: 5px; background: #5bc0de; }
 .balloon-border:before  { content: ""; position: absolute; top: -9px; z-index: 1; display: block; width: 0; border: 10px solid transparent; border-top-width: 0; border-bottom-color: #5bc0de; }
 .balloon-border:after   { content: ""; position: absolute; top: -10px; display: block; width: 0; border: 10px solid transparent; border-top-width: 0; border-bottom-color: #5bc0de; }
 .align-right .balloon-border:before,
@@ -122,7 +128,7 @@ header                  { margin-top: 10px; padding: 10px; background: #f5f5f5; 
 .align-left .balloon-border:after { left: 5%; }
 .align-left .balloon-border:before { border-bottom-color: #fff; }
 
-.container              { margin-right: auto; margin-left: auto; padding-right: 10px; padding-left: 10px; }
+.container              { min-height: 100%; margin-right: auto; margin-left: auto; padding-right: 10px; padding-left: 10px; }
 .container:before,
 .container:after        { display: table; content: " "; }
 .container:after        { clear: both; }
@@ -319,7 +325,7 @@ textarea.form-control   { height: auto; }
 
 .tabbar                 { position: fixed; bottom: 0; width: 100%; height: 49px; background: #f5f5f5; border: 1px solid #ccc; }
 .tabbar ul              { display: table; width: 100%; }
-.tabbar li              { display: table-cell; border-left: 1px solid #eee; text-align: center; }
+.tabbar li              { display: table-cell; table-layout: fixed; width: 33.33%; border-left: 1px solid #eee; text-align: center; }
 .tabbar li:first-child  { border-left: none; }
 .tabbar li a            { display: block; width: 100%; height: 100%; }
 .tabbar li p            { font-size: 10px; }
