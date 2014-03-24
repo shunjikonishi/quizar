@@ -2,12 +2,15 @@ package models
 
 import play.api.libs.json._
 import models.entities.QuizUserEvent
+import org.joda.time.{DateTime}
 
 case class UserEventInfo(
   id: Int, 
   userId: Int, 
   eventId: Int, 
   roomId: Int, 
+  title: Option[String],
+  execDate: Option[DateTime],
   correctCount: Int, 
   wrongCount: Int, 
   time: Long, 
@@ -23,17 +26,6 @@ case class UserEventInfo(
 
 object UserEventInfo {
   implicit val format = Json.format[UserEventInfo]
-
-  def create(event: QuizUserEvent) = UserEventInfo(
-    id=event.id,
-    userId=event.userId,
-    eventId=event.eventId,
-    roomId=event.roomId,
-    correctCount=event.correctCount,
-    wrongCount=event.wrongCount,
-    time=event.time,
-    point=event.point
-  )
 
   def fromJson(json: JsValue): UserEventInfo = Json.fromJson[UserEventInfo](json).get
   def fromJson(str: String): UserEventInfo = fromJson(Json.parse(str))

@@ -89,3 +89,18 @@ object QuestionInfo {
   }
   def fromJson(str: String): QuestionInfo = fromJson(Json.parse(str))
 }
+
+case class UserQuestionInfo(
+  questionId: Int,
+  question: String,
+  answered: Boolean,
+  correct: Boolean
+) {
+  def toJson = Json.toJson(this)(UserQuestionInfo.format)
+  override def toString = toJson.toString
+}
+
+object UserQuestionInfo {
+  implicit val format = Json.format[UserQuestionInfo]
+}
+
