@@ -1,4 +1,4 @@
-@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], params: PageParams, twitterUrl: String)(content: Html)(implicit lang: Lang)
+@(userInfo: Option[UserInfo], roomInfo: Option[RoomInfo], params: PageParams, twitterUrl: String)(implicit lang: Lang)
 
 @main(Messages("application.title")) {
 <link rel="stylesheet" media="screen" href="@routes.Assets.at("javascripts/ext/sidr/stylesheets/jquery.sidr.light.css")">
@@ -36,7 +36,6 @@
 	</div>
 	<div id="content">
 		<div id="content-dynamic">
-			@content
 		</div>
 		@roomInfo.map { room =>
 			@views.html.chat(userInfo, twitterUrl)

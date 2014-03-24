@@ -1,5 +1,15 @@
 flect.QuizApp = function(serverParams) {
 	var self = this;
+	function showDynamic(id, noEffect) {
+		var params = $.extend({
+				"name" : id
+			}, TemplateLogic[id]);
+		if (noEffect) {
+			params.effect = "none";
+		}
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
 	function showStatic(id, sidr) {
 		function doShowStatic() {
 			if (!$el.is(":visible")) {
@@ -70,7 +80,11 @@ flect.QuizApp = function(serverParams) {
 				"name" : "edit-question"
 			}, TemplateLogic["edit-question"]);
 			if (direction) {
-				params.direction = direction;
+				if (direction == "none") {
+					params.effect = "none";
+				} else {
+					params.direction = direction;
+				}
 			}
 			$content.children("div").hide();
 			templateManager.show(params);
@@ -226,11 +240,6 @@ flect.QuizApp = function(serverParams) {
 
 			ranking = new Ranking(self, context, users, con);
 		}
-		if ($("#home").length) {
-			con.ready(function() {
-				home.init($("#home"));
-			});
-		}
 		if (context.isRoomAdmin() || context.isPostQuestionAllowed()) {
 			makeQuestion = new MakeQuestion(self, context, con);
 			if (context.isEventRunning()) {
@@ -310,6 +319,21 @@ flect.QuizApp = function(serverParams) {
 			$a.parents(".dropdown-menu").hide();
 			return $a.attr("href") != "#";
 		})
+	}
+	function showInitial() {
+		var path = location.pathname;
+		if (path == "/") {
+			showDynamic("home", true);
+		} else {
+			var array = path.substring(1).split("/");
+			if (array.length == 2 && array[0] == "room") {
+				if (context.isRoomAdmin()) {
+					showQuestionList("none");
+				} else {
+					$("#chat").show();
+				}
+			}
+		}
 	}
 	var context = new Context(serverParams),
 		debug,
@@ -429,5 +453,6 @@ flect.QuizApp = function(serverParams) {
 		"showEffect" : showEffect,
 		"backToMypage" : backToMypage,
 		"tweet" : tweet
-	})
+	});
+	con.ready(showInitial);
 }

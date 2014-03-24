@@ -1,5 +1,5 @@
 @(userInfo: Option[UserInfo], twitterUrl: String)(implicit lang: Lang)
-<div id="chat" class="workspace">
+<div id="chat" class="workspace" style="display:none;">
 	@if(userInfo.isEmpty) {
 		<div>
 			<header class="heading">

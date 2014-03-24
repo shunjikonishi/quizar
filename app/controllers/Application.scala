@@ -35,8 +35,7 @@ object Application extends Controller {
     val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
     val params = PageParams.create(request, sessionInfo)
 
-    Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)
-      (views.html.index(sessionInfo, twitterUrl))).withSession(
+    Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)).withSession(
         "sessionId" -> sessionId
       )
   }
@@ -57,7 +56,7 @@ object Application extends Controller {
       println("userEventId = " + userEventId)
       val params = PageParams.create(request, sessionInfo, userEventId).withRoom(room)
 
-      Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)(Html.empty)).withSession(
+      Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)
