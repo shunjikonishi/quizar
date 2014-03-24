@@ -130,7 +130,8 @@ nav.paging-bar .btn i { color: #5bc0de; font-weight: bold; }
 .container:after        { display: table; content: " "; }
 .container:after        { clear: both; }
 
-.workspace              { height: 100%; margin-bottom: 49px; padding-bottom: 20px; }
+.workspace              { position: relative; height: 100%; margin-bottom: 49px; padding-bottom: 20px; }
+.workspace .back-btn    { position: absolute; top: 0; right: 0; display: inline-block; }
 
 .form-control           { display: block; width: 100%; height: 34px; line-height: 1.428571429; vertical-align: middle; padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; color: #555; font-size: 14px; background-color: #fff; background-image: none;
                           -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -262,6 +263,9 @@ textarea.form-control   { height: auto; }
 
 .notes                  { margin-top: 5px; color: #999; font-size: 12px; }
 
+.pull-left              { margin: 10px 10px 0 0; }
+.ranking-user-name      { padding-top: 10px; }
+
 
 /* Classes
 -----------------------------------------------------------------------------*/
@@ -285,7 +289,6 @@ textarea.form-control   { height: auto; }
 
 .checkbox .btn          { display: inline-block; border: 1px solid #ccc; color: #333; background: #eee; }
 .checkbox input[type="checkbox"] { margin-right: 5px; }
-
 
 .error                  { color: red; }
 .display-none           { display: none; }
@@ -370,6 +373,11 @@ td.q-text,
 td.r-name,
 td.r-winners            { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+#ranking-total-tbl td.r-name:hover,
+#ranking-event-tbl td.r-winners:hover { color: #5bc0de; text-decoration: underline; }
+#ranking-total-tbl td.r-name:hover img,
+#ranking-event-tbl td.r-winners:hover img { opacity:0.9; filter:alpha(opacity=90); }
+
 .input-form label       { display: block; margin-top: 15px; }
 .option-ctrl            { display: inline-block; margin: 15px 0 20px; padding: 5px 10px; border: 1px solid #ccc; cursor: pointer; color: #333; border-radius: 4px; font-size: 16px; background: #eee; }
 .option-ctrl.active     { margin-bottom: 0; border-bottom: none; border-radius: 4px 4px 0 0; }
@@ -378,7 +386,11 @@ td.r-winners            { white-space: nowrap; overflow: hidden; text-overflow: 
 .row-link tr            { cursor: pointer; }
 .entry-event            { display: none; }
 
-tr.q-published th, tr.q-published td { background: #ff497a;}
+tr.q-published th,
+tr.q-published td       { background: #ff497a;}
+
+th.correctCount         { text-align: right; }
+
 /* jQuery UI
 -----------------------------------------------------------------------------*/
 .ui-widget-content,
