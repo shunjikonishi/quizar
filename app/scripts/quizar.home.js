@@ -104,7 +104,11 @@ function Home(con, users, userId) {
 			"success" : function(data) {
 				buildTable($futures, data);
 				bindEvent($futures);
-				$tab = $el.find(".tab-content").tabs().show();
+				$tab = $el.find(".tab-content").tabs({
+					"beforeActivate" : function() {
+						$tab.find(".tab-pane").hide();
+					}
+				}).show();
 			}
 		});
 		if (userId) {

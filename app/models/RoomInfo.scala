@@ -52,3 +52,37 @@ object RoomInfo {
   def fromJson(str: String) = Json.fromJson[RoomInfo](Json.parse(str)).get
 }
 
+case class UserEntriedRoom(
+  roomId: Int,
+  roomName: String,
+  owner: Int,
+  ownerName: String,
+  ownerImage: String,
+  userId: Int,
+  point: Int,
+  correctCount: Int
+) {
+  def toJson = Json.toJson(this)(UserEntriedRoom.format)
+  override def toString = toJson.toString
+}
+
+object UserEntriedRoom {
+  implicit val format = Json.format[UserEntriedRoom]
+}
+
+case class OwnedRoom(
+  roomId: Int,
+  roomName: String,
+  owner: Int,
+  ownerName: String,
+  ownerImage: String,
+  eventCount: Int,
+  questionCount: Int
+) {
+  def toJson = Json.toJson(this)(OwnedRoom.format)
+  override def toString = toJson.toString
+}
+
+object OwnedRoom {
+  implicit val format = Json.format[OwnedRoom]
+}

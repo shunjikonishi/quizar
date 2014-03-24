@@ -15,9 +15,6 @@ import models.entities.QuizPublish
 import models.entities.QuizUserEvent
 import models.entities.QuizQuestion
 import models.entities.QuizUserAnswer
-import models.sqlviews.QuizEventWinner
-import models.sqlviews.QuizRanking
-import models.sqlviews.QuizTotalRanking
 import models.sqlviews.QuizAnswerCount
 import org.joda.time.DateTime
 import flect.websocket.Command
@@ -32,7 +29,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   private var openBySelf = false
 
   implicit val autoSession = QuizEvent.autoSession
-  private val (qe, que, qp, qua, qr, qac) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua, QuizRanking.qr, QuizAnswerCount.qac)
+  private val (qe, que, qp, qua) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua)
 
   private def roundTime(d: DateTime) = {
     val hour = d.getHourOfDay
@@ -217,32 +214,6 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     ))
   }
 
-  def getMemberCount(eventId: Int): Int = {
-    sql"select count(*) from quiz_user_event where event_id = ${eventId}"
-      .map(_.int(1)).single.apply.getOrElse(0)
-  }
-
-  def getPublishedQuestions(eventId: Int): List[Int] = {
-    sql"select question_id from quiz_publish where event_id = ${eventId}"
-      .map(_.int(1)).list.apply
-  }
-
-  def getEventRanking(eventId: Int, limit: Int, offset: Int): List[QuizRanking] = {
-    QuizRanking.findByEventId(eventId, limit, offset)
-  }
-
-  def getEventWinners(roomId: Int): List[QuizEventWinner] = {
-    QuizEventWinner.findByRoomId(roomId)
-  }
-
-  def getTotalRanking(roomId: Int, limit: Int): List[QuizTotalRanking] = {
-    QuizTotalRanking.findByRoomId(roomId, limit)
-  }
-
-  def getUserEvent(roomId: Int, userId: Int): List[UserEventInfo] = {
-    QuizUserEvent.findAllBy(sqls"room_id = ${roomId} AND user_id = ${userId} order by event_id desc")
-      .map(UserEventInfo.create(_))
-  }
 
   private def calcSummary(pq: PublishedQuestion, updateQuestion: Boolean) = {
     if (pq.isCalcRequired || (updateQuestion && pq.isSummaryRequired)) {
@@ -301,7 +272,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
                                   UPDATED = ?
                             WHERE USER_ID = ?
                               AND EVENT_ID = ?"""
-      getEventRanking(eventId, 10, 0).foreach { rank =>
+      RoomManager.getEventRanking(eventId, 10, 0).foreach { rank =>
         if (rank.correctCount > 0) {
           pointSql.bind(rank.correctCount, rank.wrongCount, rank.time, point, now, rank.userId, rank.eventId).update.apply()
           point -= 1
@@ -420,46 +391,6 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     val ret = answer(AnswerInfo.fromJson(command.data))
     broadcast.foreach(_.send(new CommandResponse("answer", ret.toJson)))
     CommandResponse.None
-  }
-
-  val eventRankingCommand = CommandHandler { command =>
-    val eventId = (command.data \ "eventId").as[Int]
-    val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
-    val offset = (command.data \ "offset").asOpt[Int].getOrElse(0)
-    val data = JsArray(getEventRanking(eventId, limit, offset).map(_.toJson))
-    command.json(data)
-  }
-
-  val eventWinnersCommand = CommandHandler { command =>
-    val roomId = (command.data \ "roomId").as[Int]
-    val data = JsArray(getEventWinners(roomId).map(_.toJson))
-    command.json(data)
-  }
-
-  val totalRankingCommand = CommandHandler { command =>
-    val roomId = (command.data \ "roomId").as[Int]
-    val limit = (command.data \ "limit").asOpt[Int].getOrElse(DEFAULT_RANKING_LIMIT)
-    val data = JsArray(getTotalRanking(roomId, limit).map(_.toJson))
-    command.json(data)
-  }
-
-  val userEventCommand = CommandHandler { command =>
-    val roomId = (command.data \ "roomId").as[Int]
-    val userId = (command.data \ "userId").as[Int]
-    val data = JsArray(getUserEvent(roomId, userId).map(_.toJson))
-    command.json(data)
-  }
-
-  val memberCountCommand = CommandHandler { command =>
-    val eventId = command.data.as[Int]
-    val data = JsNumber(getMemberCount(eventId))
-    command.json(data)
-  }
-
-  val publishedQuestionsCommand = CommandHandler { command =>
-    val eventId = command.data.as[Int]
-    val data = JsArray(getPublishedQuestions(eventId).map(JsNumber(_)))
-    command.json(data)
   }
 
   case class PublishedQuestion(

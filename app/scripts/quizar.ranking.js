@@ -7,8 +7,10 @@ function Ranking(app, context, users, con) {
 			"username" : "r-name",
 			"correctCount" : "r-correct"
 		};
-	function buildRank($td, rank) {
-		if (rank <= 3) {
+	function buildRank($td, rank, correctCount) {
+		if (!correctCount) {
+			$td.text("-");
+		} else if (rank <= 3) {
 			$td.html("<span class='badge circle rank-blue'>" + rank + "</span>");
 		} else {
 			$td.text(rank);
@@ -78,7 +80,7 @@ function Ranking(app, context, users, con) {
 			} else if (colName == "title") {
 				$td.text(rowData.title || new DateTime(rowData.execDate).datetimeStr());
 			} else if (colName == "rank") {
-				buildRank($td, rank);
+				buildRank($td, rank, rowData.correctCount);
 			} else if (colName == "time" && rowData.time) {
 				$td.text(roundTime(rowData.time));
 			} else if (rowData[colName]) {
