@@ -98,7 +98,7 @@ nav.paging-bar .btn:disabled i { color: #ccc; }
 nav.paging-bar .btn i   { color: #5bc0de; font-weight: bold; }
 
 #event-detail h3        { margin-top: 15px; }
-#event-detail label     { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dotted #ccc; }
+#event-detail label     { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; }
 #event-detail h3 + label { border-top: none; }
 #event-detail label.btn { display: inline-block; border-top: 1px solid #ccc; }
 
@@ -108,10 +108,11 @@ nav.paging-bar .btn i   { color: #5bc0de; font-weight: bold; }
 
 #chat ul                { display: table; width: 100%; }
 #chat li                { display: table-cell; vertical-align: bottom; }
-#chat .tweet-box        { position: relative; overflow-x: hidden; overflow-y: auto; width: 100%; margin-top: 10px;  padding: 10px; border-radius: 5px; background: #f0f0f0; }
+#chat .tweet-box        { position: relative; overflow-x: hidden; overflow-y: auto; width: 100%; margin-top: 10px;  padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
 #chat .tweet-box li     { display: block; }
 #chat .tweet-box p      { word-break: break-word; }
 #chat .tweet-box .message { font-weight: bold; }
+#chat .contributor      { margin-top: 10px; }
 #chat .form-group       { margin-top: 5px; margin-bottom: 10px; }
 #chat .form-group li:last-child { width: 85px; vertical-align: middle; padding-left: 5px;}
 #chat .text             { margin-top: 5px; margin-bottom: 5px; color: #fff; }
@@ -328,7 +329,7 @@ textarea.form-control   { height: auto; }
 .toolbar-title          { padding-top: 10px; font-size: 18px; font-weight: bold; }
 .toolbar-content div    { display: inline-block; }
 
-.tabbar                 { position: fixed; bottom: 0; width: 100%; height: 49px; background: #f5f5f5; border: 1px solid #ccc; }
+.tabbar                 { position: fixed; bottom: 0; left: 0; width: 100%; height: 49px; background: #f5f5f5; border: 1px solid #ccc; }
 .tabbar ul              { display: table; width: 100%; }
 .tabbar li              { display: table-cell; table-layout: fixed; border-left: 1px solid #eee; text-align: center; }
 .tabbar li:first-child,
