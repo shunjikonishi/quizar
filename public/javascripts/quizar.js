@@ -27,6 +27,7 @@ $(function() {
 			return self;
 		}
 		function request(params) {
+			/*
 			if (!isConnected()) {
 				if (retryCount < MAX_RETRY) {
 					ready(function() {
@@ -36,6 +37,7 @@ $(function() {
 				}
 				return;
 			}
+			*/
 			if (settings.onRequest) {
 				settings.onRequest(params.command, params.data);
 			}
@@ -1173,7 +1175,7 @@ function Chat($el, userId, hashtag, con) {
 		}
 	}
 	function isNotifyTweet() {
-		return $el.is(":hidden") && $("#chat-notify").is(":checked");
+		return $el.is(":hidden") && chatNotify;//ToDo
 	}
 	function member(data) {
 		if (arguments.length == 0) {
@@ -1201,15 +1203,41 @@ function Chat($el, userId, hashtag, con) {
 		$img.attr("src", data.img);
 		$msg.text(data.msg);
 		$ul.append($li)
-		$li.show("slow");
-		cnt++;
+		$li.show("slow", function() {
+			$tweetBox.scrollTop($tweetBox[0].scrollHeight - $tweetBox.height());
+		});
+	}
+	function calcHeight() {
+		if (calced) {
+			return;
+		}
+		calced = true;
+		var wh = $(window).height(),
+			h = 0
+		$el.children("div").each(function() {
+			var $div = $(this),
+				dh = $div.height();
+			if (!$div.hasClass("tweet-box")) {
+				if (dh <= 0) {
+					caleced = false;
+				} else {
+					h += dh;
+				}
+			}
+		});
+		h += $("#toolbar").height();
+		h += $("#tabbar").height();
+		$tweetBox.css("height", wh - h);
 	}
 	var cnt = 0,
 		$text = $("#chat-text"),
 		$twitter = $("#chat-twitter"),
 		$len = $("#chat-text-len"),
-		$ul = $el.find(".tweet-box ul"),
-		$member = $("#room-member");
+		$tweetBox = $el.find(".tweet-box"),
+		$ul = $tweetBox.find("ul"),
+		$member = $("#room-member"),
+		chatNotify = true,
+		calced = false;
 	if (userId) {
 		$("#btn-tweet").click(function() {
 			var msg = $text.val(),
@@ -1242,7 +1270,8 @@ function Chat($el, userId, hashtag, con) {
 		"member" : member,
 		"append" : append,
 		"tweet" : tweet,
-		"isNotifyTweet" : isNotifyTweet
+		"isNotifyTweet" : isNotifyTweet,
+		"calcHeight" : calcHeight
 	})
 }
 
@@ -2817,11 +2846,11 @@ flect.QuizApp = function(serverParams) {
 		$content.children("div").hide();
 		templateManager.show(params);
 	}
-	function showStatic(id, sidr) {
+	function showStatic(id, sidr, func) {
 		function doShowStatic() {
 			if (!$el.is(":visible")) {
 				$content.children("div").hide();
-				$el.show("slide", { "direction" : "right"}, EFFECT_TIME);
+				$el.show("slide", { "direction" : "right"}, EFFECT_TIME, func);
 				pushState.pushStatic(id);
 			}
 		}
@@ -2833,7 +2862,7 @@ flect.QuizApp = function(serverParams) {
 		}
 	}
 	function showChat() {
-		showStatic("chat", false);
+		showStatic("chat", false, chat.calcHeight);
 	}
 	function backToMypage() {
 		var params = {
@@ -2984,7 +3013,7 @@ flect.QuizApp = function(serverParams) {
 			var $chat = $("#chat");
 			chat = new Chat($chat, context.userId, context.hashtag, con);
 			$(".menu-chat").click(function() {
-				showStatic("chat", $(this).parents("#sidr").length > 0);
+				showStatic("chat", $(this).parents("#sidr").length > 0, chat.calcHeight);
 				return false;
 			});
 			$("#toolbar-ranking").click(function() {
@@ -3157,6 +3186,7 @@ flect.QuizApp = function(serverParams) {
 				case "chat":
 					if (initial) {
 						$("#chat").show();
+						chat.calcHeight();
 					} else {
 						showChat();
 					}

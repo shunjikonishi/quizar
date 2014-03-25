@@ -12,11 +12,11 @@ flect.QuizApp = function(serverParams) {
 		$content.children("div").hide();
 		templateManager.show(params);
 	}
-	function showStatic(id, sidr) {
+	function showStatic(id, sidr, func) {
 		function doShowStatic() {
 			if (!$el.is(":visible")) {
 				$content.children("div").hide();
-				$el.show("slide", { "direction" : "right"}, EFFECT_TIME);
+				$el.show("slide", { "direction" : "right"}, EFFECT_TIME, func);
 				pushState.pushStatic(id);
 			}
 		}
@@ -28,7 +28,7 @@ flect.QuizApp = function(serverParams) {
 		}
 	}
 	function showChat() {
-		showStatic("chat", false);
+		showStatic("chat", false, chat.calcHeight);
 	}
 	function backToMypage() {
 		var params = {
@@ -179,7 +179,7 @@ flect.QuizApp = function(serverParams) {
 			var $chat = $("#chat");
 			chat = new Chat($chat, context.userId, context.hashtag, con);
 			$(".menu-chat").click(function() {
-				showStatic("chat", $(this).parents("#sidr").length > 0);
+				showStatic("chat", $(this).parents("#sidr").length > 0, chat.calcHeight);
 				return false;
 			});
 			$("#toolbar-ranking").click(function() {
@@ -352,6 +352,7 @@ flect.QuizApp = function(serverParams) {
 				case "chat":
 					if (initial) {
 						$("#chat").show();
+						chat.calcHeight();
 					} else {
 						showChat();
 					}

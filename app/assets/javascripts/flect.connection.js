@@ -27,6 +27,7 @@ $(function() {
 			return self;
 		}
 		function request(params) {
+			/*
 			if (!isConnected()) {
 				if (retryCount < MAX_RETRY) {
 					ready(function() {
@@ -36,6 +37,7 @@ $(function() {
 				}
 				return;
 			}
+			*/
 			if (settings.onRequest) {
 				settings.onRequest(params.command, params.data);
 			}
