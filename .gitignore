@@ -18,3 +18,5 @@ properties.bat
 env.sh
 node_modules
 bower_components
+.DS_Store
+dump.rdb
