@@ -84,6 +84,9 @@ header                  { margin-top: 10px; padding: 10px; background: #f5f5f5; 
 #publish-q-text         { min-height: 100px; padding: 10px; }
 #publish-q-text span    { float: left; display: none; }
 #publish-q-text span.cur { display: block; }
+#publish-q-detail       { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; }
+
+#make-q-publish         { margin-top: 20px; border-top: 1px dashed #f5f5f5; }
 
 nav.paging-bar ul       { display: table; width: 100%; padding-right: 0; padding-left: 0; border-bottom: none; background: #f5f5f5;}
 nav.paging-bar li       { display: table-cell; padding: 0; }
@@ -99,6 +102,12 @@ nav.paging-bar .btn:disabled { border-color: #ccc; }
 nav.paging-bar .btn:disabled i { color: #ccc; }
 nav.paging-bar .btn i   { color: #5bc0de; font-weight: bold; }
 
+#mypage h3              { margin-top: 10px; }
+#mypage .mypage-totalranking { display: inline-block; margin-top: 10px; padding: 5px 10px; color: #fff; font-weight: bold; background: #333; }
+#mypage-entries td.r-room { color: #5bc0de; }
+
+#event-members .paging-bar  { margin-top: 10px; margin-bottom: 10px; }
+#event-members .paging-bar li { padding-top: 5px; padding-bottom: 5px; }
 #event-detail h3        { margin-top: 15px; }
 #event-detail label     { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc; }
 #event-detail h3 + label { border-top: none; }
@@ -178,7 +187,7 @@ textarea.form-control   { height: auto; }
 .btn.black:active       { top: 2px; box-shadow: 0 -1px 0 rgba(255,255,255,0.1) inset, 0 2px 0 #333; background: #444; }
 .btn:disabled.red                { box-shadow: 0 -1px 0 rgba(255,255,255,0.2) inset, 0 4px 0 #d91448; text-shadow: 0 1px 0 rgba(0,0,0,0.2); border-color: #f8215a; color: #fff; background: #ff497a; }
 .btn:disabled.red:active         { top: 2px; box-shadow: 0 -1px 0 rgba(255,255,255,0.1) inset, 0 2px 0 #ff497a; background: #ff497a; }
-.btn.disabled           { box-shadow: 0 -1px 0 rgba(255,255,255,0.2) inset, 0 4px 0 #999; text-shadow: 0 1px 0 rgba(0,0,0,0.2); border-color: #bfbfbf; color: #999; background: #eee; }
+.btn.disabled           { box-shadow: 0 -1px 0 rgba(255,255,255,0.2) inset, 0 4px 0 #999; border-color: #bfbfbf; color: #999; background: #eee; }
 .btn.disabled:active    { top: 2px; box-shadow: 0 -1px 0 rgba(255,255,255,0.1) inset, 0 2px 0 #c1c1c1; background: #ccc; }
 
 .dropdown               { position: relative; }
@@ -290,10 +299,10 @@ textarea.form-control   { height: auto; }
 .btn-question ul        { display: table; width: 100%; table-layout: fixed; }
 .btn-question li        { display: table-cell; vertical-align: middle; }
 .btn-question li:nth-child(1) { width: 10%; text-align: left; }
-.btn-question li:nth-child(2) { width: auto; text-align: left; word-break: break-all; }
+.btn-question li:nth-child(2) { width: auto; padding-left: 10px; text-align: left; word-break: break-all; }
 .btn-question li:nth-child(3) { width: 15%; margin-right: 15px; text-align: right; }
-.box-button             { padding-top: 15px; border-top: 2px solid #f5f5f5; }
-.buttons                { margin: 0 -10px; padding: 15px 10px; background: #eee; }
+.box-button             { padding-top: 15px; border-top: 1px solid #f5f5f5; }
+.buttons                { margin: 0 -10px; padding: 15px 10px; }
 
 .table                  { width: 100%; table-layout: fixed; }
 .table th,
@@ -302,6 +311,7 @@ textarea.form-control   { height: auto; }
 
 .checkbox .btn          { display: inline-block; border: 1px solid #ccc; color: #333; background: #eee; }
 .checkbox input[type="checkbox"] { margin-right: 5px; }
+.checkbox + button      { margin-top: 10px; }
 
 .error                  { color: red; }
 .display-none           { display: none; }
@@ -368,7 +378,8 @@ th.event-capacity       { width: 20%; }
 th.q-creator            { width: 30% }
 th.q-publish            { width: 20%; }
 td.q-publish            { text-align: right; }
-th.q-answerer           { width: 30%; }
+th.q-answerer           { width: 25%; text-align: center; }
+td.q-answerer           { text-align: center; }
 
 th.r-rank               { width: 15%; }
 td.r-rank               { text-align: center; color: #5bc0de; }
@@ -401,8 +412,10 @@ td.event-title,
 .row-link tr            { cursor: pointer; }
 .entry-event            { display: none; }
 
-tr.q-published th,
-tr.q-published td       { background: #ff497a;}
+tr:nth-child(odd).q-published th,
+tr:nth-child(odd).q-published td { background: #e9e9e9; }
+tr:nth-child(even).q-published th,
+tr:nth-child(even).q-published td { background: #e6e6e6; }
 
 th.correctCount         { text-align: right; }
 
