@@ -80,38 +80,47 @@ header                  { margin-top: 10px; padding: 10px; background: #f5f5f5; 
 
 #publish-question a     { vertical-align: middle; }
 #publish-question .buttons .btn  { min-height: 44px; white-space: inherit; }
-#publish-q-seq           { padding: 5px 10px; color: #fff; font-size: 16px; font-weight: bold; background: #5bc0de; }
-#publish-q-text          { min-height: 100px; padding: 10px; }
-#publish-q-text span     { float: left; display: none; }
+#publish-q-seq          { padding: 5px 10px; color: #fff; font-size: 16px; font-weight: bold; background: #5bc0de; }
+#publish-q-text         { min-height: 100px; padding: 10px; }
+#publish-q-text span    { float: left; display: none; }
 #publish-q-text span.cur { display: block; }
 
-nav.paging-bar ul   { display: table; width: 100%; padding-right: 0; padding-left: 0; border-bottom: none; background: #f5f5f5;}
-nav.paging-bar li   { display: table-cell; padding: 0; }
+nav.paging-bar ul       { display: table; width: 100%; padding-right: 0; padding-left: 0; border-bottom: none; background: #f5f5f5;}
+nav.paging-bar li       { display: table-cell; padding: 0; }
 nav.paging-bar li:first-child { padding-left: 10px; }
 nav.paging-bar li:last-child { padding-right: 10px;}
 nav.paging-bar li:first-child .btn,
 nav.paging-bar li:last-child .btn { background: #fff; }
 nav.paging-bar li:nth-child(2) i { color: #fff; }
-nav.paging-bar .btn { border: 1px solid #5bc0de;  }
+nav.paging-bar .btn     { border: 1px solid #5bc0de;  }
 nav.paging-bar .btn:disabled { border-color: #ccc; }
 nav.paging-bar .btn:disabled i { color: #ccc; }
-nav.paging-bar .btn i { color: #5bc0de; font-weight: bold; }
+nav.paging-bar .btn i   { color: #5bc0de; font-weight: bold; }
+
+#event-detail h3        { margin-top: 15px; }
+#event-detail label     { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dotted #ccc; }
+#event-detail h3 + label { border-top: none; }
+#event-detail label.btn { display: inline-block; border-top: 1px solid #ccc; }
+
 #edit-question-current-none { margin-top: 10px; margin-bottom: 10px; }
 
 #ranking h3             { margin-bottom: 20px; color: #333; }
 
-#chat .heading ul       { display: table; width: 100%; }
-#chat .heading li       { display: table-cell; }
-#chat .form-group       { margin-top: 5px; margin-bottom: 15px; }
-#chat .tweet-box        { position: relative; overflow-x: hidden; overflow-y: auto; width: 100%; padding: 10px; border-radius: 5px; background: #f0f0f0; }
-#chat .tweet-box li     { display: block; margin-top: 10px; }
+#chat ul                { display: table; width: 100%; }
+#chat li                { display: table-cell; vertical-align: bottom; }
+#chat .tweet-box        { position: relative; overflow-x: hidden; overflow-y: auto; width: 100%; margin-top: 10px;  padding: 10px; border-radius: 5px; background: #f0f0f0; }
+#chat .tweet-box li     { display: block; }
 #chat .tweet-box p      { word-break: break-word; }
+#chat .tweet-box .message { font-weight: bold; }
+#chat .form-group       { margin-top: 5px; margin-bottom: 10px; }
+#chat .form-group li:last-child { width: 85px; vertical-align: middle; padding-left: 5px;}
 #chat .text             { margin-top: 5px; margin-bottom: 5px; color: #fff; }
 #chat .timestamp        { text-align: right; color: #f5f5f5; font-size: 10px; }
-#chat .input-box        { position: absolute; bottom: 0; display: block; width: 100%; margin-top: 20px; margin-bottom: 10px; padding: 10px 10px 15px; border-radius: 5px; background: #eee; }
+#chat .input-box        { position: absolute; bottom: 0; right: 0; left: 0; display: block; width: 100%; margin-top: 10px; padding: 5px 10px 0; border-radius: 5px; background: #eee; }
+
 #chat .align-left .text { color: #333; }
 #chat .align-left .timestamp { color: #aaa; }
-#chat-text-len span     { display: inline-block; padding: 5px; border-radius: 5px; color: #5bc0de; background: #fff; }
+#chat-text-len span     { display: inline-block; margin-top: 10px; padding: 5px; border-radius: 5px; color: #5bc0de; background: #fff; }
 
 .contributor img        { margin-right: 5px; }
 .balloon-border         { position: relative; z-index: 0; display: inline-block; min-width: 20%; max-width: 70%; margin-top: 15px; padding: 5px 10px 5px; border: 1px solid #5bc0de; border-radius: 5px; background: #5bc0de; }
