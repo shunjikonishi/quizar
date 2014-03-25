@@ -2762,8 +2762,7 @@ flect.QuizApp = function(serverParams) {
 		}
 	}
 	function showRanking() {
-		$content.children("div").hide();
-		templateManager.show(TemplateLogic["ranking"]);
+		showDynamic("ranking");
 	}
 	function showQuestionList(direction) {
 		if (questionList) {
@@ -3012,17 +3011,63 @@ flect.QuizApp = function(serverParams) {
 		})
 	}
 	function showInitial() {
+		function redirectToDefault() {
+			location.href = "/room/" + context.roomId;
+		}
 		var path = location.pathname;
-		if (path == "/") {
+		if (path == "/" || path == "/home") {
 			showDynamic("home", true);
+		} else if (path == "/makeRoom") {
+			showDynamic("make-room", true);
+		} else if (path == "/help") {
+			showDynamic("help", true);
 		} else {
 			var array = path.substring(1).split("/");
-			if (array.length == 2 && array[0] == "room") {
+			if (array.length == 2) {
 				if (context.isRoomAdmin()) {
-					showQuestionList("none");
+					array.push("questionList");
 				} else {
-					$("#chat").show();
+					array.push("chat");
 				}
+			}
+			switch (array[2]) {
+				case "question":
+					showQuestion();
+					break;
+				case "ranking":
+					showDynamic("ranking", true);
+					break;
+				case "chat":
+					$("#chat").show();
+					break;
+				case "editRoom":
+					if (context.isRoomAdmin()) {
+						showDynamic("edit-room", true);
+					} else {
+						redirectToDefault();
+					}
+					break;
+				case "event":
+					if (context.isRoomAdmin()) {
+						showDynamic("edit-event", true);
+					} else {
+						redirectToDefault();
+					}
+					break;
+				case "questionList":
+					if (context.isRoomAdmin()) {
+						showQuestionList("none");
+					} else {
+						redirectToDefault();
+					}
+					break;
+				case "postQuestion":
+					if (!context.isRoomAdmin() && context.isPostQuestionAllowed()) {
+						showDynamic("post-question", true);
+					} else {
+						redirectToDefault();
+					}
+					break;
 			}
 		}
 	}

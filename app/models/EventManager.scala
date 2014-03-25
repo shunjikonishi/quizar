@@ -28,7 +28,6 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   private var prevPublished: Option[PublishedQuestion] = None
   private var openBySelf = false
 
-  implicit val autoSession = QuizEvent.autoSession
   private val (qe, que, qp, qua) = (QuizEvent.qe, QuizUserEvent.que, QuizPublish.qp, QuizUserAnswer.qua)
 
   private def roundTime(d: DateTime) = {
@@ -43,19 +42,19 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     ret
   }
 
-  def getQuestion(id: Int): Option[QuestionInfo] = {
+  def getQuestion(id: Int): Option[QuestionInfo] = DB.readOnly { implicit session =>
     QuizQuestion.find(id).map(QuestionInfo.create)
   }
 
-  def getEvent(id: Int): Option[EventInfo] = {
+  def getEvent(id: Int): Option[EventInfo] = DB.readOnly { implicit session =>
     QuizEvent.find(id).map(EventInfo.create(_))
   }
 
-  def getUserEventId(userId: Int, eventId: Int): Option[Int] = {
+  def getUserEventId(userId: Int, eventId: Int): Option[Int] = DB.readOnly { implicit session =>
     QuizUserEvent.findAllBy(SQLSyntax.eq(que.userId, userId).and.eq(que.eventId, eventId)).headOption.map(_.id)
   }
 
-  def getCurrentEvent: Option[EventInfo] = {
+  def getCurrentEvent: Option[EventInfo] = DB.readOnly { implicit session =>
     withSQL { 
       select
         .from(QuizEvent as qe)
@@ -65,7 +64,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }.map(QuizEvent(qe.resultName)).list.apply.headOption.map(EventInfo.create(_))
   }
 
-  def create(event: EventInfo)(implicit session: DBSession): EventInfo = {
+  def create(event: EventInfo): EventInfo = DB.localTx { implicit session =>
     val now = new DateTime()
     val entity = QuizEvent.create(
       roomId=event.roomId,
@@ -82,7 +81,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     EventInfo.create(entity)
   }
 
-  def update(event: EventInfo)(implicit session: DBSession): Boolean = {
+  def update(event: EventInfo): Boolean = DB.localTx { implicit session =>
     QuizEvent.find(event.id).map { entity =>
       entity.copy(
         roomId=event.roomId,
@@ -99,67 +98,61 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }.getOrElse(false)
   }
 
-  def open(id: Int, admin: Int): Boolean = {
-    DB localTx { implicit session =>
-      val now = new DateTime()
-      val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, ADMIN = ?, EXEC_DATE = ?, UPDATED = ? " + 
-          "WHERE ID = ? AND STATUS = ?")
-        .bind(EventStatus.Running.code, admin, roundTime(now), now, id, EventStatus.Prepared.code)
-        .update.apply();
-      ret == 1
-    }
+  def open(id: Int, admin: Int): Boolean = DB.localTx { implicit session =>
+    val now = new DateTime()
+    val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, ADMIN = ?, EXEC_DATE = ?, UPDATED = ? " + 
+        "WHERE ID = ? AND STATUS = ?")
+      .bind(EventStatus.Running.code, admin, roundTime(now), now, id, EventStatus.Prepared.code)
+      .update.apply();
+    ret == 1
   }
 
-  def close(id: Int): Boolean = {
-    DB localTx { implicit session =>
-      val now = new DateTime()
-      val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, END_DATE = ?, UPDATED = ? " + 
-          "WHERE ID = ? AND STATUS = ?")
-        .bind(EventStatus.Finished.code, roundTime(now), now, id, EventStatus.Running.code)
-        .update.apply();
-      //ToDo ranking
-      ret == 1
-    }
+  def close(id: Int): Boolean = DB.localTx { implicit session =>
+    val now = new DateTime()
+    val ret = SQL("UPDATE QUIZ_EVENT SET STATUS = ?, END_DATE = ?, UPDATED = ? " + 
+        "WHERE ID = ? AND STATUS = ?")
+      .bind(EventStatus.Finished.code, roundTime(now), now, id, EventStatus.Running.code)
+      .update.apply();
+    //ToDo ranking
+    ret == 1
   }
 
-  def entry(userId: Int, eventId: Int, userpass: Option[String]): Int = {
-    DB localTx { implicit session =>
-      val sameUser = QuizUserEvent.countBy(SQLSyntax.eq(que.userId, userId).and.eq(que.eventId, eventId))
-      if (sameUser == 1) {
-        throw new QuizException(Messages("alreadyEntryEvent"))
-      }
-      val event = QuizEvent.find(eventId).getOrElse(throw new IllegalArgumentException("Event not found: " + eventId))
-      val entryCount = QuizUserEvent.countBy(SQLSyntax.eq(que.eventId, eventId))
-      if (entryCount >= event.capacity) {
-        throw new QuizException(Messages("capacityOver"))
-      }
-      event.passcode match {
-        case Some(x) =>
-          userpass match {
-            case Some(y) =>
-              if (x != y) {
-                throw new InvalidPasscodeException()
-              }
-            case None =>
-              throw new PasscodeRequireException()
-          }
-        case None => //OK
-      }
-      val now = new DateTime()
-      QuizUserEvent.create(
-        userId=userId,
-        eventId=eventId,
-        roomId=roomId,
-        correctCount=0,
-        wrongCount=0,
-        time=0,
-        point=0,
-        created=now,
-        updated=now).id
+  def entry(userId: Int, eventId: Int, userpass: Option[String]): Int = DB.localTx { implicit session =>
+    val sameUser = QuizUserEvent.countBy(SQLSyntax.eq(que.userId, userId).and.eq(que.eventId, eventId))
+    if (sameUser == 1) {
+      throw new QuizException(Messages("alreadyEntryEvent"))
     }
+    val event = QuizEvent.find(eventId).getOrElse(throw new IllegalArgumentException("Event not found: " + eventId))
+    val entryCount = QuizUserEvent.countBy(SQLSyntax.eq(que.eventId, eventId))
+    if (entryCount >= event.capacity) {
+      throw new QuizException(Messages("capacityOver"))
+    }
+    event.passcode match {
+      case Some(x) =>
+        userpass match {
+          case Some(y) =>
+            if (x != y) {
+              throw new InvalidPasscodeException()
+            }
+          case None =>
+            throw new PasscodeRequireException()
+        }
+      case None => //OK
+    }
+    val now = new DateTime()
+    QuizUserEvent.create(
+      userId=userId,
+      eventId=eventId,
+      roomId=roomId,
+      correctCount=0,
+      wrongCount=0,
+      time=0,
+      point=0,
+      created=now,
+      updated=now).id
   }
 
-  def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = {
+  def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = DB.localTx { implicit session =>
     val zipList = q.answerList.zipWithIndex
     val (answers, answersIndex, correctAnswer) = q.answerType match {
       case AnswerType.FirstRow =>
@@ -172,34 +165,32 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
         (q.answerList, zipList.map(_._2 + 1), 0)
     }
     val now = new DateTime()
-    DB.localTx { implicit session =>
-      val entity = QuizPublish.create(
-        eventId=eventId,
-        questionId=q.id,
-        correctAnswer=correctAnswer,
-        answersIndex=answersIndex.mkString(""),
-        includeRanking=includeRanking,
-        created=now,
-        updated=now)
-      SQL("UPDATE QUIZ_QUESTION SET PUBLISH_COUNT = PUBLISH_COUNT + 1, UPDATED = ? " + 
-          "WHERE ID = ?")
-        .bind(now, q.id)
-        .update.apply();
+    val entity = QuizPublish.create(
+      eventId=eventId,
+      questionId=q.id,
+      correctAnswer=correctAnswer,
+      answersIndex=answersIndex.mkString(""),
+      includeRanking=includeRanking,
+      created=now,
+      updated=now)
+    SQL("UPDATE QUIZ_QUESTION SET PUBLISH_COUNT = PUBLISH_COUNT + 1, UPDATED = ? " + 
+        "WHERE ID = ?")
+      .bind(now, q.id)
+      .update.apply();
 
-      val seq = QuizPublish.countBy(SQLSyntax.eq(qp.eventId, eventId))
+    val seq = QuizPublish.countBy(SQLSyntax.eq(qp.eventId, eventId))
 
-      PublishInfo(
-        entity.id,
-        eventId,
-        q.id,
-        seq.toInt,
-        q.question,
-        answers
-      )
-    }
+    PublishInfo(
+      entity.id,
+      eventId,
+      q.id,
+      seq.toInt,
+      q.question,
+      answers
+    )
   }
 
-  def answer(answer: AnswerInfo) = {
+  def answer(answer: AnswerInfo) = DB.localTx { implicit session =>
     val now = new DateTime()
     AnswerInfo.fromEntity(QuizUserAnswer.create(
       userId=answer.userId, 

@@ -31,7 +31,6 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   }
   
   private val (qr, qe) = (QuizRoom.qr, QuizEvent.qe)
-  implicit val autoSession = AutoSession
 
   override protected def createRoom(name: String) = {
     val id = name.substring(5).toInt
@@ -53,7 +52,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }
   }
 
-  def create(room: RoomInfo): RoomInfo = {
+  def create(room: RoomInfo): RoomInfo = DB.localTx { implicit session =>
     val now = new DateTime()
     val entity = QuizRoom.create(
       name=room.name,
@@ -69,7 +68,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     RoomInfo.create(entity)
   }
 
-  def update(room: RoomInfo): Boolean = {
+  def update(room: RoomInfo): Boolean = DB.localTx { implicit session =>
     QuizRoom.find(room.id).map { entity =>
       entity.copy(
         name=room.name,
@@ -84,7 +83,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.getOrElse(false)
   }
 
-  def list(offset: Int, limit: Int, userId: Option[Int]): List[RoomInfo] = {
+  def list(offset: Int, limit: Int, userId: Option[Int]): List[RoomInfo] = DB.readOnly { implicit session =>
     val where = userId.map(n => sqls""" where exists(
       select * from quiz_user_event que
               where que.room_id = qr.id
@@ -104,7 +103,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.list.apply
   }
 
-  def listUserEntriedRooms(userId: Int, offset: Int, limit: Int): List[UserEntriedRoom] = {
+  def listUserEntriedRooms(userId: Int, offset: Int, limit: Int): List[UserEntriedRoom] = DB.readOnly { implicit session =>
     sql"""
       select B.id, B.name as room_name, B.owner, B.updated, 
              C.name as owner_name, C.image_url, A.user_id, 
@@ -130,7 +129,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.list.apply
   }
 
-  def listOwnedRooms(userId: Int, offset: Int, limit: Int): List[OwnedRoom] = {
+  def listOwnedRooms(userId: Int, offset: Int, limit: Int): List[OwnedRoom] = DB.readOnly { implicit session =>
     sql"""
       select A.id, A.name as room_name, A.owner, A.updated, 
              B.name as owner_name, B.image_url, 
@@ -160,29 +159,29 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.list.apply
   }
 
-  def getMemberCount(eventId: Int): Int = {
+  def getMemberCount(eventId: Int): Int = DB.readOnly { implicit session =>
     sql"select count(*) from quiz_user_event where event_id = ${eventId}"
       .map(_.int(1)).single.apply.getOrElse(0)
   }
 
-  def getPublishedQuestions(eventId: Int): List[Int] = {
+  def getPublishedQuestions(eventId: Int): List[Int] = DB.readOnly { implicit session =>
     sql"select question_id from quiz_publish where event_id = ${eventId}"
       .map(_.int(1)).list.apply
   }
 
-  def getEventRanking(eventId: Int, limit: Int, offset: Int): List[QuizRanking] = {
+  def getEventRanking(eventId: Int, limit: Int, offset: Int): List[QuizRanking] = DB.readOnly { implicit session =>
     QuizRanking.findByEventId(eventId, limit, offset)
   }
 
-  def getEventWinners(roomId: Int): List[QuizEventWinner] = {
+  def getEventWinners(roomId: Int): List[QuizEventWinner] = DB.readOnly { implicit session =>
     QuizEventWinner.findByRoomId(roomId)
   }
 
-  def getTotalRanking(roomId: Int, limit: Int): List[QuizTotalRanking] = {
+  def getTotalRanking(roomId: Int, limit: Int): List[QuizTotalRanking] = DB.readOnly { implicit session =>
     QuizTotalRanking.findByRoomId(roomId, limit)
   }
 
-  def getUserTotalRanking(roomId: Int, userId: Int): Option[Int] = {
+  def getUserTotalRanking(roomId: Int, userId: Int): Option[Int] = DB.readOnly { implicit session =>
     val numbers = sql"""
       select sum(point), sum(correct_count), sum(time) from quiz_user_event
        where room_id = ${roomId} and user_id = ${userId}
@@ -202,7 +201,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }
   }
 
-  def getEventQuestions(eventId: Int, userId: Int): List[UserQuestionInfo] = {
+  def getEventQuestions(eventId: Int, userId: Int): List[UserQuestionInfo] = DB.readOnly { implicit session =>
     sql"""
       select A.id, B.question, C.answer,
              case when C.status is null then false
@@ -227,7 +226,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.list.apply
   }
 
-  def getUserEvent(roomId: Int, userId: Int): List[UserEventInfo] = {
+  def getUserEvent(roomId: Int, userId: Int): List[UserEventInfo] = DB.readOnly { implicit session =>
     sql"""
       select A.id, A.user_id, A.event_id, A.room_id, B.title, B.exec_date,
              A.correct_count, A.wrong_count, A.time, A.point
@@ -251,7 +250,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.list.apply
   }
 
-  def getLookback(publishId: Int): Option[LookbackInfo] = {
+  def getLookback(publishId: Int): Option[LookbackInfo] = DB.readOnly { implicit session =>
     sql"""
       select A.id, B.question, B.answers, B.answer_type,
              B.description, B.related_url,

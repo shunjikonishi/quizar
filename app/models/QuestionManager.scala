@@ -15,9 +15,8 @@ import flect.websocket.CommandBroadcast
 class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
 
   private val qq = QuizQuestion.qq
-  implicit val autoSession = AutoSession
   
-  def countAndPublished: (Int, Int) = {
+  def countAndPublished: (Int, Int) = DB.readOnly { implicit session =>
     withSQL {
       select(sqls"""
         count(*),
@@ -30,7 +29,7 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
     }.map(rs => (rs.int(1), rs.int(2))).single.apply().get
   }
 
-  def list(published: Boolean, offset: Int, limit: Int): List[QuestionInfo] = {
+  def list(published: Boolean, offset: Int, limit: Int): List[QuestionInfo] = DB.readOnly { implicit session =>
     val sql = withSQL { 
       val cond = published match {
         case true => SQLSyntax.ne(qq.publishCount, 0)
@@ -45,11 +44,11 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
     sql.map(rs => QuizQuestion(qq.resultName)(rs)).list.apply.map(QuestionInfo.create(_))
   }
 
-  def get(id: Int): Option[QuestionInfo] = {
+  def get(id: Int): Option[QuestionInfo] = DB.readOnly { implicit session =>
     QuizQuestion.find(id).map(QuestionInfo.create)
   }
 
-  def create(q: QuestionInfo): QuestionInfo = {
+  def create(q: QuestionInfo): QuestionInfo = DB.localTx { implicit session =>
     val now = new DateTime()
     val entity = QuizQuestion.create(
       roomId=q.roomId,
@@ -69,7 +68,7 @@ class QuestionManager(roomId: Int, broadcast: CommandBroadcast) {
     QuestionInfo.create(entity)
   }
 
-  def update(q: QuestionInfo): Boolean = {
+  def update(q: QuestionInfo): Boolean = DB.localTx { implicit session =>
     val now = new DateTime()
     QuizQuestion.find(q.id).map { entity =>
       entity.copy(

@@ -4,7 +4,21 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /home                       controllers.Application.index
+GET     /makeRoom                   controllers.Application.index
+GET     /help                       controllers.Application.index
+
+
 GET     /room/:id                   controllers.Application.room(id: Int)
+GET     /room/:id/question          controllers.Application.room(id: Int)
+GET     /room/:id/ranking           controllers.Application.room(id: Int)
+GET     /room/:id/chat              controllers.Application.room(id: Int)
+GET     /room/:id/editRoom          controllers.Application.room(id: Int)
+GET     /room/:id/event             controllers.Application.room(id: Int)
+GET     /room/:id/questionList      controllers.Application.room(id: Int)
+GET     /room/:id/postQuestion      controllers.Application.room(id: Int)
+
+
 GET     /ws                         controllers.Application.ws
 GET     /i18n/setlang               controllers.I18N.setLang(lang)
 GET     /i18n/:lang/messages.js     controllers.I18N.messages(lang)
@@ -18,3 +32,5 @@ GET     /admin/clearAllSessions     controllers.Application.clearAllSessions
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+GET /test controllers.Application.test

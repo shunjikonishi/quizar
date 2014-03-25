@@ -24,6 +24,12 @@ class TemplateManager(session: SessionInfo) extends CommandHandler {
       case "publish-question" => views.html.publishQuestion(session)
       case "passcode" => views.html.passcode(session)
       case "ranking" => views.html.ranking(session)
+      case "help" => 
+        if (lang.language == "ja") {
+          views.html.help_ja(session)
+        } else {
+          views.html.help_en(session)
+        }
       case _ => Html("NotFound")
     }
   }
