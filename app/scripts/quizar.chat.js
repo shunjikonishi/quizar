@@ -65,7 +65,7 @@ function Chat($el, userId, hashtag, con) {
 		});
 		h += $("#toolbar").height();
 		h += $("#tabbar").height();
-		$tweetBox.css("height", wh - h);
+		$tweetBox.css("height", wh - h - 20);
 	}
 	var cnt = 0,
 		$text = $("#chat-text"),
