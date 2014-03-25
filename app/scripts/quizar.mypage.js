@@ -102,7 +102,7 @@ function Mypage(app, context, users, con) {
 			},
 			"success" : function(data) {
 				if (data) {
-					$total.text(data);
+					$total.text(MSG.format(MSG.numberWithRank, data));
 				}
 				roomInfo = {
 					"id" : room.roomId,

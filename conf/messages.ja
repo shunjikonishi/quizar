@@ -104,6 +104,7 @@ ui.makeRoom=ルームの作成
 ui.makeRoomDescForCreate=ルームを作成します。
 ui.makeRoomDescForEdit=ルームを変更します。
 ui.newEntry=イベントにエントリーしました!
+ui.numberWithRank={0}位
 ui.people=人
 ui.post=投稿
 ui.postQuestion=問題の投稿

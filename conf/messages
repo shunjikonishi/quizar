@@ -104,6 +104,7 @@ ui.makeRoom=Make room
 ui.makeRoomDescForCreate=Create room.
 ui.makeRoomDescForEdit=Edit room.
 ui.newEntry=I'm joining this event now!
+ui.numberWithRank={0}.
 ui.people=people
 ui.post=Post
 ui.postQuestion=Post question
