@@ -298,8 +298,8 @@ inputPasscode[ja]=このイベントに参加するためにはパスコード�
 cancel=Cancel
 cancel[ja]=キャンセル
 
-invalidPasscode=The passcode is incorrect.
-invalidPasscode[ja]=パスコードが正しくありません
+ui.invalidPasscode=The passcode is incorrect.
+ui.invalidPasscode[ja]=パスコードが正しくありません
 
 alreadyPublished=This question is already published in this event.
 alreadyPublished[ja]=この問題は既に出題済みです

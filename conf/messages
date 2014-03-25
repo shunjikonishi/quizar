@@ -36,7 +36,6 @@ home=Home
 html.roomMember=<span id="room-member">0</span> people in this room.
 includeToRanking=Include to ranking
 inputPasscode=To entry this event, you must input passcode!
-invalidPasscode=The passcode is incorrect.
 lessFrequentAnswer=Answer the less frequent
 loginRequiredToChat=If you want to chat, you should sign in.
 loginWithTwitter=Sign in with twitter
@@ -97,6 +96,7 @@ ui.editRoom=Edit room
 ui.eventRunning=In session
 ui.failOpenEvent=Could not start this event.
 ui.finish=Finish
+ui.invalidPasscode=The passcode is incorrect.
 ui.invalidQuizChoices=Input multiple rows.(Max 5 rows.)
 ui.invalidTime=Invalid time format
 ui.makeQuestion=Make question

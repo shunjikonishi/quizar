@@ -5,6 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /home                       controllers.Application.index
+GET     /mypage                     controllers.Application.index
 GET     /makeRoom                   controllers.Application.index
 GET     /help                       controllers.Application.index
 

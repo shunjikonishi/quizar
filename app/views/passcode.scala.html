@@ -1,13 +1,18 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="passcode" class="workspace">
-	<div>
-		<p>@Messages("inputPasscode")</p>
-	</div>
-	<div>
-		<input id="event-passcode-user" type="password" maxlength="100" class="form-control">
-	</div>
-	<div>
-		<button id="event-passcode-btn">@Messages("entry")</button>
-		<button id="event-cancel-btn">@Messages("cancel")</button>
+	<div class="input-form">
+		<form>
+			<header class="heading">
+				<p>@Messages("inputPasscode")</p>
+			</header>
+			<div>
+				<label for="event-passcode-user">@Messages("passcode")</label>
+				<input id="event-passcode-user" type="password" maxlength="100" class="form-control">
+			</div>
+		</form>
+		<div class="box-button align-center">
+			<button type="button" id="event-passcode-btn" class="btn blue btn-small">@Messages("entry")</button>
+			<button type="button" id="event-cancel-btn" class="btn gray btn-small">@Messages("cancel")</button>
+		</div>
 	</div>
 </div>

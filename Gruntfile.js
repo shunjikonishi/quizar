@@ -17,6 +17,7 @@ module.exports = function(grunt) {
                     'app/scripts/quizar.const.js' ,
                     'app/scripts/quizar.common.js' ,
                     'app/scripts/quizar.datetime.js', 
+                    'app/scripts/quizar.pushState.js' ,
                     'app/scripts/quizar.pagingBar.js' ,
                     'app/scripts/quizar.effectDialog.js' ,
                     'app/scripts/quizar.context.js' ,

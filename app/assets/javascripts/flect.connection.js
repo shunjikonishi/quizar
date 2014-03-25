@@ -28,10 +28,12 @@ $(function() {
 		}
 		function request(params) {
 			if (!isConnected()) {
-				ready(function() {
-					request(params);
-				});
-				socket = createWebSocket();
+				if (retryCount < MAX_RETRY) {
+					ready(function() {
+						request(params);
+					});
+					socket = createWebSocket();
+				}
 				return;
 			}
 			if (settings.onRequest) {
@@ -179,7 +181,9 @@ $(function() {
 		}
 		function polling(interval, params) {
 			return setInterval(function() {
-				request($.extend(true, {}, params));
+				if (isConnected()) {
+					request($.extend(true, {}, params));
+				}
 			}, interval);
 		}
 		function ready(func) {

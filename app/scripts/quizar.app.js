@@ -1,11 +1,13 @@
 flect.QuizApp = function(serverParams) {
 	var self = this;
-	function showDynamic(id, noEffect) {
+	function showDynamic(id, initial) {
 		var params = $.extend({
 				"name" : id
 			}, TemplateLogic[id]);
-		if (noEffect) {
+		if (initial) {
 			params.effect = "none";
+		} else {
+			pushState.pushDynamic(id);
 		}
 		$content.children("div").hide();
 		templateManager.show(params);
@@ -15,6 +17,7 @@ flect.QuizApp = function(serverParams) {
 			if (!$el.is(":visible")) {
 				$content.children("div").hide();
 				$el.show("slide", { "direction" : "right"}, EFFECT_TIME);
+				pushState.pushStatic(id);
 			}
 		}
 		var $el = $("#" + id);
@@ -68,6 +71,7 @@ flect.QuizApp = function(serverParams) {
 			};
 			$content.children("div").hide();
 			templateManager.show(params);
+			pushState.pushDynamic("publish-question");
 		}
 	}
 	function showRanking() {
@@ -87,6 +91,7 @@ flect.QuizApp = function(serverParams) {
 			}
 			$content.children("div").hide();
 			templateManager.show(params);
+			pushState.pushDynamic("edit-question");
 		}
 	}
 	function showMakeQuestion(q) {
@@ -100,17 +105,16 @@ flect.QuizApp = function(serverParams) {
 				"beforeShow" : makeQuestion.init,
 				"afterHide" : makeQuestion.clear
 			});
+			pushState.pushState({
+				"method" : "function",
+				"func" : function() {
+					showMakeQuestion(q);
+				}
+			})
 		}
 	}
 	function showPasscode() {
-		if (entryEvent) {
-			$content.children("div").hide();
-			templateManager.show({
-				"name" : "passcode",
-				"beforeShow" : entryEvent.init,
-				"afterHide" : entryEvent.clear
-			});
-		}
+		showDynamic("passcode");
 	}
 	function showMessage(msg, time) {
 		messageDialog.show(msg, time);
@@ -135,6 +139,7 @@ flect.QuizApp = function(serverParams) {
 		home = new Home(con, users, context.userId);
 		templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
 		publishQuestion = new PublishQuestion(self, context, con);
+		pushState = new PushState(self, context);
 		$content = $("#content");
 
 		if (context.isDebug()) {
@@ -299,13 +304,9 @@ flect.QuizApp = function(serverParams) {
 			"log" : "user=" + (context.isLogined() ? context.username : "(Anonymous)")
 		})
 		$("#sidr a.dynamic").click(function() {
-			var id = $(this).attr("href").substring(1),
-				params = $.extend({
-					"name" : id
-				}, TemplateLogic[id]);;
+			var id = $(this).attr("href").substring(1);
 			$.sidr("close", function() {
-				$content.children("div").hide();
-				templateManager.show(params);
+				showDynamic(id);
 			});
 			return false;
 		})
@@ -319,17 +320,19 @@ flect.QuizApp = function(serverParams) {
 			return $a.attr("href") != "#";
 		})
 	}
-	function showInitial() {
+	function showInitial(initial) {
 		function redirectToDefault() {
 			location.href = "/room/" + context.roomId;
 		}
 		var path = location.pathname;
 		if (path == "/" || path == "/home") {
-			showDynamic("home", true);
+			showDynamic("home", initial);
+		} else if (path == "/mypage") {
+			showDynamic("mypage", initial);
 		} else if (path == "/makeRoom") {
-			showDynamic("make-room", true);
+			showDynamic("make-room", initial);
 		} else if (path == "/help") {
-			showDynamic("help", true);
+			showDynamic("help", initial);
 		} else {
 			var array = path.substring(1).split("/");
 			if (array.length == 2) {
@@ -341,38 +344,42 @@ flect.QuizApp = function(serverParams) {
 			}
 			switch (array[2]) {
 				case "question":
-					showQuestion();
+					showDynamic("publish-question", initial);
 					break;
 				case "ranking":
-					showDynamic("ranking", true);
+					showDynamic("ranking", initial);
 					break;
 				case "chat":
-					$("#chat").show();
+					if (initial) {
+						$("#chat").show();
+					} else {
+						showChat();
+					}
 					break;
 				case "editRoom":
 					if (context.isRoomAdmin()) {
-						showDynamic("edit-room", true);
+						showDynamic("edit-room", initial);
 					} else {
 						redirectToDefault();
 					}
 					break;
 				case "event":
 					if (context.isRoomAdmin()) {
-						showDynamic("edit-event", true);
+						showDynamic("edit-event", initial);
 					} else {
 						redirectToDefault();
 					}
 					break;
 				case "questionList":
 					if (context.isRoomAdmin()) {
-						showQuestionList("none");
+						showDynamic("edit-question", initial);
 					} else {
 						redirectToDefault();
 					}
 					break;
 				case "postQuestion":
 					if (!context.isRoomAdmin() && context.isPostQuestionAllowed()) {
-						showDynamic("post-question", true);
+						showDynamic("post-question", initial);
 					} else {
 						redirectToDefault();
 					}
@@ -398,6 +405,7 @@ flect.QuizApp = function(serverParams) {
 		publishQuestion,
 		ranking,
 		$content,
+		pushState,
 		users = {};
 	init();
 	debug.log("params", context);
@@ -486,6 +494,15 @@ flect.QuizApp = function(serverParams) {
 			}
 		})
 	}
+	if (entryEvent) {
+		$.extend(TemplateLogic, {
+			"passcode" : {
+				"name" : "passcode",
+				"beforeShow" : entryEvent.init,
+				"afterHide" : entryEvent.clear
+			}
+		});
+	}
 	$.extend(this, {
 		"showQuestionList" : showQuestionList,
 		"showMakeQuestion" : showMakeQuestion,
@@ -496,8 +513,13 @@ flect.QuizApp = function(serverParams) {
 		"showLookback" : showLookback,
 		"showMessage" : showMessage,
 		"showEffect" : showEffect,
+		"showDynamic" : showDynamic,
+		"showStatic" : showStatic,
+		"showInitial" : showInitial,
 		"backToMypage" : backToMypage,
 		"tweet" : tweet
 	});
-	con.ready(showInitial);
+	con.ready(function() {
+		showInitial(true);
+	});
 }

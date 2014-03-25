@@ -36,7 +36,6 @@ home=ホーム
 html.roomMember=<span id="room-member">0</span>人がこの部屋にいます
 includeToRanking=ランキングに含める
 inputPasscode=このイベントに参加するためにはパスコードの入力が必要です。
-invalidPasscode=パスコードが正しくありません
 lessFrequentAnswer=最も少なかった回答
 loginRequiredToChat=チャットに参加するためにはログインする必要があります
 loginWithTwitter=Twitterでログイン
@@ -97,6 +96,7 @@ ui.editRoom=ルームの編集
 ui.eventRunning=開催中
 ui.failOpenEvent=このイベントを開始することができませんでした
 ui.finish=終了
+ui.invalidPasscode=パスコードが正しくありません
 ui.invalidQuizChoices=複数行入力してください(最大5行)
 ui.invalidTime=時刻フォーマットが不正です
 ui.makeQuestion=問題の作成

@@ -48,7 +48,11 @@ function EntryEvent(app, context, con) {
 	function init($el) {
 		$("#event-passcode-btn").click(function() {
 			var passcode = $("#event-passcode-user").val();
-			doEntry(passcode);
+			if (passcode) {
+				doEntry(passcode);
+			} else {
+				app.showMessage(MSG.invalidPasscode);
+			}
 		})
 		$("#event-cancel-btn").click(function() {
 			app.showChat();

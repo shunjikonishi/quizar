@@ -153,7 +153,7 @@ function Mypage(app, context, users, con) {
 			"beforeActivate" : function() {
 				$tab.find(".tab-pane").hide();
 			}
-		});
+		}).show();
 		con.request({
 			"command" : "entriedRooms",
 			"data" : {
@@ -165,7 +165,6 @@ function Mypage(app, context, users, con) {
 				var $tbody = $("#mypage-entries tbody");
 				buildTable($tbody, ENTRY_COLUMNS, data);
 				$tbody.find("tr").click(showEvents);
-				$tab.show();
 			}
 		});
 		con.request({
