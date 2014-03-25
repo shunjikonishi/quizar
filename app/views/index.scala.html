@@ -42,10 +42,22 @@
 			</table>
 		</div>
 		<div id="event-detail" class="tab-pane" style="display:none;">
-			<div class="box-button align-center">
-				<button id="room-detail-back" class="btn gray btn-small">@Messages("back")</button>
-				<button id="room-detail-enter" class="btn blue btn-small">@Messages("enterRoom")</button>
-			</div>
+			<nav class="paging-bar">
+				<ul>
+					<li>
+						<div class="pull-left">
+							<button type="button" class="btn" id="room-detail-back">
+								<i class="fa fa-angle-left fa-lg"></i>
+							</button>
+						</div>
+					</li>
+					<li class="two-btn">
+						<div class="center">
+							<button id="room-detail-enter" class="btn blue btn-small">@Messages("enterRoom")</button>
+						</div>
+					</li>
+				</ul>
+			</nav>
 			<h3 id="room-detail-name"></h3>
 			<div class="checkbox">
 				<label class="btn">
