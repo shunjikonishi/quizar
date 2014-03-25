@@ -1232,7 +1232,7 @@ function Chat($el, userId, hashtag, con) {
 	var cnt = 0,
 		$text = $("#chat-text"),
 		$twitter = $("#chat-twitter"),
-		$len = $("#chat-text-len"),
+		$len = $("#chat-text-len span"),
 		$tweetBox = $el.find(".tweet-box"),
 		$ul = $tweetBox.find("ul"),
 		$member = $("#room-member"),
@@ -1266,6 +1266,7 @@ function Chat($el, userId, hashtag, con) {
 		hashtag = "";
 	}
 	$text.val(hashtag);
+	$text.keyup();
 	$.extend(this, {
 		"member" : member,
 		"append" : append,
