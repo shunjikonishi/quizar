@@ -76,8 +76,7 @@ input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button { height: auto; }
 header                  { margin-top: 10px; padding: 10px; background: #f5f5f5; }
 
-#content                { width: 100%; }
-#content-dynamic        { height: 100%; }
+#content                { width: 100%; height: 100%; position: relative; }
 
 #publish-question a     { vertical-align: middle; }
 #publish-question .buttons .btn  { min-height: 44px; white-space: inherit; }
@@ -101,21 +100,18 @@ nav.paging-bar .btn i { color: #5bc0de; font-weight: bold; }
 
 #ranking h3             { margin-bottom: 20px; color: #333; }
 
-#chat                   { height: 100%; }
 #chat .heading ul       { display: table; width: 100%; }
 #chat .heading li       { display: table-cell; }
 #chat .form-group       { margin-top: 5px; margin-bottom: 15px; }
-#chat .tweet-box        { overflow-x: hidden; overflow-y: auto; height: auto; padding: 10px; border-radius: 5px; background: #f0f0f0; }
+#chat .tweet-box        { position: relative; overflow-x: hidden; overflow-y: auto; width: 100%; padding: 10px; border-radius: 5px; background: #f0f0f0; }
 #chat .tweet-box li     { display: block; margin-top: 10px; }
 #chat .tweet-box p      { word-break: break-word; }
 #chat .text             { margin-top: 5px; margin-bottom: 5px; color: #fff; }
 #chat .timestamp        { text-align: right; color: #f5f5f5; font-size: 10px; }
-#chat .input-box        { position: absolute; bottom: 46px; left: 0; display: block; width: 100%; margin-top: 20px; padding-bottom: 20px; border-top: 1px solid #ccc; background: #e5e5e5; }
-#chat .input-box .container { padding-top: 10px; }
+#chat .input-box        { position: absolute; bottom: 0; display: block; width: 100%; margin-top: 20px; padding: 10px 10px 20px; border-top: 1px solid #ccc; background: #e5e5e5; }
 #chat .align-left .text { color: #333; }
 #chat .align-left .timestamp { color: #aaa; }
 #chat-text-len span     { display: inline-block; padding: 5px; border-radius: 5px; color: #5bc0de; background: #fff; }
-
 
 .contributor img        { margin-right: 5px; }
 .balloon-border         { position: relative; z-index: 0; display: inline-block; min-width: 20%; max-width: 70%; margin-top: 15px; padding: 5px 10px 5px; border: 1px solid #5bc0de; border-radius: 5px; background: #5bc0de; }
@@ -135,9 +131,6 @@ nav.paging-bar .btn i { color: #5bc0de; font-weight: bold; }
 .container:before,
 .container:after        { display: table; content: " "; }
 .container:after        { clear: both; }
-
-.workspace              { position: relative; height: 100%; margin-bottom: 49px; padding-bottom: 20px; }
-.workspace .back-btn    { position: absolute; top: 0; right: 0; display: inline-block; }
 
 .form-control           { display: block; width: 100%; height: 34px; line-height: 1.428571429; vertical-align: middle; padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; color: #555; font-size: 14px; background-color: #fff; background-image: none;
                           -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -310,7 +303,7 @@ textarea.form-control   { height: auto; }
 
 /* Components
 -----------------------------------------------------------------------------*/
-.container              { height: 100%; padding-top: 70px; }
+.container              { position: relative; height: 100%; padding-top: 70px; padding-bottom: 46px; }
 .container i            { margin-left: 5px; }
 .container nav i        { margin-left: 0; }
 .toolbar                { position: fixed; right: 0; left: 0; z-index: 1030; width: 100%; min-height: 50px; margin-bottom: 20px; border: 1px solid #e7e7e7; border-radius: 0; background: #f8f8f8; }
@@ -328,7 +321,9 @@ textarea.form-control   { height: auto; }
 
 .tabbar                 { position: fixed; bottom: 0; width: 100%; height: 49px; background: #f5f5f5; border: 1px solid #ccc; }
 .tabbar ul              { display: table; width: 100%; }
-.tabbar li              { display: table-cell; table-layout: fixed; width: 33.33%; border-left: 1px solid #eee; text-align: center; }
+.tabbar li              { display: table-cell; table-layout: fixed; border-left: 1px solid #eee; text-align: center; }
+.tabbar li:first-child,
+.tabbar li:last-child   { width: 33%; }
 .tabbar li:first-child  { border-left: none; }
 .tabbar li a            { display: block; width: 100%; height: 100%; }
 .tabbar li p            { font-size: 10px; }

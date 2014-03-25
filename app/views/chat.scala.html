@@ -22,28 +22,26 @@
 		<ul></ul>
 	</div>
 	<div class="input-box">
-	    <div class="container">
-    		<form role="form">
-    			@userInfo.map { u =>
-    			    <div class="heading">
-    			        <ul>
-            				<li class="checkbox align-left">
-            					<label class="btn">
-            						<input id="chat-twitter" type="checkbox" checked="checked">
-            						@Messages("postTwitter")
-            					</label>
-            				</li>
-                            <li id="chat-text-len" class="align-right"><span>140</span></li>
-                        </ul>
-    			    </div>
-    				<div class="form-group">
-    					<textarea id="chat-text" class="form-control"></textarea>
-    				</div>
-    				<div class="align-center">
-    					<button id="btn-tweet" type="button" class="btn blue">@Messages("tweet")</button>
-    				</div>
-    			}
-    		</form>
-	    </div>
+		<form role="form">
+			@userInfo.map { u =>
+			    <div class="heading">
+			        <ul>
+        				<li class="checkbox align-left">
+        					<label class="btn">
+        						<input id="chat-twitter" type="checkbox" checked="checked">
+        						@Messages("postTwitter")
+        					</label>
+        				</li>
+                        <li id="chat-text-len" class="align-right"><span>140</span></li>
+                    </ul>
+			    </div>
+				<div class="form-group">
+					<textarea id="chat-text" class="form-control"></textarea>
+				</div>
+				<div class="align-center">
+					<button id="btn-tweet" type="button" class="btn blue">@Messages("tweet")</button>
+				</div>
+			}
+		</form>
 	</div>
 </div>
