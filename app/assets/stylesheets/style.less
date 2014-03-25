@@ -272,8 +272,10 @@ textarea.form-control   { height: auto; }
 
 .notes                  { margin-top: 5px; color: #999; font-size: 12px; }
 
-.rank-user              { margin: 10px 10px 0 0; }
-.rank-user-name         { padding-top: 10px; }
+.rank-user              { margin-right: 15px; }
+.rank-user-name         { margin-bottom: 5px; font-weight: bold; font-size: 16px; }
+.user-area              { padding: 10px; font-size: 12px; background: #eee; }
+.rank-user-point        { margin-right: 5px; color: #111; font-size: 16px; }
 
 
 /* Classes
@@ -358,9 +360,9 @@ td.chat-img             { width: 28px; }
 td.chat-left            { margin-left: 10px; text-align: left; }
 td.chat-right           { margin-right: 10px; text-align: right; }
 #chat-text-len          { font-style: italic; }
-th.event-date           { width: 30%; }
+th.event-date           { width: 25%; }
 th.event-title          { width: auto; }
-th.event-capacity       { width: 15%; }
+th.event-capacity       { width: 20%; }
 th.q-creator            { width: 30% }
 th.q-publish            { width: 20%; }
 td.q-publish            { text-align: right; }
@@ -370,13 +372,14 @@ th.r-rank               { width: 15%; }
 td.r-rank               { text-align: center; color: #5bc0de; }
 th.r-name               { width: auto; }
 th.r-correct,
-td.r-correct            { width: 20%; text-align: right; }
+td.r-correct            { width: 15%; text-align: right; }
 th.r-time,
 td.r-time               { width: 20%; text-align: right; }
 th.r-datetime           { width: 30%; }
 th.r-winners            { width: auto; }
 th.r-point,
 td.r-point              { width: 25%; text-align: right; }
+th.r-title              { width: 25%; }
 
 td.q-creator,
 td.q-answerer,
@@ -384,8 +387,9 @@ td.q-text,
 td.r-name,
 td.r-winners            { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+td.event-title,
 #ranking-total-tbl td.r-name,
-#ranking-event-tbl td.r-winners { color: #5bc0de; text-decoration: underline; }
+#ranking-event-tbl td.r-winners { color: #5bc0de; }
 
 .input-form label       { display: block; margin-top: 15px; }
 .option-ctrl            { display: inline-block; margin: 15px 0 20px; padding: 5px 10px; border: 1px solid #ccc; cursor: pointer; color: #333; border-radius: 4px; font-size: 16px; background: #eee; }
@@ -399,6 +403,7 @@ tr.q-published th,
 tr.q-published td       { background: #ff497a;}
 
 th.correctCount         { text-align: right; }
+
 
 /* jQuery UI
 -----------------------------------------------------------------------------*/
