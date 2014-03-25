@@ -26,13 +26,13 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       }
       room.commandOut(i)
 
-      val qm = QuestionManager(roomId, room)
+      val qm = room.questionManager
       addHandler("listQuestion", qm.listCommand)
       addHandler("countQuestion", qm.countCommand)
       addHandler("updateQuestion", qm.updateCommand)
       addHandler("createQuestion", qm.createCommand)
 
-      val em = EventManager(roomId, room)
+      val em = room.eventManager
       addHandler("createEvent", em.createCommand)
       addHandler("updateEvent", em.updateCommand)
       addHandler("getEvent", em.getCommand)
@@ -42,11 +42,6 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       addHandler("closeEvent", em.closeCommand)
       addHandler("publishQuestion", em.publishCommand)
       addHandler("answer", em.answerCommand)
-      addHandler("getEventRanking", em.eventRankingCommand)
-      addHandler("getEventWinners", em.eventWinnersCommand)
-      addHandler("getTotalRanking", em.totalRankingCommand)
-      addHandler("getUserEvent", em.userEventCommand)
-      addHandler("getPublishedQuestions", em.publishedQuestionsCommand)
 
       addHandler("member", room.memberCommand)
       room.incMember
@@ -86,7 +81,18 @@ println("filterRedisMessage: " + res.name)
     addHandler("makeRoom", RoomManager.createCommand)
     addHandler("updateRoom", RoomManager.updateCommand)
     addHandler("listRoom", RoomManager.listCommand)
+    addHandler("entriedRooms", RoomManager.entriedRoomsCommand)
+    addHandler("ownedRooms", RoomManager.ownedRoomsCommand)
     addHandler("getRoom", RoomManager.getCommand)
+    addHandler("getEventRanking", RoomManager.eventRankingCommand)
+    addHandler("getEventWinners", RoomManager.eventWinnersCommand)
+    addHandler("getTotalRanking", RoomManager.totalRankingCommand)
+    addHandler("getUserTotalRanking", RoomManager.userTotalRankingCommand)
+    addHandler("getUserEvent", RoomManager.userEventCommand)
+    addHandler("getPublishedQuestions", RoomManager.publishedQuestionsCommand)
+    addHandler("getEventQuestions", RoomManager.eventQuestionsCommand)
+    addHandler("getMemberCount", RoomManager.memberCountCommand)
+    addHandler("getLookback", RoomManager.lookbackCommand)
     addHandler("getUser", UserManager.getCommand)
     addHandler("tweet") { c =>
       room.foreach { room =>

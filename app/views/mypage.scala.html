@@ -1,0 +1,86 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="mypage" class="workspace">
+	<div class="tab-content" style="display:none;">
+		<ul class="clear-fix">
+			<li><a href="#mypage-entries">@Messages("entriedRooms")</a></li>
+			<li><a href="#mypage-owners">@Messages("yourRooms")</a></li>
+		</ul>
+		<div id="mypage-entries" class="tab-pane">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="r-room">@Messages("title")</th>
+						<th class="r-point">@Messages("point")</th>
+						<th class="r-correct">@Messages("correctCount")</th>
+					</tr>
+				</thead>
+				<tbody class="row-link">
+				</tbody>
+			</table>
+		</div>
+		<div id="mypage-owners" class="tab-pane">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="r-room">@Messages("title")</th>
+						<th class="r-event">@Messages("eventCount")</th>
+						<th class="r-question">@Messages("questionCount")</th>
+					</tr>
+				</thead>
+				<tbody class="row-link">
+				</tbody>
+			</table>
+		</div>
+		<div id="mypage-events" class="tab-pane" style="display:none;">
+			<div class="back-btn">
+				<button id="mypage-events-back" class="btn gray btn-small">@Messages("back")</button>
+			</div>
+			<h3 id="mypage-events-roomName"></h3>
+			<p>@Messages("totalRanking"): <span id="mypage-events-total">-</span></p>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="r-title">@Messages("title")</th>
+						<th class="r-point">@Messages("point")</th>
+						<th class="r-correct">@Messages("correctCount")</th>
+					</tr>
+				</thead>
+				<tbody class="row-link">
+				</tbody>
+			</table>
+		</div>
+		<div id="mypage-events" class="tab-pane" style="display:none;">
+			<div class="back-btn">
+				<button id="mypage-events-back" class="btn gray btn-small">@Messages("back")</button>
+			</div>
+			<h3 id="mypage-events-roomName"></h3>
+			<p>@Messages("totalRanking"): <span id="mypage-events-total">-</span></p>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="r-title">@Messages("title")</th>
+						<th class="r-point">@Messages("point")</th>
+						<th class="r-correct">@Messages("correctCount")</th>
+					</tr>
+				</thead>
+				<tbody class="row-link">
+				</tbody>
+			</table>
+		</div>
+		<div id="mypage-questions" class="tab-pane" style="display:none;">
+			<div class="back-btn">
+				<button id="mypage-questions-back" class="btn gray btn-small">@Messages("back")</button>
+			</div>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th class="q-question">@Messages("questions")</th>
+						<th class="q-correct">@Messages("answer")</th>
+					</tr>
+				</thead>
+				<tbody class="row-link">
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

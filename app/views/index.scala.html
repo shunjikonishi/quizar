@@ -7,12 +7,6 @@
 					<i class="fa fa-twitter fa-2x"></i>
 					@Messages("loginWithTwitter")
 				</a>
-@*
-				<button class="btn btn-facebook" style="margin-left:10px;">
-					<i class="fa fa-facebook fa-2x"></i>
-					Facebookでログイン
-				</button>
-*@
 			</div>
 		}
 	</div>
@@ -21,7 +15,7 @@
 			<li><a href="#event-future">@Messages("upcoming")</a></li>
 			<li><a href="#event-yours">@Messages("yourEvents")</a></li>
 		</ul>
-		<div id="event-future">
+		<div id="event-future" class="tab-pane">
 			<table class="table table-hover">
 				<thead>
 					<tr>
@@ -34,7 +28,7 @@
 				</tbody>
 			</table>
 		</div>
-		<div id="event-yours">
+		<div id="event-yours" class="tab-pane">
 			<table class="table table-hover">
 				<thead>
 					<tr>
@@ -46,6 +40,34 @@
 				<tbody>
 				</tbody>
 			</table>
+		</div>
+		<div id="event-detail" class="tab-pane" style="display:none;">
+			<div class="box-button align-center">
+				<button id="room-detail-back" class="btn gray btn-small">@Messages("back")</button>
+				<button id="room-detail-enter" class="btn blue btn-small">@Messages("enterRoom")</button>
+			</div>
+			<h3 id="room-detail-name"></h3>
+			<div class="checkbox">
+				<label class="btn">
+					<input id="room-detail-userQuiz" type="checkbox" disabled="disabled"/>
+					@Messages("allowUserQuestion")
+				</label>
+			</div>
+			<div>
+				<label>@Messages("description")</label>
+				<textarea id="room-detail-description" rows="5" class="form-control" disabled="disabled"></textarea>
+			</div>
+			<div id="room-detail-event">
+				<h3>@Messages("nextEventInformation")</h3>
+				<label>@Messages("title")</label>
+				<p id="room-detail-title"></p>
+				<label>@Messages("scheduledDate")</label>
+				<p id="room-detail-date"></p>
+				<label>@Messages("capacity")</label>
+				<p id="room-detail-capacity"></p>
+				<label>@Messages("description")</label>
+				<textarea id="room-detail-description2" rows="5" class="form-control" disabled="disabled"></textarea>
+			</div>
 		</div>
 	</div>
 </div>

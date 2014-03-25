@@ -44,3 +44,6 @@ function optionControl($ctrl, $panel) {
 function roundTime(t) {
 	return Math.round(t / 10) / 100;
 }
+function slideIn($el, direction) {
+	$el.show("slide", {"direction" : direction}, EFFECT_TIME);
+}

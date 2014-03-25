@@ -20,6 +20,7 @@ import models.QuizRoomEngine
 import models.TemplateManager
 import models.PageParams
 import flect.websocket.CommandInvoker
+import flect.websocket.CommandResponse
 
 import java.util.UUID
 
@@ -34,8 +35,7 @@ object Application extends Controller {
     val twitterUrl = sessionInfo.user.map(_ => "#").getOrElse(TwitterManager.authorizationUrl)
     val params = PageParams.create(request, sessionInfo)
 
-    Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)
-      (views.html.index(sessionInfo, twitterUrl))).withSession(
+    Ok(views.html.frame(sessionInfo.user, None, params, twitterUrl)).withSession(
         "sessionId" -> sessionId
       )
   }
@@ -56,7 +56,7 @@ object Application extends Controller {
       println("userEventId = " + userEventId)
       val params = PageParams.create(request, sessionInfo, userEventId).withRoom(room)
 
-      Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)(Html.empty)).withSession(
+      Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)).withSession(
         "sessionId" -> sessionId
       )
     }.getOrElse(NotFound)
@@ -67,7 +67,11 @@ object Application extends Controller {
     val sm = SessionManager
     val handler = session.get("sessionId").map { sessionId =>
       new QuizRoomEngine(sm.get(sessionId))
-    }.getOrElse(new CommandInvoker())
+    }.getOrElse(new CommandInvoker() {
+      addHandler("noop") { command =>
+        new CommandResponse("redirect", "/")
+      }
+    })
     (handler.in, handler.out)
   }
 

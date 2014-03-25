@@ -20,7 +20,7 @@ function PublishQuestion(app, context, con) {
 		$btn.removeClass("white blue disabled").addClass("red");
 		$btn.find("li:first").empty().append("<i class='fa fa-times fa-2x'></i>")
 	}
-	function showAnswerCounts() {
+	function showAnswerCounts(answerCounts) {
 		if ($buttons) {
 			for (var i=0; i<BUTTON_COUNT; i++) {
 				var idx = "" + (i+1),
@@ -56,7 +56,7 @@ function PublishQuestion(app, context, con) {
 				"time" : time
 			}
 		});
-		showAnswerCounts();
+		showAnswerCounts(answerCounts);
 	}
 	function receiveAnswer(answer) {
 		var idx = "" + answer.answer,
@@ -66,7 +66,7 @@ function PublishQuestion(app, context, con) {
 			setButtonCount(idx, current);
 		}
 	}
-	function getCorrectAnswerButtons() {
+	function getCorrectAnswerButtons(answerDetail, answerCounts) {
 		function minCount() {
 			var ret = -1;
 			for (var name in answerCounts) {
@@ -89,7 +89,9 @@ function PublishQuestion(app, context, con) {
 		}
 		switch (answerDetail.answerType) {
 			case AnswerType.FirstRow:
-				var text = answerDetail.answers.split("\n")[0];
+				var text = $.isArray(answerDetail.answers) ?
+					answerDetail.answers[0] : 
+					answerDetail.answers.split("\n")[0];
 				for (var i=0; i<$buttons.length; i++) {
 					var $btn = $($buttons[i]);
 					if ($btn.find(".answer").text() == text) {
@@ -105,7 +107,7 @@ function PublishQuestion(app, context, con) {
 				} else {
 					var ret = [];
 					$buttons.each(function() {
-						if ($(this).find(".answer-cnt count").text() == cnt) {
+						if ($(this).find(".answer-cnt .count").text() == cnt) {
 							ret.push(this);
 						}
 					})
@@ -117,7 +119,7 @@ function PublishQuestion(app, context, con) {
 		}
 		throw "IllegalState: " + answerDetail.answerType;
 	}
-	function buildAnswerDetail(effect) {
+	function buildAnswerDetail(answerDetail, answerCounts, effect) {
 		function isCorrect($ab, $cbs) {
 			var ret = false,
 				id = $ab.attr("id");
@@ -131,7 +133,7 @@ function PublishQuestion(app, context, con) {
 		if (!$buttons) {
 			return;
 		}
-		var $correctBtns = getCorrectAnswerButtons();
+		var $correctBtns = getCorrectAnswerButtons(answerDetail, answerCounts);
 		if ($correctBtns) {
 			if ($answerBtn) {
 				var correct = isCorrect($answerBtn, $correctBtns);
@@ -165,7 +167,7 @@ function PublishQuestion(app, context, con) {
 	function receiveAnswerDetail(data) {
 		answerDetail = data;
 		if (showAnswerDetail) {
-			buildAnswerDetail(true);
+			buildAnswerDetail(answerDetail, answerCounts, true);
 		}
 	}
 	function progress() {
@@ -185,10 +187,10 @@ function PublishQuestion(app, context, con) {
 				setTimeout(doProgress, interval);
 			} else {
 				applyDisabled($buttons);
-				showAnswerCounts();
+				showAnswerCounts(answerCounts);
 				showAnswerDetail = true;
 				if (answerDetail) {
-					buildAnswerDetail(true);
+					buildAnswerDetail(answerDetail, answerCounts, true);
 				}
 			}
 		}
@@ -232,48 +234,70 @@ function PublishQuestion(app, context, con) {
 	function init($el) {
 		var $seq = $("#publish-q-seq");
 		$text = $("#publish-q-text");
-		$("#publish-q-none").hide();
 		$buttons = $el.find(".btn-question").hide();
-		if (question) {
-			$seq.text(MSG.format(MSG.questionSeq, question.seq));
-			for (var i=0; i<question.answers.length; i++) {
+		if (lookback) {
+			$seq.hide();
+			$("#publish-q-progress").hide();
+			$("#publish-q-ranking").hide();
+			$el.find(".publish-q-animation").hide();
+			$("#publish-q-back").show();
+			$("#publish-q-back-btn").click(function() {
+				app.backToMypage();
+			})
+			for (var i=0; i<lookback.answers.length; i++) {
 				var $btn = $("#answer-" + (i+1)).show();
 				$btn.find(".answer-seq").text((i+1) + ".");
-				$btn.find(".answer").text(question.answers[i]);
+				$btn.find(".answer").text(lookback.answers[i]);
 			}
-			$text.text(question.question);
-		}
-
-		if (answerDetail) {
-			$(".publish-q-animation").css({
-				"animation-name" : "",
-				"-webkit-animation-name" : ""
-			});
-			showAnswerCounts();
+			if (lookback.userAnswer) {
+				$answerBtn = $("#answer-" + lookback.userAnswer);
+			}
+			showAnswerCounts(lookback.answerCounts);
 			applyDisabled($buttons);
-			buildAnswerDetail(false);
-		} else if (question) {
-			$(".publish-q-animation").css({
-				"animation-name" : "inout",
-				"-webkit-animation-name" : "inout"
-			});
-			if (context.isEventAdmin()) {
-				showAnswerCounts();
-			} else if (context.userEventId) {
-				$buttons.click(answer);
-			} else {
-				applyDisabled($buttons);
-			}
+			buildAnswerDetail(lookback, lookback.answerCounts, false);
+			$text.text(lookback.question);
 		} else {
-			$("#publish-q-default").hide();
-			$("#publish-q-none").show();
+			if (question) {
+				$seq.text(MSG.format(MSG.questionSeq, question.seq));
+				for (var i=0; i<question.answers.length; i++) {
+					var $btn = $("#answer-" + (i+1)).show();
+					$btn.find(".answer-seq").text((i+1) + ".");
+					$btn.find(".answer").text(question.answers[i]);
+				}
+				$text.text(question.question);
+			}
+
+			if (answerDetail) {
+				$el.find(".publish-q-animation").css({
+					"animation-name" : "",
+					"-webkit-animation-name" : ""
+				});
+				showAnswerCounts(answerCounts);
+				applyDisabled($buttons);
+				buildAnswerDetail(answerDetail, answerCounts, false);
+			} else if (question) {
+				$el.find(".publish-q-animation").css({
+					"animation-name" : "inout",
+					"-webkit-animation-name" : "inout"
+				});
+				if (context.isEventAdmin()) {
+					showAnswerCounts(answerCounts);
+				} else if (context.userEventId) {
+					$buttons.click(answer);
+				} else {
+					applyDisabled($buttons);
+				}
+			} else {
+				$("#publish-q-default").hide();
+				$("#publish-q-none").show();
+			}
+			$("#publish-q-ranking").click(function() {
+				app.showRanking();
+			});
 		}
-		$("#publish-q-ranking").click(function() {
-			app.showRanking();
-		});
 	}
 	function afterShow() {
-		if (!answerDetail) {
+		if (!answerDetail && !lookback) {
 			startTime = new Date().getTime();
 			progress();
 		}
@@ -290,6 +314,10 @@ function PublishQuestion(app, context, con) {
 		answered = false;
 		startTime = 0;
 		showAnswerDetail = false;
+		lookback = null;
+	}
+	function setLookback(qa) {
+		lookback = qa;
 	}
 	var question = null,
 		answerCounts = {},
@@ -297,6 +325,7 @@ function PublishQuestion(app, context, con) {
 		answered = false,
 		startTime = 0,
 		showAnswerDetail = false,
+		lookback = null,
 		$buttons = null,
 		$answerBtn = null,
 		$text = null;
@@ -307,6 +336,7 @@ function PublishQuestion(app, context, con) {
 		"clear" : clear,
 		"receiveAnswer" : receiveAnswer,
 		"receiveAnswerDetail" : receiveAnswerDetail,
-		"setQuestion" : setQuestion
+		"setQuestion" : setQuestion,
+		"setLookback" : setLookback
 	})
 }

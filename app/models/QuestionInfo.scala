@@ -89,3 +89,35 @@ object QuestionInfo {
   }
   def fromJson(str: String): QuestionInfo = fromJson(Json.parse(str))
 }
+
+case class UserQuestionInfo(
+  publishId: Int,
+  question: String,
+  userAnswer: Option[Int],
+  correct: Boolean
+) {
+  def toJson = Json.toJson(this)(UserQuestionInfo.format)
+  override def toString = toJson.toString
+}
+
+object UserQuestionInfo {
+  implicit val format = Json.format[UserQuestionInfo]
+}
+
+case class LookbackInfo(
+  publishId: Int,
+  question: String,
+  answers: List[String],
+  answerType: AnswerType,
+  description: Option[String],
+  relatedUrl: Option[String],
+  correctAnswer: Int,
+  answerCounts: Map[String, Int]
+) {
+  def toJson = Json.toJson(this)(LookbackInfo.format)
+  override def toString = toJson.toString
+}
+
+object LookbackInfo {
+  implicit val format = Json.format[LookbackInfo]
+}

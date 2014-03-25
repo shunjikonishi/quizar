@@ -40,9 +40,9 @@ object QuizRanking extends SQLSyntaxSupport[QuizRanking] {
 
   override val autoSession = AutoSession
 
-  def findByEventId(eventId: Int, limit: Int)(implicit session: DBSession = autoSession): List[QuizRanking] = {
+  def findByEventId(eventId: Int, limit: Int, offset: Int = 0)(implicit session: DBSession = autoSession): List[QuizRanking] = {
     withSQL { 
-      select.from(QuizRanking as qr).where.eq(qr.eventId, eventId).orderBy(sqls"correct_count desc, time asc").limit(limit)
+      select.from(QuizRanking as qr).where.eq(qr.eventId, eventId).orderBy(sqls"correct_count desc, time asc").limit(limit).offset(offset)
     }.map(create(qr.resultName)).list.apply()
   }
    

@@ -1,5 +1,15 @@
 flect.QuizApp = function(serverParams) {
 	var self = this;
+	function showDynamic(id, noEffect) {
+		var params = $.extend({
+				"name" : id
+			}, TemplateLogic[id]);
+		if (noEffect) {
+			params.effect = "none";
+		}
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
 	function showStatic(id, sidr) {
 		function doShowStatic() {
 			if (!$el.is(":visible")) {
@@ -16,6 +26,31 @@ flect.QuizApp = function(serverParams) {
 	}
 	function showChat() {
 		showStatic("chat", false);
+	}
+	function backToMypage() {
+		var params = {
+			"name" : "mypage",
+			"direction" : "left",
+			"beforeShow" : mypage.init,
+			"afterHide" : mypage.clear
+		};
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
+	function showLookback(qa) {
+		var params = {
+			"name" : "publish-question",
+			"beforeShow" : function($el) {
+				publishQuestion.setLookback(qa);
+				publishQuestion.init($el);
+			},
+			"afterHide" : function() {
+				publishQuestion.clear();
+				publishQuestion.setLookback(null);
+			}
+		};
+		$content.children("div").hide();
+		templateManager.show(params);
 	}
 	function showQuestion(data) {
 		if (publishQuestion) {
@@ -45,7 +80,11 @@ flect.QuizApp = function(serverParams) {
 				"name" : "edit-question"
 			}, TemplateLogic["edit-question"]);
 			if (direction) {
-				params.direction = direction;
+				if (direction == "none") {
+					params.effect = "none";
+				} else {
+					params.direction = direction;
+				}
 			}
 			$content.children("div").hide();
 			templateManager.show(params);
@@ -94,9 +133,9 @@ flect.QuizApp = function(serverParams) {
 		messageDialog = new flect.MessageDialog($("#msg-dialog"));
 		effectDialog = new EffectDialog($("#effect-dialog"));
 		con = new flect.Connection(context.uri, debug);
-		home = new Home(con, users);
-		makeRoom = new MakeRoom(app, context.userId, con);
+		home = new Home(con, users, context.userId);
 		templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
+		publishQuestion = new PublishQuestion(self, context, con);
 		$content = $("#content");
 
 		if (context.isDebug()) {
@@ -119,12 +158,17 @@ flect.QuizApp = function(serverParams) {
 				alert(data);
 			});
 		}
+		con.addEventListener("redirect", function(data) {
+			location.href = data;
+		})
 		if (context.isLogined()) {
 			users[context.userId] = new User({
 				"id" : context.userId,
 				"name" : context.username,
 				"imageUrl" : context.userImage
 			});
+			mypage = new Mypage(self, context, users, con);
+			makeRoom = new MakeRoom(app, context.userId, con);
 		}
 
 		if (context.isInRoom()) {
@@ -188,7 +232,6 @@ flect.QuizApp = function(serverParams) {
 				}
 			});
 
-			publishQuestion = new PublishQuestion(self, context, con);
 			con.addEventListener("question", function(data) {
 				showQuestion(data);
 			});
@@ -196,11 +239,6 @@ flect.QuizApp = function(serverParams) {
 			con.addEventListener("answerDetail", publishQuestion.receiveAnswerDetail);
 
 			ranking = new Ranking(self, context, users, con);
-		}
-		if ($("#home").length) {
-			con.ready(function() {
-				home.init($("#home"));
-			});
 		}
 		if (context.isRoomAdmin() || context.isPostQuestionAllowed()) {
 			makeQuestion = new MakeQuestion(self, context, con);
@@ -230,6 +268,7 @@ flect.QuizApp = function(serverParams) {
 					});
 				}
 			});
+			eventMembers = new EventMembers(self, context, con);
 		}
 		if (context.canEntryEvent()) {
 			entryEvent = new EntryEvent(self, context, con);
@@ -281,15 +320,32 @@ flect.QuizApp = function(serverParams) {
 			return $a.attr("href") != "#";
 		})
 	}
+	function showInitial() {
+		var path = location.pathname;
+		if (path == "/") {
+			showDynamic("home", true);
+		} else {
+			var array = path.substring(1).split("/");
+			if (array.length == 2 && array[0] == "room") {
+				if (context.isRoomAdmin()) {
+					showQuestionList("none");
+				} else {
+					$("#chat").show();
+				}
+			}
+		}
+	}
 	var context = new Context(serverParams),
 		debug,
 		messageDialog,
 		effectDialog,
 		con,
 		home,
+		mypage,
 		makeQuestion,
 		makeRoom,
 		editEvent,
+		eventMembers,
 		entryEvent,
 		templateManager,
 		chat,
@@ -300,29 +356,44 @@ flect.QuizApp = function(serverParams) {
 		users = {};
 	init();
 	debug.log("params", context);
-console.log("eventAdmin: " + context.eventAdmin);
 	var TemplateLogic = {
 		"home" : {
 			"beforeShow" : home.init,
 			"afterHide" : home.clear
-		},
-		"make-room" : {
-			"beforeShow" : function($el) {
-				makeRoom.clear();
-				makeRoom.init($el);
-			},
-			"afterHide" : makeRoom.clear
-		},
-		"edit-room" : {
-			"name" : "make-room",
-			"beforeShow" : function($el) {
-				makeRoom.clear();
-				makeRoom.edit(context.roomId);
-				makeRoom.init($el)
-			},
-			"afterHide" : makeRoom.clear
 		}
-	};
+	}
+	if (context.isLogined()) {
+		$.extend(TemplateLogic, {
+			"mypage" : {
+				"beforeShow" : function($el) {
+					mypage.reset();
+					mypage.init($el);
+				},
+				"afterHide" : mypage.clear
+			},
+			"make-room" : {
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.init($el);
+				},
+				"afterHide" : makeRoom.clear
+			},
+			"publish-question" : {
+				"name" : "publish-question",
+				"beforeShow" : publishQuestion.init,
+				"afterHide" : publishQuestion.clear
+			},
+			"edit-room" : {
+				"name" : "make-room",
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.edit(context.roomId);
+					makeRoom.init($el)
+				},
+				"afterHide" : makeRoom.clear
+			}
+		});
+	}
 	if (context.isRoomAdmin()) {
 		$.extend(TemplateLogic, {
 			"edit-question" : {
@@ -332,8 +403,23 @@ console.log("eventAdmin: " + context.eventAdmin);
 		})
 		$.extend(TemplateLogic, {
 			"edit-event" : {
-				"beforeShow" : editEvent.init,
-				"afterHide" : editEvent.clear
+				"beforeShow" : function($el) {
+					if (context.isEventRunning()) {
+						eventMembers.init($el);
+					} else {
+						editEvent.init($el);
+					}
+				},
+				"name" : function() {
+					return context.isEventRunning() ? "event-members" : "edit-event";
+				},
+				"afterHide" : function() {
+					if (context.isEventRunning()) {
+						eventMembers.clear();
+					} else {
+						editEvent.clear();
+					}
+				}
 			}
 		})
 	} else if (context.isPostQuestionAllowed()) {
@@ -347,11 +433,6 @@ console.log("eventAdmin: " + context.eventAdmin);
 	}
 	if (context.isInRoom()) {
 		$.extend(TemplateLogic, {
-			"publish-question" : {
-				"name" : "publish-question",
-				"beforeShow" : publishQuestion.init,
-				"afterHide" : publishQuestion.clear
-			},
 			"ranking" : {
 				"name" : "ranking",
 				"beforeShow" : ranking.init,
@@ -367,8 +448,11 @@ console.log("eventAdmin: " + context.eventAdmin);
 		"showChat" : showChat,
 		"showRanking" : showRanking,
 		"showQuestion" : showQuestion,
+		"showLookback" : showLookback,
 		"showMessage" : showMessage,
 		"showEffect" : showEffect,
+		"backToMypage" : backToMypage,
 		"tweet" : tweet
-	})
+	});
+	con.ready(showInitial);
 }

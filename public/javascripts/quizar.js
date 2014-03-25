@@ -262,10 +262,14 @@ $(function() {
 					"name" : params
 				}
 			}
-			var template = storage.getItem("template." + params.name);
+			var name = params.name;
+			if (typeof(name) === "function") {
+				name = name();
+			}
+			var template = storage.getItem("template." + name);
 			if (!template) {
-				loadTemplate(params.name, function(data) {
-					storage.setItem("template." + params.name, data);
+				loadTemplate(name, function(data) {
+					storage.setItem("template." + name, data);
 					showTemplate(data, params);
 				});
 			} else {
@@ -490,6 +494,9 @@ function optionControl($ctrl, $panel) {
 function roundTime(t) {
 	return Math.round(t / 10) / 100;
 }
+function slideIn($el, direction) {
+	$el.show("slide", {"direction" : direction}, EFFECT_TIME);
+}
 
 function DateTime() {
 	function dateStr() {
@@ -538,6 +545,70 @@ function DateTime() {
 	})
 }
 
+function PagingBar($el, count, func, rowSize) {
+	function prev() {
+		if (offset > 0) {
+			offset -= rowSize;
+			func(offset, rowSize, false);
+			buttonControl();
+		}
+	}
+	function next() {
+		if (offset + rowSize < count) {
+			offset += rowSize;
+			func(offset, rowSize, true);
+			buttonControl();
+		}
+	}
+	function buttonControl() {
+		enableInput($btnPrev, offset > 0);
+		enableInput($btnNext, offset + rowSize < count);
+	}
+	function recordCount() {
+		if (arguments.length == 0) {
+			return count;
+		} else {
+			count = arguments[0];
+			return this;
+		}
+	}
+	function swipeParams() {
+		return {
+			"swipeLeft": function(e) {
+				next();
+				e.stopImmediatePropagation();
+			},
+			"swipeRight": function(e) {
+				prev();
+				e.stopImmediatePropagation();
+			},
+			"tap": function (event, target) {
+				if (SUPPORTS_TOUCH) {
+					$(target).click();
+				}
+			}
+		};
+	}
+	function release() {
+		$btnPrev = null;
+		$btnNext = null;
+	}
+	var offset = 0,
+		$btnPrev = $el.find(".paging-bar-left"),
+		$btnNext = $el.find(".paging-bar-right");
+	rowSize = rowSize || 10;
+	$btnPrev.click(prev);
+	$btnNext.click(next);
+	buttonControl();
+
+	$.extend(this, {
+		"prev" : prev,
+		"next" : next,
+		"recordCount" : recordCount,
+		"swipeParams" : swipeParams,
+		"release" : release
+	})
+}
 function EffectDialog($el) {
 	function show(msg, second) {
 		if (!second) {
@@ -613,12 +684,47 @@ function User(hash) {
 	clearHash(hash);
 }
 
-function Home(con, users) {
+function Home(con, users, userId) {
+	function enterRoom() {
+		var id = $(this).attr("data-id");
+		if (id) {
+			location.href = "/room/" + id;
+		}
+	}
+	function backToList() {
+		var idx = $tab.tabs("option", "active"),
+			$el = idx == 0 ? $("#event-future") : $("#event-yours");
+		$("#event-detail").hide();
+		slideIn($el, "left");
+	}
+	function showRoomInfo(room) {
+		$("#room-detail-enter").attr("data-id", room.id);
+		$("#room-detail-name").text(room.name);
+		if (room.userQuiz) {
+			$("#room-detail-userQuiz").attr("checked", "checked");
+		}
+		$("#room-detail-description").val(room.description || "");
+		if (room.event) {
+			$("#room-detail-event").show();
+			$("#room-detail-title").text(room.event.title || "-");
+			$("#room-detail-date").text(
+				room.event.exceDate ? 
+					new DateTime(room.event.execDate).datetimeStr() : 
+					"-"
+			);
+			$("#room-detail-capacity").text(room.event.capacity);
+			$("#room-detail-description2").val(room.event.description || "");
+		} else {
+			$("#room-detail-event").hide();
+		}
+		$tab.find(".tab-pane").hide();
+		slideIn($("#event-detail"), "right");
+	}
 	function bindEvent($el) {
 		$el.find("tbody tr").click(function() {
-			var id = $(this).attr("data-room");
-			if (id) {
-				location.href = "/room/" + id;
+			var room = $.data(this, "room");
+			if (room) {
+				showRoomInfo(room);
 			}
 		});
 	}
@@ -668,6 +774,7 @@ function Home(con, users) {
 					}
 				})
 			}
+			$.data($tr[0], "room", room);
 			$tbody.append($tr);
 		}
 	}
@@ -683,15 +790,261 @@ function Home(con, users) {
 			"success" : function(data) {
 				buildTable($futures, data);
 				bindEvent($futures);
-				$el.find(".tab-content").tabs().show();
+				$tab = $el.find(".tab-content").tabs({
+					"beforeActivate" : function() {
+						$tab.find(".tab-pane").hide();
+					}
+				}).show();
 			}
-		})
+		});
+		if (userId) {
+			con.request({
+				"command" : "listRoom",
+				"data" : {
+					"limit" : 10,
+					"offset" : 0,
+					"userId" : userId
+				},
+				"success" : function(data) {
+					buildTable($yours, data);
+					bindEvent($yours);
+				}
+			})
+		}
+		$("#room-detail-enter").click(enterRoom);
+		$("#room-detail-back").click(backToList);
 	}
 	function clear() {
+		$tab = null;
 	}
+	var $tab = null;
 	$.extend(this, {
 		"init" : init,
 		"clear" : clear
+	})
+}
+
+function Mypage(app, context, users, con) {
+	var ENTRY_COLUMNS = ["r-room", "r-point", "r-correct"],
+		OWNER_COLUMNS = ["r-room", "r-event", "r-question"],
+		EVENT_COLUMNS = ["r-title", "r-point", "r-correct"],
+		QUESTION_COLUMNS = ["q-text", "q-correct"];
+
+	function buildRank($td, rank, correctCount) {
+		if (!correctCount) {
+			$td.text("-");
+		} else if (rank <= 3) {
+			$td.html("<span class='badge circle rank-blue'>" + rank + "</span>");
+		} else {
+			$td.text(rank);
+		}
+		$td.attr("data-sortAs", rank);
+	}
+	function buildTable($tbody, columns, data) {
+		$tbody.empty();
+		for (var i=0; i<data.length; i++) {
+			var rowData = data[i],
+				$tr = $("<tr></tr>");
+			for (var j=0; j<columns.length; j++) {
+				var clazz = columns[j],
+					$td = $("<td></td>");
+				$td.addClass(clazz);
+				if (clazz == "r-room") {
+					var $img = $("<img/>");
+					$img.attr("src", rowData.ownerImage);
+					$td.append($img);
+					$td.append(rowData.roomName);
+				} else if (clazz == "r-title") {
+					$td.text(rowData.title || new DateTime(rowData.execDate).datetimeStr());
+				} else if (clazz == "r-point") {
+					$td.text(rowData.point);
+				} else if (clazz == "r-correct") {
+					$td.text(rowData.correctCount);
+				} else if (clazz == "r-event") {
+					$td.text(rowData.eventCount);
+				} else if (clazz == "r-question") {
+					$td.text(rowData.questionCount);
+				} else if (clazz == "q-text") {
+					$td.text(rowData.question);
+				} else if (clazz == "q-correct") {
+					if (rowData.userAnswer) {
+						var icon = rowData.correct ? "fa-circle-o" : "fa-times",
+							$i = $("<i class='fa'></i>");
+						$i.addClass(icon);
+						$td.append($i);
+					}
+				}
+				if (!users[rowData.owner]) {
+					users[rowData.owner] = new User({
+						"id" : rowData.owner,
+						"name" : rowData.ownerName,
+						"imageUrl" : rowData.ownerImage
+					});
+				}
+				$tr.append($td);
+			}
+			$tbody.append($tr);
+			$.data($tr[0], "obj", rowData);
+		}
+	}
+	function enterRoom() {
+		var room = $.data(this, "obj");
+		location.href = "/room/" + room.roomId;
+	}
+	function buildEvents(roomInfo, events) {
+		var $tbody = $("#mypage-events tbody");
+		$("#mypage-events-roomName").text(roomInfo.name);
+		$("#mypage-events-total").text(roomInfo.rank ? roomInfo.rank : "-");
+		buildTable($tbody, EVENT_COLUMNS, events);
+		$tbody.find("tr").click(showQuestions);
+	}
+	function showEvents() {
+		var room = $.data(this, "obj"),
+			$total = $("#mypage-events-total");
+		$total.text("-");
+		con.request({
+			"command" : "getUserEvent",
+			"data" : {
+				"roomId" : room.roomId,
+				"userId" : context.userId
+			},
+			"success" : function(data) {
+				var $pane = $("#mypage-events"),
+					$tbody = $pane.find("tbody");
+				
+				events = data;
+				$("#mypage-events-roomName").text(room.roomName);
+				buildTable($tbody, EVENT_COLUMNS, data);
+				$tab.find(".tab-pane").hide();
+				$tbody.find("tr").click(showQuestions);
+				slideIn($pane, "right");
+			}
+		});
+		con.request({
+			"command" : "getUserTotalRanking",
+			"data" : {
+				"roomId" : room.roomId,
+				"userId" : context.userId
+			},
+			"success" : function(data) {
+				if (data) {
+					$total.text(data);
+				}
+				roomInfo = {
+					"id" : room.roomId,
+					"name" : room.roomName,
+					"rank" : data
+				}
+			}
+		})
+	}
+	function buildQuestions(questions) {
+		var $tbody = $("#mypage-questions tbody");
+		buildTable($tbody, QUESTION_COLUMNS, questions);
+		$tbody.find("tr").click(showLookback);
+	}
+	function showQuestions() {
+		var event = $.data(this, "obj");
+		con.request({
+			"command" : "getEventQuestions",
+			"data" : {
+				"eventId" : event.eventId,
+				"userId" : context.userId
+			},
+			"success" : function(data) {
+				var $pane = $("#mypage-questions"),
+					$tbody = $pane.find("tbody");
+				
+				questions = data;
+				buildTable($tbody, QUESTION_COLUMNS, data);
+				$tbody.find("tr").click(showLookback);
+				$tab.find(".tab-pane").hide();
+				slideIn($pane, "right");
+			}
+		});
+	}
+	function showLookback() {
+		var q = $.data(this, "obj");
+		con.request({
+			"command" : "getLookback",
+			"data" : q.publishId,
+			"success" : function(data) {
+				data.userAnswer = q.userAnswer;
+				app.showLookback(data);
+			}
+		})
+	}
+	function init($el) {
+		$tab = $el.find(".tab-content").tabs({
+			"beforeActivate" : function() {
+				$tab.find(".tab-pane").hide();
+			}
+		});
+		con.request({
+			"command" : "entriedRooms",
+			"data" : {
+				"limit" : 100,
+				"offset" : 0,
+				"userId" : context.userId
+			},
+			"success" : function(data) {
+				var $tbody = $("#mypage-entries tbody");
+				buildTable($tbody, ENTRY_COLUMNS, data);
+				$tbody.find("tr").click(showEvents);
+				$tab.show();
+			}
+		});
+		con.request({
+			"command" : "ownedRooms",
+			"data" : {
+				"limit" : 100,
+				"offset" : 0,
+				"userId" : context.userId
+			},
+			"success" : function(data) {
+				var $tbody = $("#mypage-owners tbody");
+				buildTable($tbody, OWNER_COLUMNS, data);
+				$tbody.find("tr").click(enterRoom);
+			}
+		});
+		$("#mypage-events-back").click(function() {
+			roomInfo = null;
+			events = null;
+			$tab.find(".tab-pane").hide();
+			slideIn($("#mypage-entries"), "left");
+		})
+		$("#mypage-questions-back").click(function() {
+			questions = null;
+			$tab.find(".tab-pane").hide();
+			slideIn($("#mypage-events"), "left");
+		})
+		if (roomInfo && events) {
+			$tab.find(".tab-pane").hide();
+			buildEvents(roomInfo, events);
+			if (questions) {
+				buildQuestions(questions);
+				$("#mypage-questions").show();
+			} else {
+				$("#mypage-events").show();
+			}
+		}
+	}
+	function clear() {
+		$tab = null;
+	}
+	function reset() {
+		roomInfo = null;
+		events = null;
+		questions = null;
+	}
+	var $tab = null,
+		roomInfo = null,
+		events = null,
+		questions = null;
+	$.extend(this, {
+		"init" : init,
+		"clear" : clear,
+		"reset" : reset
 	})
 }
 
@@ -1359,7 +1712,7 @@ function PublishQuestion(app, context, con) {
 		$btn.removeClass("white blue disabled").addClass("red");
 		$btn.find("li:first").empty().append("<i class='fa fa-times fa-2x'></i>")
 	}
-	function showAnswerCounts() {
+	function showAnswerCounts(answerCounts) {
 		if ($buttons) {
 			for (var i=0; i<BUTTON_COUNT; i++) {
 				var idx = "" + (i+1),
@@ -1395,7 +1748,7 @@ function PublishQuestion(app, context, con) {
 				"time" : time
 			}
 		});
-		showAnswerCounts();
+		showAnswerCounts(answerCounts);
 	}
 	function receiveAnswer(answer) {
 		var idx = "" + answer.answer,
@@ -1405,7 +1758,7 @@ function PublishQuestion(app, context, con) {
 			setButtonCount(idx, current);
 		}
 	}
-	function getCorrectAnswerButtons() {
+	function getCorrectAnswerButtons(answerDetail, answerCounts) {
 		function minCount() {
 			var ret = -1;
 			for (var name in answerCounts) {
@@ -1428,7 +1781,9 @@ function PublishQuestion(app, context, con) {
 		}
 		switch (answerDetail.answerType) {
 			case AnswerType.FirstRow:
-				var text = answerDetail.answers.split("\n")[0];
+				var text = $.isArray(answerDetail.answers) ?
+					answerDetail.answers[0] : 
+					answerDetail.answers.split("\n")[0];
 				for (var i=0; i<$buttons.length; i++) {
 					var $btn = $($buttons[i]);
 					if ($btn.find(".answer").text() == text) {
@@ -1444,7 +1799,7 @@ function PublishQuestion(app, context, con) {
 				} else {
 					var ret = [];
 					$buttons.each(function() {
-						if ($(this).find(".answer-cnt count").text() == cnt) {
+						if ($(this).find(".answer-cnt .count").text() == cnt) {
 							ret.push(this);
 						}
 					})
@@ -1456,7 +1811,7 @@ function PublishQuestion(app, context, con) {
 		}
 		throw "IllegalState: " + answerDetail.answerType;
 	}
-	function buildAnswerDetail(effect) {
+	function buildAnswerDetail(answerDetail, answerCounts, effect) {
 		function isCorrect($ab, $cbs) {
 			var ret = false,
 				id = $ab.attr("id");
@@ -1470,7 +1825,7 @@ function PublishQuestion(app, context, con) {
 		if (!$buttons) {
 			return;
 		}
-		var $correctBtns = getCorrectAnswerButtons();
+		var $correctBtns = getCorrectAnswerButtons(answerDetail, answerCounts);
 		if ($correctBtns) {
 			if ($answerBtn) {
 				var correct = isCorrect($answerBtn, $correctBtns);
@@ -1504,7 +1859,7 @@ function PublishQuestion(app, context, con) {
 	function receiveAnswerDetail(data) {
 		answerDetail = data;
 		if (showAnswerDetail) {
-			buildAnswerDetail(true);
+			buildAnswerDetail(answerDetail, answerCounts, true);
 		}
 	}
 	function progress() {
@@ -1524,10 +1879,10 @@ function PublishQuestion(app, context, con) {
 				setTimeout(doProgress, interval);
 			} else {
 				applyDisabled($buttons);
-				showAnswerCounts();
+				showAnswerCounts(answerCounts);
 				showAnswerDetail = true;
 				if (answerDetail) {
-					buildAnswerDetail(true);
+					buildAnswerDetail(answerDetail, answerCounts, true);
 				}
 			}
 		}
@@ -1571,48 +1926,70 @@ function PublishQuestion(app, context, con) {
 	function init($el) {
 		var $seq = $("#publish-q-seq");
 		$text = $("#publish-q-text");
-		$("#publish-q-none").hide();
 		$buttons = $el.find(".btn-question").hide();
-		if (question) {
-			$seq.text(MSG.format(MSG.questionSeq, question.seq));
-			for (var i=0; i<question.answers.length; i++) {
+		if (lookback) {
+			$seq.hide();
+			$("#publish-q-progress").hide();
+			$("#publish-q-ranking").hide();
+			$el.find(".publish-q-animation").hide();
+			$("#publish-q-back").show();
+			$("#publish-q-back-btn").click(function() {
+				app.backToMypage();
+			})
+			for (var i=0; i<lookback.answers.length; i++) {
 				var $btn = $("#answer-" + (i+1)).show();
 				$btn.find(".answer-seq").text((i+1) + ".");
-				$btn.find(".answer").text(question.answers[i]);
+				$btn.find(".answer").text(lookback.answers[i]);
 			}
-			$text.text(question.question);
-		}
-
-		if (answerDetail) {
-			$(".publish-q-animation").css({
-				"animation-name" : "",
-				"-webkit-animation-name" : ""
-			});
-			showAnswerCounts();
+			if (lookback.userAnswer) {
+				$answerBtn = $("#answer-" + lookback.userAnswer);
+			}
+			showAnswerCounts(lookback.answerCounts);
 			applyDisabled($buttons);
-			buildAnswerDetail(false);
-		} else if (question) {
-			$(".publish-q-animation").css({
-				"animation-name" : "inout",
-				"-webkit-animation-name" : "inout"
-			});
-			if (context.isEventAdmin()) {
-				showAnswerCounts();
-			} else if (context.userEventId) {
-				$buttons.click(answer);
-			} else {
-				applyDisabled($buttons);
-			}
+			buildAnswerDetail(lookback, lookback.answerCounts, false);
+			$text.text(lookback.question);
 		} else {
-			$("#publish-q-default").hide();
-			$("#publish-q-none").show();
+			if (question) {
+				$seq.text(MSG.format(MSG.questionSeq, question.seq));
+				for (var i=0; i<question.answers.length; i++) {
+					var $btn = $("#answer-" + (i+1)).show();
+					$btn.find(".answer-seq").text((i+1) + ".");
+					$btn.find(".answer").text(question.answers[i]);
+				}
+				$text.text(question.question);
+			}
+
+			if (answerDetail) {
+				$el.find(".publish-q-animation").css({
+					"animation-name" : "",
+					"-webkit-animation-name" : ""
+				});
+				showAnswerCounts(answerCounts);
+				applyDisabled($buttons);
+				buildAnswerDetail(answerDetail, answerCounts, false);
+			} else if (question) {
+				$el.find(".publish-q-animation").css({
+					"animation-name" : "inout",
+					"-webkit-animation-name" : "inout"
+				});
+				if (context.isEventAdmin()) {
+					showAnswerCounts(answerCounts);
+				} else if (context.userEventId) {
+					$buttons.click(answer);
+				} else {
+					applyDisabled($buttons);
+				}
+			} else {
+				$("#publish-q-default").hide();
+				$("#publish-q-none").show();
+			}
+			$("#publish-q-ranking").click(function() {
+				app.showRanking();
+			});
 		}
-		$("#publish-q-ranking").click(function() {
-			app.showRanking();
-		});
 	}
 	function afterShow() {
-		if (!answerDetail) {
+		if (!answerDetail && !lookback) {
 			startTime = new Date().getTime();
 			progress();
 		}
@@ -1629,6 +2006,10 @@ function PublishQuestion(app, context, con) {
 		answered = false;
 		startTime = 0;
 		showAnswerDetail = false;
+		lookback = null;
+	}
+	function setLookback(qa) {
+		lookback = qa;
 	}
 	var question = null,
 		answerCounts = {},
@@ -1636,6 +2017,7 @@ function PublishQuestion(app, context, con) {
 		answered = false,
 		startTime = 0,
 		showAnswerDetail = false,
+		lookback = null,
 		$buttons = null,
 		$answerBtn = null,
 		$text = null;
@@ -1646,7 +2028,8 @@ function PublishQuestion(app, context, con) {
 		"clear" : clear,
 		"receiveAnswer" : receiveAnswer,
 		"receiveAnswerDetail" : receiveAnswerDetail,
-		"setQuestion" : setQuestion
+		"setQuestion" : setQuestion,
+		"setLookback" : setLookback
 	})
 }
 
@@ -1738,9 +2121,6 @@ function EditEvent(app, context, con) {
 				$("#event-date").val(d.dateStr());
 				$("#event-time").val(d.timeStr());
 			}
-			$toggleBtn.text(data.status == EventStatus.Prepared ? MSG.start : MSG.finish);;
-		} else {
-			$toggleBtn.text(MSG.start);;
 		}
 	}
 	function collectData() {
@@ -1794,7 +2174,6 @@ function EditEvent(app, context, con) {
 				},
 				"success" : function(data) {
 					if (data) {
-						$toggleBtn.text(MSG.finish);
 						app.showQuestionList();
 					} else {
 						app.showMessage(MSG.failOpenEvent);
@@ -1803,25 +2182,9 @@ function EditEvent(app, context, con) {
 			})
 		}
 	}
-	function closeEvent() {
-		if (!context.isEventRunning()) {
-			return;
-		}
-		con.request({
-			"command" : "closeEvent",
-			"data" : context.eventId,
-			"success" : function(data) {
-				if (data) {
-					clearField();
-					$toggleBtn.text(MSG.start);
-				}
-			}
-		})
-	}
 	function updateEvent(start) {
 		if (validator && validator.form()) {
 			var data = collectData();
-console.log("updateEvent: " + JSON.stringify(data));
 			if (data.id) {
 				con.request({
 					"command" : "updateEvent",
@@ -1875,14 +2238,7 @@ console.log("updateEvent: " + JSON.stringify(data));
 			"focusInvalid" : true
 		});
 		optionControl($el);
-		$toggleBtn = $("#event-toggle-btn").click(function() {
-console.log("toggleBtn: " + context.eventStatus);
-			if (context.eventStatus == EventStatus.Prepared) {
-				openEvent();
-			} else if (context.eventStatus == EventStatus.Running) {
-				closeEvent();
-			}
-		})
+		$("#event-start-btn").click(openEvent);
 		$("#event-update-btn").click(function() {
 			updateEvent(false);
 		});
@@ -1894,17 +2250,96 @@ console.log("toggleBtn: " + context.eventStatus);
 	function clear() {
 		$form = null;
 		validator = null;
-		$toggleBtn = null;
 	}
 	var $form = null,
-		validator = null,
-		$toggleBtn = null;
+		validator = null;
 	$.extend(this, {
 		"init" : init,
 		"clear" : clear
 	});
 }
 
+function EventMembers(app, context, con) {
+	function buildMembers($tbody, data, offset) {
+		for (var i=0; i<data.length; i++) {
+			var rowData = data[i],
+				$tr = $("<tr><td class='r-rank'/><td class='r-name'/>" +
+					"<td class='r-correct'/><td class='r-time'/></tr>"),
+				$rank = $tr.find(".r-rank"),
+				$name = $tr.find(".r-name"),
+				$img = $("<img/>");
+
+			$rank.text(rowData.correctCount > 0 ? offset + i + 1 : "-");
+			$img.attr("src", rowData.imageUrl);
+			$name.append($img);
+			$name.append(rowData.username);
+			if (rowData.correctCount) {
+				$tr.find(".r-correct").text(rowData.correctCount);
+				$tr.find(".r-time").text(roundTime(rowData.time));
+			}
+			$tbody.append($tr);
+		}
+	}
+	function loadData(offset, rowSize, next) {
+		var slideDir;
+		if (typeof(next) === "boolean") {
+			slideDir = next ? "right" : "left";
+		}
+		con.request({
+			"command" : "getEventRanking",
+			"data" : {
+				"eventId" : context.eventId,
+				"limit" : 10
+			},
+			"success" : function(data) {
+				var $table = $("#event-members-tbl"),
+					$tbody = $table.find("tbody");
+				$tbody.empty();
+				if (slideDir) {
+					$table.hide();
+				}
+				buildMembers($tbody, data, offset);
+				if (slideDir) {
+					$table.show("slide", { "direction" : slideDir}, EFFECT_TIME);
+				}
+			}
+		})
+
+	}
+	function closeEvent() {
+		if (!context.isEventRunning()) {
+			return;
+		}
+		con.request({
+			"command" : "closeEvent",
+			"data" : context.eventId,
+			"success" : function(data) {
+				if (data) {
+					app.showRanking();
+				}
+			}
+		})
+	}
+	function init($el) {
+		$("#event-finish-btn").click(closeEvent);
+		con.request({
+			"command" : "getMemberCount",
+			"data" : context.eventId,
+			"success" : function(data) {
+				pagingBar = new PagingBar($el.find(".paging-bar"), data, loadData, 10);
+				loadData(0, 10);
+			}
+		})
+	}	
+	function clear() {
+		pagingBar = null;
+	}
+	var pagingBar = null;
+	$.extend(this, {
+		"init" : init,
+		"clear" : clear
+	})
+}
 function Ranking(app, context, users, con) {
 	var EVENT_COLUMNS = ["rank", "username", "correctCount", "time"],
 		WINNER_COLUMNS = ["title", ["username", "r-winners"], "correctCount", "time"],
@@ -1914,8 +2349,10 @@ function Ranking(app, context, users, con) {
 			"username" : "r-name",
 			"correctCount" : "r-correct"
 		};
-	function buildRank($td, rank) {
-		if (rank <= 3) {
+	function buildRank($td, rank, correctCount) {
+		if (!correctCount) {
+			$td.text("-");
+		} else if (rank <= 3) {
 			$td.html("<span class='badge circle rank-blue'>" + rank + "</span>");
 		} else {
 			$td.text(rank);
@@ -1985,7 +2422,7 @@ function Ranking(app, context, users, con) {
 			} else if (colName == "title") {
 				$td.text(rowData.title || new DateTime(rowData.execDate).datetimeStr());
 			} else if (colName == "rank") {
-				buildRank($td, rank);
+				buildRank($td, rank, rowData.correctCount);
 			} else if (colName == "time" && rowData.time) {
 				$td.text(roundTime(rowData.time));
 			} else if (rowData[colName]) {
@@ -2254,6 +2691,16 @@ function PageDebugger($el, con, messageDialog) {
 
 flect.QuizApp = function(serverParams) {
 	var self = this;
+	function showDynamic(id, noEffect) {
+		var params = $.extend({
+				"name" : id
+			}, TemplateLogic[id]);
+		if (noEffect) {
+			params.effect = "none";
+		}
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
 	function showStatic(id, sidr) {
 		function doShowStatic() {
 			if (!$el.is(":visible")) {
@@ -2270,6 +2717,31 @@ flect.QuizApp = function(serverParams) {
 	}
 	function showChat() {
 		showStatic("chat", false);
+	}
+	function backToMypage() {
+		var params = {
+			"name" : "mypage",
+			"direction" : "left",
+			"beforeShow" : mypage.init,
+			"afterHide" : mypage.clear
+		};
+		$content.children("div").hide();
+		templateManager.show(params);
+	}
+	function showLookback(qa) {
+		var params = {
+			"name" : "publish-question",
+			"beforeShow" : function($el) {
+				publishQuestion.setLookback(qa);
+				publishQuestion.init($el);
+			},
+			"afterHide" : function() {
+				publishQuestion.clear();
+				publishQuestion.setLookback(null);
+			}
+		};
+		$content.children("div").hide();
+		templateManager.show(params);
 	}
 	function showQuestion(data) {
 		if (publishQuestion) {
@@ -2299,7 +2771,11 @@ flect.QuizApp = function(serverParams) {
 				"name" : "edit-question"
 			}, TemplateLogic["edit-question"]);
 			if (direction) {
-				params.direction = direction;
+				if (direction == "none") {
+					params.effect = "none";
+				} else {
+					params.direction = direction;
+				}
 			}
 			$content.children("div").hide();
 			templateManager.show(params);
@@ -2348,9 +2824,9 @@ flect.QuizApp = function(serverParams) {
 		messageDialog = new flect.MessageDialog($("#msg-dialog"));
 		effectDialog = new EffectDialog($("#effect-dialog"));
 		con = new flect.Connection(context.uri, debug);
-		home = new Home(con, users);
-		makeRoom = new MakeRoom(app, context.userId, con);
+		home = new Home(con, users, context.userId);
 		templateManager = new flect.TemplateManager(con, $("#content-dynamic"));
+		publishQuestion = new PublishQuestion(self, context, con);
 		$content = $("#content");
 
 		if (context.isDebug()) {
@@ -2373,12 +2849,17 @@ flect.QuizApp = function(serverParams) {
 				alert(data);
 			});
 		}
+		con.addEventListener("redirect", function(data) {
+			location.href = data;
+		})
 		if (context.isLogined()) {
 			users[context.userId] = new User({
 				"id" : context.userId,
 				"name" : context.username,
 				"imageUrl" : context.userImage
 			});
+			mypage = new Mypage(self, context, users, con);
+			makeRoom = new MakeRoom(app, context.userId, con);
 		}
 
 		if (context.isInRoom()) {
@@ -2442,7 +2923,6 @@ flect.QuizApp = function(serverParams) {
 				}
 			});
 
-			publishQuestion = new PublishQuestion(self, context, con);
 			con.addEventListener("question", function(data) {
 				showQuestion(data);
 			});
@@ -2450,11 +2930,6 @@ flect.QuizApp = function(serverParams) {
 			con.addEventListener("answerDetail", publishQuestion.receiveAnswerDetail);
 
 			ranking = new Ranking(self, context, users, con);
-		}
-		if ($("#home").length) {
-			con.ready(function() {
-				home.init($("#home"));
-			});
 		}
 		if (context.isRoomAdmin() || context.isPostQuestionAllowed()) {
 			makeQuestion = new MakeQuestion(self, context, con);
@@ -2484,6 +2959,7 @@ flect.QuizApp = function(serverParams) {
 					});
 				}
 			});
+			eventMembers = new EventMembers(self, context, con);
 		}
 		if (context.canEntryEvent()) {
 			entryEvent = new EntryEvent(self, context, con);
@@ -2535,15 +3011,32 @@ flect.QuizApp = function(serverParams) {
 			return $a.attr("href") != "#";
 		})
 	}
+	function showInitial() {
+		var path = location.pathname;
+		if (path == "/") {
+			showDynamic("home", true);
+		} else {
+			var array = path.substring(1).split("/");
+			if (array.length == 2 && array[0] == "room") {
+				if (context.isRoomAdmin()) {
+					showQuestionList("none");
+				} else {
+					$("#chat").show();
+				}
+			}
+		}
+	}
 	var context = new Context(serverParams),
 		debug,
 		messageDialog,
 		effectDialog,
 		con,
 		home,
+		mypage,
 		makeQuestion,
 		makeRoom,
 		editEvent,
+		eventMembers,
 		entryEvent,
 		templateManager,
 		chat,
@@ -2554,29 +3047,44 @@ flect.QuizApp = function(serverParams) {
 		users = {};
 	init();
 	debug.log("params", context);
-console.log("eventAdmin: " + context.eventAdmin);
 	var TemplateLogic = {
 		"home" : {
 			"beforeShow" : home.init,
 			"afterHide" : home.clear
-		},
-		"make-room" : {
-			"beforeShow" : function($el) {
-				makeRoom.clear();
-				makeRoom.init($el);
-			},
-			"afterHide" : makeRoom.clear
-		},
-		"edit-room" : {
-			"name" : "make-room",
-			"beforeShow" : function($el) {
-				makeRoom.clear();
-				makeRoom.edit(context.roomId);
-				makeRoom.init($el)
-			},
-			"afterHide" : makeRoom.clear
 		}
-	};
+	}
+	if (context.isLogined()) {
+		$.extend(TemplateLogic, {
+			"mypage" : {
+				"beforeShow" : function($el) {
+					mypage.reset();
+					mypage.init($el);
+				},
+				"afterHide" : mypage.clear
+			},
+			"make-room" : {
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.init($el);
+				},
+				"afterHide" : makeRoom.clear
+			},
+			"publish-question" : {
+				"name" : "publish-question",
+				"beforeShow" : publishQuestion.init,
+				"afterHide" : publishQuestion.clear
+			},
+			"edit-room" : {
+				"name" : "make-room",
+				"beforeShow" : function($el) {
+					makeRoom.clear();
+					makeRoom.edit(context.roomId);
+					makeRoom.init($el)
+				},
+				"afterHide" : makeRoom.clear
+			}
+		});
+	}
 	if (context.isRoomAdmin()) {
 		$.extend(TemplateLogic, {
 			"edit-question" : {
@@ -2586,8 +3094,23 @@ console.log("eventAdmin: " + context.eventAdmin);
 		})
 		$.extend(TemplateLogic, {
 			"edit-event" : {
-				"beforeShow" : editEvent.init,
-				"afterHide" : editEvent.clear
+				"beforeShow" : function($el) {
+					if (context.isEventRunning()) {
+						eventMembers.init($el);
+					} else {
+						editEvent.init($el);
+					}
+				},
+				"name" : function() {
+					return context.isEventRunning() ? "event-members" : "edit-event";
+				},
+				"afterHide" : function() {
+					if (context.isEventRunning()) {
+						eventMembers.clear();
+					} else {
+						editEvent.clear();
+					}
+				}
 			}
 		})
 	} else if (context.isPostQuestionAllowed()) {
@@ -2601,11 +3124,6 @@ console.log("eventAdmin: " + context.eventAdmin);
 	}
 	if (context.isInRoom()) {
 		$.extend(TemplateLogic, {
-			"publish-question" : {
-				"name" : "publish-question",
-				"beforeShow" : publishQuestion.init,
-				"afterHide" : publishQuestion.clear
-			},
 			"ranking" : {
 				"name" : "ranking",
 				"beforeShow" : ranking.init,
@@ -2621,10 +3139,13 @@ console.log("eventAdmin: " + context.eventAdmin);
 		"showChat" : showChat,
 		"showRanking" : showRanking,
 		"showQuestion" : showQuestion,
+		"showLookback" : showLookback,
 		"showMessage" : showMessage,
 		"showEffect" : showEffect,
+		"backToMypage" : backToMypage,
 		"tweet" : tweet
-	})
+	});
+	con.ready(showInitial);
 }
 
 });
