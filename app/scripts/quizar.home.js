@@ -38,6 +38,12 @@ function Home(con, users, userId) {
 		$el.find("tbody tr").click(function() {
 			var room = $.data(this, "room");
 			if (room) {
+				location.href = "/room/" + room.id;
+			}
+		});
+		$el.find("tbody tr button").click(function() {
+			var room = $.data(this, "room");
+			if (room) {
 				showRoomInfo(room);
 			}
 		});
@@ -48,8 +54,11 @@ function Home(con, users, userId) {
 
 		for (var i=0; i<data.length; i++) {
 			var room = data[i],
-				$tr = $("<tr><td class='event-date'></td><td class='event-title'><img src='" + 
-					DEFAULT_IMAGE + "'/></td><td class='event-capacity'></td></tr>"),
+				$tr = $("<tr><td class='event-date'></td>" +
+					"<td class='event-title'><img src='" + DEFAULT_IMAGE + "'/></td>" +
+					"<td class='event-capacity'></td>" +
+					"<td class='event-enter'><button class='btn blue'>" + MSG.enter +
+					"</button></td></tr>"),
 				$img = $tr.find("img"),
 				date = MSG.undecided,
 				title = room.name,

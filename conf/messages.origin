@@ -364,6 +364,9 @@ eventDescription[ja]=イベントの編集、開始、終了を行います。
 enterRoom=Enter
 enterRoom[ja]=入室する
 
+ui.enter=Enter
+ui.enter[ja]=入室
+
 nextEventInformation=Next event information
 nextEventInformation[ja]=次回イベント情報
 

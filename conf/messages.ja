@@ -94,6 +94,7 @@ ui.createQuestion=問題を作成します。
 ui.editAndPublishQuestion=問題の変更または出題します。
 ui.editQuestion=問題を変更します。
 ui.editRoom=ルームの編集
+ui.enter=入室
 ui.eventRunning=開催中
 ui.failOpenEvent=このイベントを開始することができませんでした
 ui.finish=終了

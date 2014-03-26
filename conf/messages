@@ -94,6 +94,7 @@ ui.createQuestion=Create question.
 ui.editAndPublishQuestion=Edit and publish question.
 ui.editQuestion=Edit question.
 ui.editRoom=Edit room
+ui.enter=Enter
 ui.eventRunning=In session
 ui.failOpenEvent=Could not start this event.
 ui.finish=Finish
