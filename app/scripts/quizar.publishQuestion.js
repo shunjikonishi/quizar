@@ -149,7 +149,7 @@ function PublishQuestion(app, context, con) {
 		}
 		if (answerDetail.description) {
 			var $desc = $("#publish-q-description");
-			$desc.find("textarea").val(answerDetail.description);
+			$desc.find("pre").text(answerDetail.description);
 			$desc.show();
 		}
 		if (answerDetail.relatedUrl) {

@@ -2043,7 +2043,7 @@ function PublishQuestion(app, context, con) {
 		}
 		if (answerDetail.description) {
 			var $desc = $("#publish-q-description");
-			$desc.find("textarea").val(answerDetail.description);
+			$desc.find("pre").text(answerDetail.description);
 			$desc.show();
 		}
 		if (answerDetail.relatedUrl) {
@@ -3079,7 +3079,7 @@ flect.QuizApp = function(serverParams) {
 			});
 			mypage = new Mypage(self, context, users, con);
 			userSetting = new UserSetting(self, context, users, con);
-			makeRoom = new MakeRoom(app, context.userId, con);
+			makeRoom = new MakeRoom(self, context.userId, con);
 			$("#menu-mypage").click(function() {
 				showDynamic("mypage");
 				return false;

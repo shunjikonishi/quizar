@@ -183,7 +183,7 @@ flect.QuizApp = function(serverParams) {
 			});
 			mypage = new Mypage(self, context, users, con);
 			userSetting = new UserSetting(self, context, users, con);
-			makeRoom = new MakeRoom(app, context.userId, con);
+			makeRoom = new MakeRoom(self, context.userId, con);
 			$("#menu-mypage").click(function() {
 				showDynamic("mypage");
 				return false;
