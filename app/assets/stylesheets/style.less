@@ -110,9 +110,10 @@ nav.paging-bar .btn i   { color: #5bc0de; font-weight: bold; }
 #event-members .paging-bar  { margin-top: 10px; margin-bottom: 10px; }
 #event-members .paging-bar li { padding-top: 5px; padding-bottom: 5px; }
 #event-detail h3        { margin-top: 20px; }
-#event-detail label     { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; }
+#event-detail label     { display: block; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; font-size: 12px; }
 #event-detail h3 + label { border-top: none; }
 #event-detail label.btn { display: inline-block; border-top: 1px solid #ccc; }
+#event-detail .event-detail-info { color: #999; font-size: 14px; }
 
 #edit-question-current-none { margin-top: 10px; margin-bottom: 10px; }
 
@@ -289,7 +290,7 @@ textarea.form-control   { height: auto; }
 .rank-user-point        { margin-right: 5px; color: #111; font-size: 16px; }
 
 #room-detail-event      { margin-top: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-#room-detail-event h3   { margin: -10px; padding: 10px 10px 5px; background: #eee; }
+#room-detail-event h3   { margin: -10px; padding: 10px 10px 5px; font-size: 14px; background: #eee; }
 
 .pre-break-word         { overflow: auto; white-space: pre-wrap; word-wrap: break-word; }
 .explanation            { display: block; width: 100%; line-height: 1.428571429; vertical-align: middle; padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; color: #555; font-size: 14px; background-color: #fff; background-image: none;
@@ -330,7 +331,6 @@ textarea.form-control   { height: auto; }
 .clearFix:after         { content: ""; display: block; overflow: hidden; }
 .clearFix:after         { clear: both; }
 .clearFix               { zoom: 1; }
-.indent                 { margin-left: 1em; }
 
 
 /* Components
@@ -430,7 +430,9 @@ tr:nth-child(even).q-published td { background: #e6e6e6; }
 
 th.correctCount         { text-align: right; }
 
-.table-striped tr.q-published td { background: #ccc !important; }
+.table-striped tr.q-published td { color: #fff; background: #5bc0de !important; }
+
+.in-session             { color: #ff3c2d; }
 
 
 /* jQuery UI

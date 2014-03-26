@@ -78,7 +78,7 @@
 			<li><a href="#make-room" class="dynamic">@Messages("ui.makeRoom")</a></li>
 		}
 		@roomInfo.map { room =>
-			<li>@Messages("roomMenu")
+			<li><span>@Messages("roomMenu")</span>
 				<ul>
 					<li><a href="#publish-question" class="dynamic">@Messages("questions")</a></li>
 					<li><a href="#ranking" class="dynamic">@Messages("ranking")</a></li>
@@ -89,7 +89,7 @@
 				</ul>
 			</li>
 			@userInfo.filter(u => room.isAdmin(u.id)).map { user =>
-				<li>@Messages("manageRoom")
+				<li><span>@Messages("manageRoom")</span>
 					<ul>
 						<li><a href="#edit-room" class="dynamic">@Messages("ui.editRoom")</a></li>
 						<li><a href="#edit-event" class="dynamic">@Messages("editEvent")</a></li>
