@@ -23,6 +23,7 @@ module.exports = function(grunt) {
                     'app/scripts/quizar.context.js' ,
                     'app/scripts/quizar.user.js' ,
                     'app/scripts/quizar.home.js' ,
+                    'app/scripts/quizar.userSetting.js' ,
                     'app/scripts/quizar.mypage.js' ,
                     'app/scripts/quizar.chat.js' ,
                     'app/scripts/quizar.makeRoom.js' ,

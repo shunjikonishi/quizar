@@ -14,7 +14,8 @@
 				<i class="fa fa-caret-down"></i>
 			</button>
 			<ul class="dropdown-menu">
-				<li><a href="#">@user.name</a></li>
+				<li><a href="#" id="menu-mypage">@user.name</a></li>
+				<li><a href="#" id="menu-settings">@Messages("settings")</a></li>
 				<li class="entry-event"><a href="#" class="entry-event-btn">@Messages("entryEvent")</a></li>
 				<li class="divider"></li>
 				<li><a href="/signout"><i class="fa fa-sign-out"></i> @Messages("signout")</a></li>
@@ -110,6 +111,7 @@
 <script src="@routes.Assets.at("javascripts/ext/animatedtablesorter/tsort.min.js")"></script>
 <script src="@routes.Assets.at("javascripts/ext/bootstrap-switch/js/bootstrap-switch.min.js")"></script>
 <script src="@routes.Assets.at("javascripts/ext/jquery-validation/jquery.validate.min.js")"></script>
+<script src="@routes.Assets.at("javascripts/ext/jquery-cookie/jquery.cookie.js")"></script>
 <script src="@routes.I18N.messages(lang.language)"></script>
 <script src="@routes.Assets.at("javascripts/quizar.js")"></script>
 <script>

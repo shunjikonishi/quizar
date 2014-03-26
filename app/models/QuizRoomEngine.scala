@@ -7,13 +7,13 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 import flect.websocket.CommandInvoker
+import flect.websocket.CommandHandler
 import flect.websocket.CommandResponse
 
 class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
 
   private val rm = RoomManager
 
-  init
   private val userId = session.user.map(_.id).getOrElse(0)
 
   private val room: Option[RedisRoom] = {
@@ -60,7 +60,6 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         None
       }
     }
-println("filterRedisMessage: " + res.name)
     if (res.name == "createQuestion") {
       filterCreateQuestion(res)
     } else {
@@ -94,6 +93,7 @@ println("filterRedisMessage: " + res.name)
     addHandler("getMemberCount", RoomManager.memberCountCommand)
     addHandler("getLookback", RoomManager.lookbackCommand)
     addHandler("getUser", UserManager.getCommand)
+    addHandler("updateUser", updateUserCommand)
     addHandler("tweet") { c =>
       room.foreach { room =>
         val username = session.user.map(_.name).get
@@ -118,4 +118,19 @@ println("filterRedisMessage: " + res.name)
       CommandResponse.None
     }
   }
+
+  val updateUserCommand = CommandHandler { command =>
+    val id = (command.data \ "userId").as[Int]
+    val name = (command.data \ "name").as[String]
+    val ret = UserManager.update(id, name)
+    if (ret) {
+      val newSession = session.copy(
+        user=session.user.map(_.copy(name=name))
+      )
+      SessionManager.set(newSession.id, newSession)
+    }
+    command.json(JsBoolean(ret))
+  }
+  
+  init
 }

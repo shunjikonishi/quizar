@@ -248,7 +248,6 @@ function Ranking(app, context, users, con) {
 	function clear() {
 		$tab = null;
 		$tableNow = null;
-		console.log("Ranking#clear");
 	}
 	var prevData = null,
 		nextData = null,

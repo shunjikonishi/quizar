@@ -25,6 +25,13 @@ function Context(hash) {
 	function canEntryEvent() {
 		return isLogined() && isInRoom() && !isRoomAdmin();
 	}
+	function setNotifyTweet(value) {
+		this.notifyTweet = value;
+		$.cookie("notifyTweet", value ? 1 : 0, {
+			"path" : "/",
+			"expires" : 100
+		});
+	}
 
 	$.extend(this, hash, {
 		"isLogined" : isLogined,
@@ -38,9 +45,12 @@ function Context(hash) {
 		"openEvent" : openEvent,
 		"closeEvent" : closeEvent,
 		"entryEvent" : entryEvent,
-		"canEntryEvent" : canEntryEvent
+		"canEntryEvent" : canEntryEvent,
+		"setNotifyTweet" : setNotifyTweet
 	});
 	if (!this.eventStatus) {
 		this.eventStatus = EventStatus.Prepared;
 	}
+	this.notifyTweet = $.cookie("notifyTweet") == 1;
+	setNotifyTweet(this.notifyTweet);
 }

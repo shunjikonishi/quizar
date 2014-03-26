@@ -384,3 +384,9 @@ totalRanking[ja]=総合順位
 
 answer=Ans.
 answer[ja]=解答
+
+userSettingDescription=User settings
+userSettingDescription[ja]=ユーザ設定を変更します。
+
+settings=Settings
+settings[ja]=設定

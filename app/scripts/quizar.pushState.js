@@ -7,7 +7,6 @@ function PushState(app, context) {
 			if (min > key) {
 				min = key;
 			}
-console.log("purge: " + min);
 			cnt++;
 		}
 		if (cnt > MAX_FUNCS) {
@@ -20,6 +19,8 @@ console.log("purge: " + min);
 				return "/home";
 			case "mypage":
 				return "/mypage";
+			case "user-setting":
+				return "/userSetting";
 			case "make-room":
 				return "/makeRoom";
 			case "help":
@@ -81,7 +82,6 @@ console.log("purge: " + min);
 	}
 	function popState(event) {
 		var obj = event.originalEvent.state;
-console.log("popState1: " + JSON.stringify(obj) + JSON.stringify(currentState));
 		if (!obj && !currentState) {
 			return;
 		}

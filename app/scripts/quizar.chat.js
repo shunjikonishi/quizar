@@ -1,4 +1,4 @@
-function Chat($el, userId, hashtag, con) {
+function Chat($el, context, con) {
 	var MAX_LOG = 20;
 	function tweet(msg, withTwitter) {
 		if (userId) {
@@ -13,7 +13,7 @@ function Chat($el, userId, hashtag, con) {
 		}
 	}
 	function isNotifyTweet() {
-		return $el.is(":hidden") && chatNotify;//ToDo
+		return $el.is(":hidden") && context.notifyTweet;
 	}
 	function member(data) {
 		if (arguments.length == 0) {
@@ -68,13 +68,14 @@ function Chat($el, userId, hashtag, con) {
 		$tweetBox.css("height", wh - h - 20);
 	}
 	var cnt = 0,
+		userId = context.userId,
+		hashtag = context.hashtag,
 		$text = $("#chat-text"),
 		$twitter = $("#chat-twitter"),
 		$len = $("#chat-text-len span"),
 		$tweetBox = $el.find(".tweet-box"),
 		$ul = $tweetBox.find("ul"),
 		$member = $("#room-member"),
-		chatNotify = true,
 		calced = false;
 	if (userId) {
 		$("#btn-tweet").click(function() {

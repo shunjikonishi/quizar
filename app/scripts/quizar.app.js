@@ -180,12 +180,21 @@ flect.QuizApp = function(serverParams) {
 				"imageUrl" : context.userImage
 			});
 			mypage = new Mypage(self, context, users, con);
+			userSetting = new UserSetting(self, context, users, con);
 			makeRoom = new MakeRoom(app, context.userId, con);
+			$("#menu-mypage").click(function() {
+				showDynamic("mypage");
+				return false;
+			})
+			$("#menu-settings").click(function() {
+				showDynamic("user-setting");
+				return false;
+			})
 		}
 
 		if (context.isInRoom()) {
 			var $chat = $("#chat");
-			chat = new Chat($chat, context.userId, context.hashtag, con);
+			chat = new Chat($chat, context, con);
 			$(".menu-chat").click(function() {
 				showStatic("chat", $(this).parents("#sidr").length > 0, chat.calcHeight);
 				return false;
@@ -330,15 +339,33 @@ flect.QuizApp = function(serverParams) {
 	}
 	function showInitial(initial) {
 		function redirectToDefault() {
-			location.href = "/room/" + context.roomId;
+			if (context.isInRoom()) {
+				location.href = "/room/" + context.roomId;
+			} else {
+				location.href = "/";
+			}
 		}
 		var path = location.pathname;
 		if (path == "/" || path == "/home") {
 			showDynamic("home", initial);
 		} else if (path == "/mypage") {
-			showDynamic("mypage", initial);
+			if (context.isLogined()) {
+				showDynamic("mypage", initial);
+			} else {
+				redirectToDefault();
+			}
 		} else if (path == "/makeRoom") {
-			showDynamic("make-room", initial);
+			if (context.isLogined()) {
+				showDynamic("make-room", initial);
+			} else {
+				redirectToDefault();
+			}
+		} else if (path == "/userSetting") {
+			if (context.isLogined()) {
+				showDynamic("user-setting", initial);
+			} else {
+				redirectToDefault();
+			}
 		} else if (path == "/help") {
 			showDynamic("help", initial);
 		} else {
@@ -403,6 +430,7 @@ flect.QuizApp = function(serverParams) {
 		con,
 		home,
 		mypage,
+		userSetting,
 		makeQuestion,
 		makeRoom,
 		editEvent,
@@ -432,6 +460,10 @@ flect.QuizApp = function(serverParams) {
 					mypage.init($el);
 				},
 				"afterHide" : mypage.clear
+			},
+			"user-setting" : {
+				"beforeShow" : userSetting.init,
+				"afterHide" : userSetting.clear
 			},
 			"make-room" : {
 				"beforeShow" : function($el) {

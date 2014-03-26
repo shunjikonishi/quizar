@@ -560,7 +560,6 @@ function PushState(app, context) {
 			if (min > key) {
 				min = key;
 			}
-console.log("purge: " + min);
 			cnt++;
 		}
 		if (cnt > MAX_FUNCS) {
@@ -573,6 +572,8 @@ console.log("purge: " + min);
 				return "/home";
 			case "mypage":
 				return "/mypage";
+			case "user-setting":
+				return "/userSetting";
 			case "make-room":
 				return "/makeRoom";
 			case "help":
@@ -634,7 +635,6 @@ console.log("purge: " + min);
 	}
 	function popState(event) {
 		var obj = event.originalEvent.state;
-console.log("popState1: " + JSON.stringify(obj) + JSON.stringify(currentState));
 		if (!obj && !currentState) {
 			return;
 		}
@@ -782,6 +782,13 @@ function Context(hash) {
 	function canEntryEvent() {
 		return isLogined() && isInRoom() && !isRoomAdmin();
 	}
+	function setNotifyTweet(value) {
+		this.notifyTweet = value;
+		$.cookie("notifyTweet", value ? 1 : 0, {
+			"path" : "/",
+			"expires" : 100
+		});
+	}
 
 	$.extend(this, hash, {
 		"isLogined" : isLogined,
@@ -795,11 +802,14 @@ function Context(hash) {
 		"openEvent" : openEvent,
 		"closeEvent" : closeEvent,
 		"entryEvent" : entryEvent,
-		"canEntryEvent" : canEntryEvent
+		"canEntryEvent" : canEntryEvent,
+		"setNotifyTweet" : setNotifyTweet
 	});
 	if (!this.eventStatus) {
 		this.eventStatus = EventStatus.Prepared;
 	}
+	this.notifyTweet = $.cookie("notifyTweet") == 1;
+	setNotifyTweet(this.notifyTweet);
 }
 
 function User(hash) {
@@ -955,6 +965,46 @@ function Home(con, users, userId) {
 	})
 }
 
+function UserSetting(app, context, users, con) {
+	function update() {
+		var username = $("#user-name").val();
+		if (username && username != context.username) {
+			con.request({
+				"command" : "updateUser",
+				"data" : {
+					"userId" : context.userId,
+					"name" : username
+				},
+				"success" : function(data) {
+					if (data) {
+						app.showMessage(MSG.successUpdate);
+						setTimeout(function() {
+							var href = context.isInRoom() ? "/room/" + context.roomId : "/";
+							location.href = href;
+						}, 3000);
+					}
+				}
+			})
+		}
+	}
+	function init() {
+		$("#user-name").val(context.username);
+		if (context.notifyTweet) {
+			$("#user-notify-tweet").attr("checked", "checked");
+		}
+		$("#user-notify-tweet").change(function() {
+			var b = $(this).is(":checked");
+			context.setNotifyTweet(b);
+		})
+		$("#btn-user-setting").click(update);
+	}
+	function clear() {
+	}
+	$.extend(this, {
+		"init" : init,
+		"clear" : clear
+	})
+}
 function Mypage(app, context, users, con) {
 	var ENTRY_COLUMNS = ["r-room", "r-point", "r-correct"],
 		OWNER_COLUMNS = ["r-room", "r-event", "r-question"],
@@ -1178,7 +1228,7 @@ function Mypage(app, context, users, con) {
 	})
 }
 
-function Chat($el, userId, hashtag, con) {
+function Chat($el, context, con) {
 	var MAX_LOG = 20;
 	function tweet(msg, withTwitter) {
 		if (userId) {
@@ -1193,7 +1243,7 @@ function Chat($el, userId, hashtag, con) {
 		}
 	}
 	function isNotifyTweet() {
-		return $el.is(":hidden") && chatNotify;//ToDo
+		return $el.is(":hidden") && context.notifyTweet;
 	}
 	function member(data) {
 		if (arguments.length == 0) {
@@ -1248,13 +1298,14 @@ function Chat($el, userId, hashtag, con) {
 		$tweetBox.css("height", wh - h - 20);
 	}
 	var cnt = 0,
+		userId = context.userId,
+		hashtag = context.hashtag,
 		$text = $("#chat-text"),
 		$twitter = $("#chat-twitter"),
 		$len = $("#chat-text-len span"),
 		$tweetBox = $el.find(".tweet-box"),
 		$ul = $tweetBox.find("ul"),
 		$member = $("#room-member"),
-		chatNotify = true,
 		calced = false;
 	if (userId) {
 		$("#btn-tweet").click(function() {
@@ -2752,7 +2803,6 @@ function Ranking(app, context, users, con) {
 	function clear() {
 		$tab = null;
 		$tableNow = null;
-		console.log("Ranking#clear");
 	}
 	var prevData = null,
 		nextData = null,
@@ -3033,12 +3083,21 @@ flect.QuizApp = function(serverParams) {
 				"imageUrl" : context.userImage
 			});
 			mypage = new Mypage(self, context, users, con);
+			userSetting = new UserSetting(self, context, users, con);
 			makeRoom = new MakeRoom(app, context.userId, con);
+			$("#menu-mypage").click(function() {
+				showDynamic("mypage");
+				return false;
+			})
+			$("#menu-settings").click(function() {
+				showDynamic("user-setting");
+				return false;
+			})
 		}
 
 		if (context.isInRoom()) {
 			var $chat = $("#chat");
-			chat = new Chat($chat, context.userId, context.hashtag, con);
+			chat = new Chat($chat, context, con);
 			$(".menu-chat").click(function() {
 				showStatic("chat", $(this).parents("#sidr").length > 0, chat.calcHeight);
 				return false;
@@ -3183,15 +3242,33 @@ flect.QuizApp = function(serverParams) {
 	}
 	function showInitial(initial) {
 		function redirectToDefault() {
-			location.href = "/room/" + context.roomId;
+			if (context.isInRoom()) {
+				location.href = "/room/" + context.roomId;
+			} else {
+				location.href = "/";
+			}
 		}
 		var path = location.pathname;
 		if (path == "/" || path == "/home") {
 			showDynamic("home", initial);
 		} else if (path == "/mypage") {
-			showDynamic("mypage", initial);
+			if (context.isLogined()) {
+				showDynamic("mypage", initial);
+			} else {
+				redirectToDefault();
+			}
 		} else if (path == "/makeRoom") {
-			showDynamic("make-room", initial);
+			if (context.isLogined()) {
+				showDynamic("make-room", initial);
+			} else {
+				redirectToDefault();
+			}
+		} else if (path == "/userSetting") {
+			if (context.isLogined()) {
+				showDynamic("user-setting", initial);
+			} else {
+				redirectToDefault();
+			}
 		} else if (path == "/help") {
 			showDynamic("help", initial);
 		} else {
@@ -3256,6 +3333,7 @@ flect.QuizApp = function(serverParams) {
 		con,
 		home,
 		mypage,
+		userSetting,
 		makeQuestion,
 		makeRoom,
 		editEvent,
@@ -3285,6 +3363,10 @@ flect.QuizApp = function(serverParams) {
 					mypage.init($el);
 				},
 				"afterHide" : mypage.clear
+			},
+			"user-setting" : {
+				"beforeShow" : userSetting.init,
+				"afterHide" : userSetting.clear
 			},
 			"make-room" : {
 				"beforeShow" : function($el) {

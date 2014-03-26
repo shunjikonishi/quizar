@@ -32,9 +32,6 @@ case class PageParams(
       userQuiz=Some(room.userQuiz),
       hashtag=room.hashtag
     )
-    room.event.foreach { e =>
-      println("!!!!!!!!!!!" + e.admin + "," + userId)
-    }
     room.event.map(e => ret.copy(
       eventId=Some(e.id),
       eventStatus=Some(e.status.code),
@@ -60,7 +57,7 @@ object PageParams {
   def create(request: RequestHeader, session: SessionInfo, userEventId: Option[Int]=None) = {
     val uri = controllers.routes.Application.ws().webSocketURL()(request)
     //ToDo remove debug
-    val debug = request.getQueryString("debug").map(_ == "true").getOrElse(true)
+    val debug = request.getQueryString("debug").map(_ == "true").getOrElse(false)
     val ret = PageParams(
       uri=uri,
       debug=debug,

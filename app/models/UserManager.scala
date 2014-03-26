@@ -51,11 +51,22 @@ class UserManager {
     }
   }
 
+  def update(id: Int, name: String): Boolean = DB.localTx { implicit session =>
+    QuizUser.find(id).map { entity =>
+      entity.copy(
+        name = name,
+        updated= new DateTime()
+      ).save();
+      true;
+    }.getOrElse(false)
+  }
+
   val getCommand = CommandHandler { command =>
     val id = command.data.as[Int]
     val user = getUserById(id)
     command.json(UserInfo.create(user).toJson)
   }
+
 }
 
 object UserManager extends UserManager

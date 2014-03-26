@@ -54,7 +54,6 @@ object Application extends Controller {
       } else {
         None
       }
-      println("userEventId = " + userEventId)
       val params = PageParams.create(request, sessionInfo, userEventId).withRoom(room)
 
       Ok(views.html.frame(sessionInfo.user, Some(room), params, twitterUrl)).withSession(

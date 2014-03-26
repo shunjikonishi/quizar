@@ -1,0 +1,23 @@
+@(sessionInfo: SessionInfo)(implicit lang: Lang)
+<div id="user-setting" class="workspace">
+	<div class="input-form">
+		<form id="user-setting-form">
+			<header class="heading">
+				<p>@Messages("userSettingDescription")</p>
+			</header>
+			<div>
+				<label for="user-name">@Messages("username")</label>
+				<input id="user-name" class="form-control" />
+			</div>
+			<div class="checkbox">
+				<label for="user-notify-tweet" class="btn">
+					<input id="user-notify-tweet" type="checkbox" />
+					@Messages("notifyTweet")
+				</label>
+			</div>
+			<div class="box-button align-center">
+				<button type="button" id="btn-user-setting" class="btn blue btn-small" >@Messages("ui.update")</button>
+			</div>
+		</form>
+	</div>
+</div>
