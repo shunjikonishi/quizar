@@ -1,6 +1,7 @@
 flect.QuizApp = function(serverParams) {
 	var self = this;
 	function showDynamic(id, initial) {
+		$.sidr("close");
 		var params = $.extend({
 				"name" : id
 			}, TemplateLogic[id]);
@@ -14,6 +15,7 @@ flect.QuizApp = function(serverParams) {
 	}
 	function showStatic(id, sidr, func) {
 		function doShowStatic() {
+			$.sidr("close");
 			if (!$el.is(":visible")) {
 				$content.children("div").hide();
 				$el.show("slide", { "direction" : "right"}, EFFECT_TIME, func);

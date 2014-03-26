@@ -97,8 +97,8 @@ html.roomMember[ja]=<span id="room-member">0</span>人がこの部屋にいま�
 loginWithTwitter=Sign in with twitter
 loginWithTwitter[ja]=Twitterでログイン
 
-loginRequiredToChat=If you want to chat, you should sign in.
-loginRequiredToChat[ja]=チャットに参加するためにはログインする必要があります
+loginRequiredToChat=If you want to chat, you should <a href="{0}">sign in</a>.
+loginRequiredToChat[ja]=チャットに参加するためには<a href="{0}">ログイン</a>する必要があります
 
 stock=Stock
 stock[ja]=ストック

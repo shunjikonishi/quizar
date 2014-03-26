@@ -1276,19 +1276,13 @@ function Chat($el, context, con) {
 		});
 	}
 	function calcHeight() {
-		if (calced) {
-			return;
-		}
-		calced = true;
 		var wh = $(window).height(),
 			h = 0
 		$el.children("div").each(function() {
 			var $div = $(this),
 				dh = $div.height();
 			if (!$div.hasClass("tweet-box")) {
-				if (dh <= 0) {
-					caleced = false;
-				} else {
+				if (dh > 0) {
 					h += dh;
 				}
 			}
@@ -1305,8 +1299,7 @@ function Chat($el, context, con) {
 		$len = $("#chat-text-len span"),
 		$tweetBox = $el.find(".tweet-box"),
 		$ul = $tweetBox.find("ul"),
-		$member = $("#room-member"),
-		calced = false;
+		$member = $("#room-member");
 	if (userId) {
 		$("#btn-tweet").click(function() {
 			var msg = $text.val(),
@@ -2904,6 +2897,7 @@ function PageDebugger($el, con, messageDialog) {
 flect.QuizApp = function(serverParams) {
 	var self = this;
 	function showDynamic(id, initial) {
+		$.sidr("close");
 		var params = $.extend({
 				"name" : id
 			}, TemplateLogic[id]);
@@ -2917,6 +2911,7 @@ flect.QuizApp = function(serverParams) {
 	}
 	function showStatic(id, sidr, func) {
 		function doShowStatic() {
+			$.sidr("close");
 			if (!$el.is(":visible")) {
 				$content.children("div").hide();
 				$el.show("slide", { "direction" : "right"}, EFFECT_TIME, func);

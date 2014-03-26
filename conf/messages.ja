@@ -37,7 +37,7 @@ html.roomMember=<span id="room-member">0</span>人がこの部屋にいます
 includeToRanking=ランキングに含める
 inputPasscode=このイベントに参加するためにはパスコードの入力が必要です。
 lessFrequentAnswer=最も少なかった回答
-loginRequiredToChat=チャットに参加するためにはログインする必要があります
+loginRequiredToChat=チャットに参加するためには<a href="{0}">ログイン</a>する必要があります
 loginWithTwitter=Twitterでログイン
 manageEvent=イベント管理
 manageRoom=ルーム管理

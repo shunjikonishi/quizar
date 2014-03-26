@@ -37,7 +37,7 @@ html.roomMember=<span id="room-member">0</span> people in this room.
 includeToRanking=Include to ranking
 inputPasscode=To entry this event, you must input passcode!
 lessFrequentAnswer=Answer the less frequent
-loginRequiredToChat=If you want to chat, you should sign in.
+loginRequiredToChat=If you want to chat, you should <a href="{0}">sign in</a>.
 loginWithTwitter=Sign in with twitter
 manageEvent=Event management
 manageRoom=Room management

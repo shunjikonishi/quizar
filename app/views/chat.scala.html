@@ -3,7 +3,7 @@
 	@if(userInfo.isEmpty) {
 		<div>
 			<header class="heading">
-				<p>@Messages("loginRequiredToChat")</p>
+				<p>@Html(Messages("loginRequiredToChat", twitterUrl))</p>
 			</header>
 		</div>
 	}

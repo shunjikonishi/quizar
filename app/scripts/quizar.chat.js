@@ -46,19 +46,13 @@ function Chat($el, context, con) {
 		});
 	}
 	function calcHeight() {
-		if (calced) {
-			return;
-		}
-		calced = true;
 		var wh = $(window).height(),
 			h = 0
 		$el.children("div").each(function() {
 			var $div = $(this),
 				dh = $div.height();
 			if (!$div.hasClass("tweet-box")) {
-				if (dh <= 0) {
-					caleced = false;
-				} else {
+				if (dh > 0) {
 					h += dh;
 				}
 			}
@@ -75,8 +69,7 @@ function Chat($el, context, con) {
 		$len = $("#chat-text-len span"),
 		$tweetBox = $el.find(".tweet-box"),
 		$ul = $tweetBox.find("ul"),
-		$member = $("#room-member"),
-		calced = false;
+		$member = $("#room-member");
 	if (userId) {
 		$("#btn-tweet").click(function() {
 			var msg = $text.val(),
