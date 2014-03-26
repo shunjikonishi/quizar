@@ -95,10 +95,10 @@ html.roomMember=<span id="room-member">0</span> people in this room.
 html.roomMember[ja]=<span id="room-member">0</span>人がこの部屋にいます
 
 loginWithTwitter=Sign in with twitter
-loginWithTwitter[ja]=Twitterでログイン
+loginWithTwitter[ja]=Twitterでサインイン
 
 loginRequiredToChat=If you want to chat, you should <a href="{0}">sign in</a>.
-loginRequiredToChat[ja]=チャットに参加するためには<a href="{0}">ログイン</a>する必要があります
+loginRequiredToChat[ja]=チャットに参加するためには<a href="{0}">サインイン</a>する必要があります
 
 stock=Stock
 stock[ja]=ストック

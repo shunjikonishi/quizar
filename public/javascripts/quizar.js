@@ -887,6 +887,7 @@ function Home(con, users, userId) {
 				}
 				if (room.event.status == EventStatus.Running) {
 					date = MSG.eventRunning;
+					$tr.find(".event-date").addClass("in-session");
 				} else if (room.event.execDate) {
 					date = new DateTime(room.event.execDate).datetimeStr();
 				}
