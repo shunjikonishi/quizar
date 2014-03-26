@@ -283,10 +283,12 @@ textarea.form-control   { height: auto; }
 .notes                  { margin-top: 5px; color: #999; font-size: 12px; }
 
 .rank-user              { margin-right: 15px; }
-.rank-user-name         { margin-bottom: 5px; font-weight: bold; font-size: 16px; }
-.user-area              { padding: 10px; font-size: 12px; background: #eee; }
+.rank-user-name         { margin-bottom: 5px; color: #fff; font-weight: bold; font-size: 16px; }
+.user-area              { margin-top: 10px; padding: 10px; font-size: 12px; background: #ccc; }
 .rank-user-point        { margin-right: 5px; color: #111; font-size: 16px; }
 
+#room-detail-event      { margin-top: 10px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+#room-detail-event h3   { margin-top: 0; }
 
 /* Classes
 -----------------------------------------------------------------------------*/
@@ -322,6 +324,7 @@ textarea.form-control   { height: auto; }
 .clearFix:after         { content: ""; display: block; overflow: hidden; }
 .clearFix:after         { clear: both; }
 .clearFix               { zoom: 1; }
+.indent                 { margin-left: 1em; }
 
 
 /* Components
@@ -420,6 +423,8 @@ tr:nth-child(even).q-published th,
 tr:nth-child(even).q-published td { background: #e6e6e6; }
 
 th.correctCount         { text-align: right; }
+
+.table-striped tr.q-published td { color: #fff; background: #5bc0de !important; }
 
 
 /* jQuery UI
