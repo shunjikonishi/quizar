@@ -128,7 +128,7 @@ entriedRooms=Entried rooms
 entriedRooms[ja]=参加ルーム
 
 yourRooms=Your rooms
-yourRooms=主催ルーム
+yourRooms[ja]=主催ルーム
 
 datetime=Datetime
 datetime[ja]=日時
