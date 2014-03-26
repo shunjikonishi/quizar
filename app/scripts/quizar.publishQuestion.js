@@ -39,12 +39,12 @@ function PublishQuestion(app, context, con) {
 		}
 		answered = true;
 		applyDisabled($buttons);
-		applyAnswered($btn);
-		$answerBtn = $btn;
 		if (time > TIMELIMIT) {
-			app.showMessage("timeLimitExceeded");
+			app.showMessage(MSG.timeLimitExceeded);
 			return;
 		}
+		applyAnswered($btn);
+		$answerBtn = $btn;
 		con.request({
 			"command" : "answer",
 			"data" : {

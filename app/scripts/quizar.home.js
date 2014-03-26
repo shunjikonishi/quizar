@@ -17,7 +17,7 @@ function Home(con, users, userId) {
 		if (room.userQuiz) {
 			$("#room-detail-userQuiz").attr("checked", "checked");
 		}
-		$("#room-detail-description").val(room.description || "");
+		$("#room-detail-description").text(room.description || "");
 		if (room.event) {
 			$("#room-detail-event").show();
 			$("#room-detail-title").text(room.event.title || "-");
@@ -27,7 +27,7 @@ function Home(con, users, userId) {
 					"-"
 			);
 			$("#room-detail-capacity").text(room.event.capacity);
-			$("#room-detail-description2").val(room.event.description || "");
+			$("#room-detail-description2").text(room.event.description || "");
 		} else {
 			$("#room-detail-event").hide();
 		}
