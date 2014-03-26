@@ -67,6 +67,18 @@ console.log("purge: " + min);
 			history.pushState(obj, null, url);
 		}
 	}
+	function isBackFromLookback(prev, current) {
+		if (prev == null || current == null) {
+			return false;
+		}
+		if (prev.method != "lookback" || current.method != "dynamic") {
+			return false;
+		}
+		if (prev.seq <= current.seq) {
+			return false;
+		}
+		return true;
+	}
 	function popState(event) {
 		var obj = event.originalEvent.state;
 console.log("popState1: " + JSON.stringify(obj) + JSON.stringify(currentState));
@@ -78,7 +90,11 @@ console.log("popState1: " + JSON.stringify(obj) + JSON.stringify(currentState));
 			if (obj == null) {
 				app.showInitial(false);
 			} else if (obj.method == "dynamic") {
-				app.showDynamic(obj.id);
+				if (isBackFromLookback(currentState, obj)) {
+					app.backToMypage();
+				} else {
+					app.showDynamic(obj.id);
+				}
 			} else if (obj.method == "static") {
 				app.showStatic(obj.id);
 			} else if (obj.method == "function") {
@@ -86,6 +102,8 @@ console.log("popState1: " + JSON.stringify(obj) + JSON.stringify(currentState));
 				if (func) {
 					func();
 				}
+			} else if (obj.method == "lookback") {
+				app.showLookback(obj.qa);
 			} else {
 				console.log("popState: " + JSON.stringify(obj));
 			}

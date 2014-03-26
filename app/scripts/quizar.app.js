@@ -39,6 +39,10 @@ flect.QuizApp = function(serverParams) {
 		};
 		$content.children("div").hide();
 		templateManager.show(params);
+		pushState.pushState({
+			"method" : "function",
+			"func" : backToMypage
+		}, "/mypage");
 	}
 	function showLookback(qa) {
 		var params = {
@@ -54,6 +58,10 @@ flect.QuizApp = function(serverParams) {
 		};
 		$content.children("div").hide();
 		templateManager.show(params);
+		pushState.pushState({
+			"method" : "lookback",
+			"qa" : qa
+		}, "/room/" + context.roomId + "/question");
 	}
 	function showQuestion(data) {
 		if (publishQuestion) {
