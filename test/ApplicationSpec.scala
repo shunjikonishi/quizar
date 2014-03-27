@@ -5,6 +5,8 @@ import org.junit.runner._
 import play.api.test._
 import play.api.test.Helpers._
 
+import models._
+
 /**
  * Add your spec here.
  * You can mock out a whole application including requests, plugins etc.
@@ -14,7 +16,12 @@ import play.api.test.Helpers._
 class ApplicationSpec extends Specification {
 
   "Application" should {
+    "user 1 is skonishi" in new WithApplication {
+      val user = UserManager.getUserById(1)
+      user.name must startWith("@shunjikonishi")
+    }
 
+    /*
     "send 404 on a bad request" in new WithApplication{
       route(FakeRequest(GET, "/boum")) must beNone
     }
@@ -24,7 +31,8 @@ class ApplicationSpec extends Specification {
 
       status(home) must equalTo(OK)
       contentType(home) must beSome.which(_ == "text/html")
-      contentAsString(home) must contain ("Your new application is ready.")
+      contentAsString(home) must contain ("Quizar")
     }
+    */
   }
 }

@@ -13,12 +13,16 @@ import play.api.test.Helpers._
 class IntegrationSpec extends Specification {
 
   "Application" should {
-
+    "contain 11 characters" in {
+      "Hello world" must have size(11)
+    }
+    /*
     "work from within a browser" in new WithBrowser {
 
       browser.goTo("http://localhost:" + port)
 
-      browser.pageSource must contain("Your new application is ready.")
+      browser.pageSource must contain("Quizar")
     }
+    */
   }
 }
