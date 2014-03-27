@@ -104,6 +104,22 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     }.list.apply
   }
 
+  def listRecent(offset: Int, limit: Int): List[RoomInfo] = DB.readOnly { implicit session =>
+    val now = new DateTime()
+    withSQL { 
+      select
+        .from(QuizRoom as qr)
+        .leftJoin(QuizEvent as qe).on(sqls"qr.id = qe.room_id and qe.status in (0, 1)")
+        .where(sqls"qe.status = 1 or qe.status is null or qe.exec_date > ${now}")
+        .orderBy(sqls"COALESCE(qe.status, 0) desc, qe.exec_date asc, qr.updated desc")
+        .limit(limit).offset(offset)
+    }.map { rs =>
+      val room = RoomInfo.create(QuizRoom(qr.resultName)(rs))
+      val event = rs.intOpt(qe.resultName.roomId).map(_ => EventInfo.create(QuizEvent(qe.resultName)(rs)))
+      event.map(room.withEvent(_)).getOrElse(room)
+    }.list.apply
+  }
+
   def listUserEntriedRooms(userId: Int, offset: Int, limit: Int): List[UserEntriedRoom] = DB.readOnly { implicit session =>
     sql"""
       select B.id, B.name as room_name, B.owner, B.updated, 
@@ -359,7 +375,11 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     val limit = (command.data \ "limit").as[Int]
     val offset = (command.data \ "offset").as[Int]
     val userId = (command.data \ "userId").asOpt[Int]
-    val data = list(offset, limit, userId).map(_.toJson)
+    val data = if (userId.isDefined) {
+      list(offset, limit, userId).map(_.toJson)
+    } else {
+      listRecent(offset, limit).map(_.toJson)
+    }
     command.json(JsArray(data))
   }
 
