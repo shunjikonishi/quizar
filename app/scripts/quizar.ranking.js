@@ -113,7 +113,7 @@ function Ranking(app, context, users, con) {
 			var rowData = data[i],
 				$tr = cache[rowData.userId];
 			if ($tr) {
-				buildRank($tr.find(".r-rank"), i + 1);
+				buildRank($tr.find(".r-rank"), i + 1, rowData.correctCount);
 				$tr.find(".r-correct").text(rowData.correctCount);
 				$tr.find(".r-time").text(roundTime(rowData.time));
 			} else {
