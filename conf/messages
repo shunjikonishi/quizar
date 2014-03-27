@@ -120,6 +120,7 @@ ui.question=Question
 ui.questionPosted=Post question to room master.
 ui.questionSeq=Question {0}
 ui.start=Start
+ui.successCopy=Copy succeed
 ui.successUpdate=Update succeed
 ui.test=Test
 ui.timeLimitExceeded=Time limit exceeded.

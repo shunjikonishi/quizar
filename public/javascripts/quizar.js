@@ -1829,9 +1829,8 @@ function MakeQuestion(app, context, con) {
 					"data" : q,
 					"success" : function(data) {
 						if (context.isRoomAdmin()) {
-							editQuestion = data;
 							if (context.isEventAdmin()) {
-								app.showMessage(MSG.successUpdate);
+								app.showMessage(editQuestion ? MSG.successCopy : MSG.successUpdate);
 								$btnUpdate.text(MSG.update);
 								$publish.show("slow");
 								enableInput($form.find(":input"), true);
@@ -1839,6 +1838,7 @@ function MakeQuestion(app, context, con) {
 							} else {
 								app.showQuestionList("left");
 							}
+							editQuestion = data;
 						} else {
 							app.showMessage(MSG.questionPosted);
 							clearField();

@@ -61,6 +61,9 @@ ui.post[ja]=投稿
 ui.successUpdate=Update succeed
 ui.successUpdate[ja]=更新しました
 
+ui.successCopy=Copy succeed
+ui.successCopy[ja]=コピーしました
+
 roomName=Room name
 roomName[ja]=ルーム名
 

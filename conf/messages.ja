@@ -120,6 +120,7 @@ ui.question=問題
 ui.questionPosted=問題をルーム管理者に投稿しました
 ui.questionSeq=第 {0} 問
 ui.start=開始
+ui.successCopy=コピーしました
 ui.successUpdate=更新しました
 ui.test=Test
 ui.timeLimitExceeded=制限時間を過ぎています
