@@ -145,6 +145,9 @@ ui.undecided[ja]=未定
 ui.people=people
 ui.people[ja]=人
 
+ui.capacityFormat={0} people
+ui.capacityFormat[ja]={0}人
+
 ranking=Ranking
 ranking[ja]=ランキング
 

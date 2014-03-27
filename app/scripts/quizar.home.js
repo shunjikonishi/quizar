@@ -22,11 +22,11 @@ function Home(con, users, userId) {
 			$("#room-detail-event").show();
 			$("#room-detail-title").text(room.event.title || "-");
 			$("#room-detail-date").text(
-				room.event.exceDate ? 
+				room.event.execDate ? 
 					new DateTime(room.event.execDate).datetimeStr() : 
 					"-"
 			);
-			$("#room-detail-capacity").text(room.event.capacity);
+			$("#room-detail-capacity").text(MSG.format(MSG.capacityFormat, room.event.capacity));
 			$("#room-detail-description2").text(room.event.description || "");
 		} else {
 			$("#room-detail-event").hide();
