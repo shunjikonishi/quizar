@@ -188,9 +188,10 @@ function PublishQuestion(app, context, con) {
 			} else {
 				applyDisabled($buttons);
 				showAnswerCounts(answerCounts);
-				showAnswerDetail = true;
 				if (answerDetail) {
 					buildAnswerDetail(answerDetail, answerCounts, true);
+				} else {
+					showAnswerDetail = true;
 				}
 			}
 		}
