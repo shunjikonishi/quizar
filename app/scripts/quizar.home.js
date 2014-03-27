@@ -38,14 +38,16 @@ function Home(con, users, userId) {
 		$el.find("tbody tr").click(function() {
 			var room = $.data(this, "room");
 			if (room) {
-				location.href = "/room/" + room.id;
-			}
-		});
-		$el.find("tbody tr button").click(function() {
-			var room = $.data(this, "room");
-			if (room) {
 				showRoomInfo(room);
 			}
+			return false;
+		});
+		$el.find("tbody tr button").click(function() {
+			var room = $.data($(this).parents("tr")[0], "room");
+			if (room) {
+				location.href = "/room/" + room.id;
+			}
+			return false;
 		});
 	}
 	function buildTable($el, data) {
