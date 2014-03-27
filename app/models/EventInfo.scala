@@ -65,3 +65,15 @@ object EventInfo {
   def fromJson(str: String): EventInfo = fromJson(Json.parse(str))
 }
 
+case class EventWithCount(
+  event: EventInfo,
+  userCount: Int,
+  publishCount: Int
+) {
+  def toJson = Json.toJson(this)(EventWithCount.format)
+  override def toString = toJson.toString
+}
+
+object EventWithCount {
+  implicit val format = Json.format[EventWithCount]
+}

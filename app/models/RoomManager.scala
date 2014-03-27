@@ -95,7 +95,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
         .from(QuizRoom as qr)
         .leftJoin(QuizEvent as qe).on(sqls"qr.id = qe.room_id and qe.status in (0, 1)")
         .append(where)
-        .orderBy(sqls"COALESCE(qe.exec_date, qr.updated)").desc
+        .orderBy(sqls"COALESCE(qe.status, 0) desc, qe.exec_date asc, qr.updated desc")
         .limit(limit).offset(offset)
     }.map { rs =>
       val room = RoomInfo.create(QuizRoom(qr.resultName)(rs))
@@ -263,6 +263,37 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
         wrongCount=rs.int("wrong_count"),
         time=rs.int("time"),
         point=rs.int("point")
+      )
+    }.list.apply
+  }
+
+  def getEventWithCount(roomId: Int): List[EventWithCount] = DB readOnly { implicit session =>
+    sql"""
+      select A.id, A.room_id, A.title, A.status, A.admin, A.exec_date, A.end_date, 
+             A.capacity, A.passcode, A.description,
+             B.user_count, C.publish_count
+        from quiz_event A
+  inner join (select event_id, count(*) as user_count from quiz_user_event group by event_id) B ON (A.id = B.event_id)
+  inner join (select event_id, count(*) as publish_count from quiz_publish group by event_id) C ON (A.id = C.event_id)
+       where A.room_id = ${roomId}
+    order by A.id desc
+    """.map { rs =>
+      val event = EventInfo(
+        id=rs.int("id"),
+        roomId = rs.int("room_id"),
+        title = rs.stringOpt("title"),
+        status = EventStatus.fromCode(rs.short("status")),
+        admin = rs.intOpt("admin"),
+        execDate = rs.timestampOpt("exec_date").map(_.toDateTime),
+        endDate = rs.timestampOpt("end_date").map(_.toDateTime),
+        capacity = rs.int("capacity"),
+        passcode = rs.stringOpt("passcode"),
+        description = rs.stringOpt("description")
+      )
+      EventWithCount(
+        event=event,
+        userCount=rs.int("user_count"),
+        publishCount=rs.int("publish_count")
       )
     }.list.apply
   }
@@ -450,6 +481,12 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
     val eventId = (command.data \ "eventId").as[Int]
     val userId = (command.data \ "userId").as[Int]
     val data = JsArray(getEventQuestions(eventId, userId).map(_.toJson))
+    command.json(data)
+  }
+
+  val eventWithCountCommand = CommandHandler { command =>
+    val roomId = command.data.as[Int]
+    val data = JsArray(getEventWithCount(roomId).map(_.toJson))
     command.json(data)
   }
 

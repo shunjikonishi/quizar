@@ -26,7 +26,7 @@ function Home(con, users, userId) {
 					new DateTime(room.event.execDate).datetimeStr() : 
 					"-"
 			);
-			$("#room-detail-capacity").text(MSG.format(MSG.capacityFormat, room.event.capacity));
+			$("#room-detail-capacity").text(MSG.format(MSG.numberWithPeople, room.event.capacity));
 			$("#room-detail-description2").text(room.event.description || "");
 		} else {
 			$("#room-detail-event").hide();

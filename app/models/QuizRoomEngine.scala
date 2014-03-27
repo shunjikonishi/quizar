@@ -92,6 +92,7 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
     addHandler("getEventQuestions", RoomManager.eventQuestionsCommand)
     addHandler("getMemberCount", RoomManager.memberCountCommand)
     addHandler("getLookback", RoomManager.lookbackCommand)
+    addHandler("getEventWithCount", RoomManager.eventWithCountCommand)
     addHandler("getUser", UserManager.getCommand)
     addHandler("updateUser", updateUserCommand)
     addHandler("tweet") { c =>

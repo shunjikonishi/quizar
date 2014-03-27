@@ -145,8 +145,8 @@ ui.undecided[ja]=未定
 ui.people=people
 ui.people[ja]=人
 
-ui.capacityFormat={0} people
-ui.capacityFormat[ja]={0}人
+ui.numberWithPeople={0}
+ui.numberWithPeople[ja]={0}人
 
 ranking=Ranking
 ranking[ja]=ランキング
@@ -279,6 +279,12 @@ eventConfirm[ja]=この部屋では現在イベントを開催しています。
 
 entry=Entry
 entry[ja]=参加
+
+memberCount=Member
+memberCount[ja]=参加者
+
+publishCount=Pub.
+publishCount[ja]=出題
 
 notEntry=No
 notEntry[ja]=参加しない

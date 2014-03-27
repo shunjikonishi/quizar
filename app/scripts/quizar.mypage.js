@@ -2,6 +2,7 @@ function Mypage(app, context, users, con) {
 	var ENTRY_COLUMNS = ["r-room", "r-point", "r-correct"],
 		OWNER_COLUMNS = ["r-room", "r-event", "r-question"],
 		EVENT_COLUMNS = ["r-title", "r-point", "r-correct"],
+		OWNER_EVENT_COLUMNS = ["r-title", "r-member", "r-publish"],
 		QUESTION_COLUMNS = ["q-text", "q-correct"];
 
 	function buildRank($td, rank, correctCount) {
@@ -40,6 +41,10 @@ function Mypage(app, context, users, con) {
 					$td.text(rowData.questionCount);
 				} else if (clazz == "q-text") {
 					$td.text(rowData.question);
+				} else if (clazz == "r-member") {
+					$td.text(MSG.format(MSG.numberWithPeople, rowData.userCount));
+				} else if (clazz == "r-publish") {
+					$td.text(rowData.publishCount);
 				} else if (clazz == "q-correct") {
 					if (rowData.userAnswer) {
 						var icon = rowData.correct ? "fa-circle-o" : "fa-times",
@@ -48,7 +53,7 @@ function Mypage(app, context, users, con) {
 						$td.append($i);
 					}
 				}
-				if (!users[rowData.owner]) {
+				if (rowData.owner && !users[rowData.owner]) {
 					users[rowData.owner] = new User({
 						"id" : rowData.owner,
 						"name" : rowData.ownerName,
@@ -60,10 +65,6 @@ function Mypage(app, context, users, con) {
 			$tbody.append($tr);
 			$.data($tr[0], "obj", rowData);
 		}
-	}
-	function enterRoom() {
-		var room = $.data(this, "obj");
-		location.href = "/room/" + room.roomId;
 	}
 	function buildEvents(roomInfo, events) {
 		var $tbody = $("#mypage-events tbody");
@@ -112,6 +113,42 @@ function Mypage(app, context, users, con) {
 			}
 		})
 	}
+	function buildOwnersEvents(roomInfo, events) {
+		var $tbody = $("#mypage-owners-events tbody");
+		$("#mypage-owners-events-roomName").text(roomInfo.name);
+		buildTable($tbody, OWNER_EVENT_COLUMNS, events);
+		$tbody.find("tr").click(showQuestions);
+	}
+	function showOwnersEvents() {
+		var room = $.data(this, "obj");
+		$("#mypage-owners-events-roomName").text(room.roomName);
+		con.request({
+			"command" : "getEventWithCount",
+			"data" : room.roomId,
+			"success" : function(data) {
+				var $pane = $("#mypage-owners-events"),
+					$tbody = $pane.find("tbody");
+				
+				var newData = [];
+				for (var i=0; i<data.length; i++) {
+					var event = data[i].event;
+					event.eventId = event.id;
+					event.userCount = data[i].userCount;
+					event.publishCount = data[i].publishCount;
+					newData.push(event);
+				}
+				roomInfo = {
+					"id" : room.roomId,
+					"name" : room.roomName
+				};
+				events = newData;
+				buildTable($tbody, OWNER_EVENT_COLUMNS, newData);
+				$tab.find(".tab-pane").hide();
+				$tbody.find("tr").click(showQuestions);
+				slideIn($pane, "right");
+			}
+		});
+	}
 	function buildQuestions(questions) {
 		var $tbody = $("#mypage-questions tbody");
 		buildTable($tbody, QUESTION_COLUMNS, questions);
@@ -119,6 +156,7 @@ function Mypage(app, context, users, con) {
 	}
 	function showQuestions() {
 		var event = $.data(this, "obj");
+console.log("test1: " + event.eventId);
 		con.request({
 			"command" : "getEventQuestions",
 			"data" : {
@@ -177,7 +215,7 @@ function Mypage(app, context, users, con) {
 			"success" : function(data) {
 				var $tbody = $("#mypage-owners tbody");
 				buildTable($tbody, OWNER_COLUMNS, data);
-				$tbody.find("tr").click(enterRoom);
+				$tbody.find("tr").click(showOwnersEvents);
 			}
 		});
 		$("#mypage-events-back").click(function() {
@@ -186,19 +224,38 @@ function Mypage(app, context, users, con) {
 			$tab.find(".tab-pane").hide();
 			slideIn($("#mypage-entries"), "left");
 		})
+		$("#mypage-owners-events-back").click(function() {
+			roomInfo = null;
+			events = null;
+			$tab.find(".tab-pane").hide();
+			slideIn($("#mypage-owners"), "left");
+		})
 		$("#mypage-questions-back").click(function() {
 			questions = null;
 			$tab.find(".tab-pane").hide();
-			slideIn($("#mypage-events"), "left");
+			if (roomInfo.rank) {
+				slideIn($("#mypage-events"), "left");
+			} else {
+				slideIn($("#mypage-owners-events"), "left");
+			}
 		})
 		if (roomInfo && events) {
+			if (!roomInfo.rank) {
+				$tab.tabs("option", "active", 1);
+			}
 			$tab.find(".tab-pane").hide();
-			buildEvents(roomInfo, events);
+			if (roomInfo.rank) {
+				buildEvents(roomInfo, events);
+			} else {
+				buildOwnersEvents(roomInfo, events);
+			}
 			if (questions) {
 				buildQuestions(questions);
 				$("#mypage-questions").show();
-			} else {
+			} else if (roomInfo.rank) {
 				$("#mypage-events").show();
+			} else {
+				$("#mypage-owners-events").show();
 			}
 		}
 	}
