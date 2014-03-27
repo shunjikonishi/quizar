@@ -1,5 +1,6 @@
 package models
 
+import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.iteratee.Enumerator
@@ -294,6 +295,47 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
         answerCounts=answerCounts
       )
     }.single.apply
+  }
+
+  def recalcQuestion(roomId: Int) = DB.localTx{ implicit session =>
+    val now = new DateTime()
+    sql"""UPDATE QUIZ_QUESTION A
+             SET CORRECT_COUNT = B.CORRECT_COUNT,
+                 WRONG_COUNT = B.WRONG_COUNT,
+                 UPDATED = ${now}
+            FROM (SELECT QUESTION_ID, 
+                         SUM(CORRECT_COUNT) AS CORRECT_COUNT, 
+                         SUM(WRONG_COUNT) AS WRONG_COUNT
+                    FROM QUIZ_ANSWER_COUNT
+                   GROUP BY QUESTION_ID) B
+              WHERE A.ROOM_ID = ${roomId}
+                AND A.ID = B.QUESTION_ID
+      """.update.apply()
+  }
+
+  def closeInactiveEvents = {
+    val now = new DateTime()
+    val openEvents: List[(Int, Int, DateTime)] = DB.readOnly { implicit session =>
+      sql"""
+        SELECT A.ID, A.ROOM_ID, A.EXEC_DATE, MAX(B.UPDATED)
+          FROM QUIZ_EVENT A 
+     LEFT JOIN QUIZ_PUBLISH B ON (A.ID = B.EVENT_ID)
+         WHERE A.STATUS = ${EventStatus.Running.code}
+      GROUP BY A.ID, A.EXEC_DATE
+      """.map { rs =>
+        val eventId = rs.int(1)
+        val roomId = rs.int(2)
+        val date = rs.timestampOpt(4).getOrElse(rs.timestamp(3)).toDateTime
+        (eventId, roomId, date)
+      }.list.apply
+    }
+    openEvents.filter(_._3.plusDays(1).getMillis < now.getMillis).foreach { t =>
+      val eventId = t._1
+      val roomId = t._2
+      Logger.info("closeInactiveEvent: " + eventId)
+      EventManager(roomId).close(eventId)
+      recalcQuestion(roomId)
+    }
   }
 
   val createCommand = CommandHandler { command =>

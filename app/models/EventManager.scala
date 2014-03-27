@@ -113,7 +113,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
         "WHERE ID = ? AND STATUS = ?")
       .bind(EventStatus.Finished.code, roundTime(now), now, id, EventStatus.Running.code)
       .update.apply();
-    //ToDo ranking
+    calcRanking(id)
     ret == 1
   }
 
@@ -272,10 +272,6 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }
   }
 
-  private def recalcQuestion(eventId: Int) = {
-    //ToDo
-  }
-
   val createCommand = CommandHandler { command =>
     val event = create(EventInfo.fromJson(command.data))
     command.json(event.toJson)
@@ -345,9 +341,8 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     }
     val recalc = !openBySelf
     openBySelf = false
-    calcRanking(id)
     if (recalc) {
-      recalcQuestion(id)
+      getEvent(id).foreach(e => RoomManager.recalcQuestion(e.roomId))
     }
     command.json(JsBoolean(ret))
   }
