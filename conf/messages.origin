@@ -402,3 +402,6 @@ userSettingDescription[ja]=ユーザ設定を変更します。
 
 settings=Settings
 settings[ja]=設定
+
+ui.copy=Copy
+ui.copy[ja]=コピー

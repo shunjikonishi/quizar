@@ -45,12 +45,9 @@ function MakeQuestion(app, context, con) {
 		return this;
 	}
 	function update() {
-		if (editQuestion && editQuestion.publishCount > 0) {
-			app.showMessage("Can not update published question");
-		}
 		if (validator && validator.form()) {
 			var q = collectField();
-			if (editQuestion) {
+			if (editQuestion && editQuestion.publishCount == 0) {
 				con.request({
 					"command" : "updateQuestion",
 					"data" : q,
@@ -75,6 +72,7 @@ function MakeQuestion(app, context, con) {
 								app.showMessage(MSG.successUpdate);
 								$btnUpdate.text(MSG.update);
 								$publish.show("slow");
+								enableInput($form.find(":input"), true);
 								enableInput($btnPublish, true);
 							} else {
 								app.showQuestionList("left");
@@ -152,10 +150,11 @@ function MakeQuestion(app, context, con) {
 		optionControl($el);
 		if (editQuestion) {
 			$("#make-q-desc").text(eventId ? MSG.editAndPublishQuestion : MSG.editQuestion);
-			$btnUpdate.text(MSG.update);
 			if (editQuestion.publishCount > 0) {
 				enableInput($form.find(":input"), false);
-				enableInput($btnUpdate, false);
+				$btnUpdate.text(MSG.copy);
+			} else {
+				$btnUpdate.text(MSG.update);
 			}
 			if (editQuestion.answerType == AnswerType.NoAnswer) {
 				enableIncludeRank(false);

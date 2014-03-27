@@ -90,6 +90,7 @@ title=Title
 top=Top
 totalRanking=Total ranking
 tweet=Tweet
+ui.copy=Copy
 ui.correctAnswer=Good job!
 ui.create=Create
 ui.createQuestion=Create question.

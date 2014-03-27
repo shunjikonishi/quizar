@@ -90,6 +90,7 @@ title=タイトル
 top=トップ
 totalRanking=総合順位
 tweet=つぶやく
+ui.copy=コピー
 ui.correctAnswer=正解！
 ui.create=作成
 ui.createQuestion=問題を作成します。
