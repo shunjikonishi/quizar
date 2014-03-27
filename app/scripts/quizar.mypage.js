@@ -156,7 +156,6 @@ function Mypage(app, context, users, con) {
 	}
 	function showQuestions() {
 		var event = $.data(this, "obj");
-console.log("test1: " + event.eventId);
 		con.request({
 			"command" : "getEventQuestions",
 			"data" : {
@@ -258,6 +257,9 @@ console.log("test1: " + event.eventId);
 				$("#mypage-owners-events").show();
 			}
 		}
+		backButtonControl($("#mypage-events"));
+		backButtonControl($("#mypage-owners-events"));
+		backButtonControl($("#mypage-questions"));
 	}
 	function clear() {
 		$tab = null;

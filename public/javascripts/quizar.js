@@ -497,6 +497,24 @@ function optionControl($ctrl, $panel) {
 		$panel.slideToggle();
 	})
 }
+function backButtonControl($el) {
+	var $pagingBar = $el.find(".paging-bar");
+	if ($pagingBar.length) {
+		var $div = $pagingBar.parent(),
+			$button = $pagingBar.find("button");
+		$div.swipe({
+			"swipeRight": function(e) {
+				$button.click();
+				e.stopImmediatePropagation();
+			},
+			"tap": function (event, target) {
+				if (SUPPORTS_TOUCH) {
+					$(target).click();
+				}
+			}
+		})
+	}
+}
 function roundTime(t) {
 	return Math.round(t / 10) / 100;
 }
@@ -1175,7 +1193,6 @@ function Mypage(app, context, users, con) {
 	}
 	function showQuestions() {
 		var event = $.data(this, "obj");
-console.log("test1: " + event.eventId);
 		con.request({
 			"command" : "getEventQuestions",
 			"data" : {
@@ -1277,6 +1294,9 @@ console.log("test1: " + event.eventId);
 				$("#mypage-owners-events").show();
 			}
 		}
+		backButtonControl($("#mypage-events"));
+		backButtonControl($("#mypage-owners-events"));
+		backButtonControl($("#mypage-questions"));
 	}
 	function clear() {
 		$tab = null;
