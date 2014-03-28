@@ -209,9 +209,11 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
       case Some((point, correctCount, time)) if correctCount > 0 =>
         val cnt = sql"""
           select count(*) from quiz_total_ranking
-           where (point > ${point})
+           where room_id = ${roomId}
+             and ((point > ${point})
               or (point = ${point} and correct_count > ${correctCount})
               or (point = ${point} and correct_count = ${correctCount} and time < ${time})
+                 )
         """.map(_.int(1)).single.apply.get
         Some(cnt + 1)
       case _ => None
