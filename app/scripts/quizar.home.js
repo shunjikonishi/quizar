@@ -139,6 +139,7 @@ function Home(con, users, userId) {
 		}
 		$("#room-detail-enter").click(enterRoom);
 		$("#room-detail-back").click(backToList);
+		backButtonControl($("#event-detail"));
 	}
 	function clear() {
 		$tab = null;

@@ -28,7 +28,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
 
   override protected def terminate() = {
     super.terminate()
-    redis.close
+    redis.clear
   }
   
   private val (qr, qe) = (QuizRoom.qr, QuizEvent.qe)

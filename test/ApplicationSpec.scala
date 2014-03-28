@@ -16,7 +16,6 @@ import models._
 class ApplicationSpec extends Specification {
 
   "Application" should {
-    /*
     "user 1 is skonishi" in new WithApplication {
       val user = UserManager.getUserById(1)
       user.name must startWith("@shunjikonishi")
@@ -25,7 +24,6 @@ class ApplicationSpec extends Specification {
     "send 404 on a bad request" in new WithApplication{
       route(FakeRequest(GET, "/boum")) must beNone
     }
-    */
 
     "render the index page" in new WithApplication{
       val home = route(FakeRequest(GET, "/")).get

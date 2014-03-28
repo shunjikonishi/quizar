@@ -257,6 +257,7 @@ function PublishQuestion(app, context, con) {
 			applyDisabled($buttons);
 			buildAnswerDetail(lookback, lookback.answerCounts, false);
 			$text.text(lookback.question);
+			backButtonControl($el);
 		} else {
 			if (question) {
 				$seq.text(MSG.format(MSG.questionSeq, question.seq));

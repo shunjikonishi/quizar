@@ -315,6 +315,7 @@ flect.QuizApp = function(serverParams) {
 				$.sidr('open');
 			},
 			"tap": function (event, target) {
+				$.sidr('close');
 				if (SUPPORTS_TOUCH) {
 					$(target).click();
 				}

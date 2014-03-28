@@ -126,6 +126,7 @@ ui.test=Test
 ui.timeLimitExceeded=制限時間を過ぎています
 ui.undecided=未定
 ui.update=更新
+ui.websocketNotSupported=このブラウザはWebSocketをサポートしていません。最新のモダンブラウザをご使用ください。
 ui.wrongAnswer=不正解！
 upcoming=近日開催
 userSettingDescription=ユーザ設定を変更します。

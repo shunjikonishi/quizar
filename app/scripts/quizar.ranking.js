@@ -233,6 +233,8 @@ function Ranking(app, context, users, con) {
 			$tab.find(".tab-pane").hide();
 			$("#ranking-total").show("slide", { "direction" : "left"}, EFFECT_TIME);
 		});
+		backButtonControl($("#ranking-event-detail"));
+		backButtonControl($("#ranking-user"));
 		$tab = $("#ranking-tab").tabs({
 			"active" : context.isEventRunning() ? 0 : 1,
 			"beforeActivate" : function() {

@@ -501,18 +501,20 @@ function backButtonControl($el) {
 	var $pagingBar = $el.find(".paging-bar");
 	if ($pagingBar.length) {
 		var $div = $pagingBar.parent(),
-			$button = $pagingBar.find("button");
-		$div.swipe({
-			"swipeRight": function(e) {
-				$button.click();
-				e.stopImmediatePropagation();
-			},
-			"tap": function (event, target) {
-				if (SUPPORTS_TOUCH) {
-					$(target).click();
+			$button = $pagingBar.find("button.back-btn");
+		if ($button.length) {
+			$div.swipe({
+				"swipeRight": function(e) {
+					$button.click();
+					e.stopImmediatePropagation();
+				},
+				"tap": function (event, target) {
+					if (SUPPORTS_TOUCH) {
+						$(target).click();
+					}
 				}
-			}
-		})
+			})
+		}
 	}
 }
 function roundTime(t) {
@@ -984,6 +986,7 @@ function Home(con, users, userId) {
 		}
 		$("#room-detail-enter").click(enterRoom);
 		$("#room-detail-back").click(backToList);
+		backButtonControl($("#event-detail"));
 	}
 	function clear() {
 		$tab = null;
@@ -2239,6 +2242,7 @@ function PublishQuestion(app, context, con) {
 			applyDisabled($buttons);
 			buildAnswerDetail(lookback, lookback.answerCounts, false);
 			$text.text(lookback.question);
+			backButtonControl($el);
 		} else {
 			if (question) {
 				$seq.text(MSG.format(MSG.questionSeq, question.seq));
@@ -2870,6 +2874,8 @@ function Ranking(app, context, users, con) {
 			$tab.find(".tab-pane").hide();
 			$("#ranking-total").show("slide", { "direction" : "left"}, EFFECT_TIME);
 		});
+		backButtonControl($("#ranking-event-detail"));
+		backButtonControl($("#ranking-user"));
 		$tab = $("#ranking-tab").tabs({
 			"active" : context.isEventRunning() ? 0 : 1,
 			"beforeActivate" : function() {
@@ -3300,6 +3306,7 @@ flect.QuizApp = function(serverParams) {
 				$.sidr('open');
 			},
 			"tap": function (event, target) {
+				$.sidr('close');
 				if (SUPPORTS_TOUCH) {
 					$(target).click();
 				}
