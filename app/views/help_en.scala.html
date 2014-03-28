@@ -1,6 +1,372 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
-<div id="help" class="workspace">
-	<h1>@Messages("application.title")</h1>
-	<p>Help</p>
-	<p>Sorry, now English document is not prepared.</p>
+<div id="help" class="workspace help">
+	<section>
+		<h1 class="alert alert-info">Welcome to @Messages("application.title")!</h1>
+		<article>
+			<p>@Messages("application.title") is a realtime quiz application.</p>
+			<p>For example, you can use this app for studying meeting, or enjoy in any party.</p>
+		</article>
+		<article class="alert alert-danger">
+			<p>@Messages("application.title") uses newest technologies.(e.g. WebSocket, SessionStorage, PushState)</p>
+			<p>This app requires newest modern browser.。</p>
+			<p><em>Before IE9 and Android standard browser(beofre 4.3) are not suppoted.</em></p>
+		</article>
+	</section>
+	<section>
+		<h2 class="alert alert-info">Usage for quiz master.</h2>
+		<article>
+			<p>At first, the quiz master makes a room. The room is the place to publish quiz.</p>
+			<p>You can name the room as you want.(e.g. "Java study", "Hollywood movie quiz")</p>
+		</article>
+		<article>
+			<p>Next, you should make some questions.</p>
+			<p>The question can take 5 choices. And it can have an explanation for the answer and reference link.</p>
+		</article>
+		<article>
+			<p>After that, let's hava an event with some quiz panelists.</p>
+			<p>In the event, you can publish some quiz to the panelists. Th event makes a ranking of panelists.</p>
+		</article>
+		<article class="alert alert-warning">
+			<p>Though the quiz master and the panelists are not necessary to be in the same place, maybe it is more fun to in same place.</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">Usage for quiz panelists.</h2>
+		<article>
+			<p>At first, the quiz panelist enter the room of quiz master.</p>
+			<p>In the room, you can chat with others.</p>
+		</article>
+		<article>
+			<p>When the quiz master starts an event, the entry dialog is shown. After entry the event, you can answer the quiz.</p>
+			<p>The time limit for a quiz is 10 seconds.</p>
+		</article>
+		<article class="alert alert-warning">
+			<p>This app requires good network environment.</p>
+			<p>At the time of quiz, if your device is sleeping, or your browser is closed, you can not  answer the quiz. It's a part of the game.</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">Screen shot</h2>
+		<article>ToDo スナップショットx2 画面内に番号を振る</article>
+		<ol>
+			<li>Menu button. Open side menu by clicking.</li>
+			<li>User menu. A drop down menu of user related functions.</li>
+			<li>Side menu.Most functions are executed from this.</li>
+			<li>Short cut bar. Shortcut of fluently used functions.</li>
+		</ol>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">Sign in</h2>
+		<article>
+			<p>This app requires Twitter account for sign in.</p>
+			<p>You can sign in with this button of the top page.
+				<a class="btn btn-twitter" href="javascript:void(0)">
+					<i class="fa fa-twitter fa-2x"></i>
+					@Messages("loginWithTwitter")
+				</a>
+			</p>
+		</article>
+		<article class="alert alert-warning">
+			<p>This app uses following Twitter features.</p>
+			<ul>
+				<li>User authentication.</li>
+				<li>Display user icon.</li>
+				<li>Tweet.(Option feature of the chat room.)</li>
+			</ul>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">Home</h2>
+		<article>
+			<p>Top page of this application. You can show this page by "Home" button of the side mentu.</p>
+			<p>This page has list of rooms.</p>
+			<dl>
+				<dt>Recent</dt>
+				<dd>The rooms which have a running event or recent event are listed.</dd>
+
+				<dt>Yours</dt>
+				<dd>Your own rooms and entried rooms are listed.</dd>
+			</dl>
+			<p>You can look the detail information by clicking a row.</p>
+			<p>You can enter the room with enter button.</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">ルームの作成／編集</h2>
+		<article>
+			<p>サイドメニューの「ルームの作成」を選択することでルーム作成画面が表示されます。</p>
+		</article>
+		<table class="table">
+			<tr>
+				<th>ルーム名</th>
+				<td>ルームの名前を指定します。唯一の必須項目です。</td>
+			</tr>
+			<tr>
+				<th>参加者の問題投稿を許可</th>
+				<td>チェックすると自分以外のユーザーが問題を投稿できるようになります。</td>
+			</tr>
+			<tr>
+				<th>タグ</th>
+				<td>任意の文字列を設定できます。(現在未使用ですが将来的に検索できるようになるかもしれません。)</td>
+			</tr>
+			<tr>
+				<th>ハッシュタグ</th>
+				<td>チャットに付加されるハッシュタグを指定します。</td>
+			</tr>
+			<tr>
+				<th>説明</th>
+				<td>任意の説明を記述します。</td>
+			</tr>
+		</table>
+		<article>
+			<p>ルームの設定内容はサイドメニューの「ルームの編集」からいつでも変更できます。</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">問題の作成</h2>
+		<article>
+			<p>サイドメニューの「問題の編集／出題」を選択することで問題一覧画面が表示されます。</p>
+			<p>または画面下のショートカットバーからもこの画面を開くことができます。</p>
+			<dl>
+				<dt>ストック</dt>
+				<dd>
+					<p>まだ一度も出題したことがない問題の一覧です。</p>
+					<p>各行をクリックすることで詳細画面に遷移し内容を変更することができます。</p>
+					<p>またイベント開催時には一覧からショートカット的に問題を出題できます。(詳細画面からも出題はできます。)</p>
+				</dd>
+
+				<dt>出題済み</dt>
+				<dd>
+					<p>過去に出題した問題の一覧です。</p>
+					<p>各行をクリックすることで詳細画面に遷移しますが内容を変更することはできません。</p>
+					<p>(問題をコピーして新しい問題として登録することはできます。)</p>
+					<p>一覧にはこれまでの出題回数と累計正答者数が表示されます。</p>
+					<p>出題済みの問題であってもイベントが変われば詳細画面から何度でも出題することができます。</p>
+				</dd>
+
+				<dt>新規作成</dt>
+				<dd>
+					<p>問題作成画面に遷移します。</p>
+				</dd>
+			</dl>
+		</article>
+		<table class="table">
+			<tr>
+				<th>問題</th>
+				<td>問題文を記述します。</td>
+			</tr>
+			<tr>
+				<th>選択肢</th>
+				<td>
+					<p>回答の選択肢を記述します。</p>
+					<p>改行区切りで最大5つまで指定できます。</p>
+				</td>
+			</tr>
+			<tr>
+				<th>正解</th>
+				<td>
+					<p>問題の正解がどれであるかの設定です。</p>
+					<ul>
+						<li>先頭行 - 選択肢の先頭行が正解になります。</li>
+						<li>最も多かった回答 - 回答者の一番多かった選択肢が正解となります。</li>
+						<li>最も少なかった回答 - 回答者の一番少なかった選択肢がが正解となります。(0は除く)</li>
+						<li>正解なし - アンケートのような正解のない問題を出す場合に使用します。</li>
+					</ul>
+				</td>
+			</tr>
+			<tr>
+				<th>タグ</th>
+				<td>任意の文字列を設定できます。(現在未使用ですが将来的に検索できるようになるかもしれません。)</td>
+			</tr>
+			<tr>
+				<th>説明</th>
+				<td>任意の説明を記述します。</td>
+			</tr>
+			<tr>
+				<th>参考リンク</th>
+				<td>問題の解説として参考になるサイトがあるならそのURLを指定します。</td>
+			</tr>
+		</table>
+		<article class="alert alert-warning">
+			<p>イベント参加者はマイページから自分の参加したイベントの問題を振り返ることができるので、勉強会目的の場合は説明、参考リンクを設定しておくことで学習の助けとなります。</p>
+		</article>
+		<h3>問題の出題</h3>
+		<article>
+			<p>イベント開催時にはこの画面から問題を出題することができます。</p>
+		</article>
+		<table class="table">
+			<tr>
+				<th>ランキングに含める</th>
+				<td>チェックを外すと問題に正解してもランキング集計の対象外となります。</td>
+			</tr>
+		</table>
+		<article class="alert alert-warning">
+			<ul>
+				<li>正解なしの問題はランキングに含めることはできません。</li>
+				<li>先頭行が正解の問題は出題時に選択肢がシャッフルされます。</li>
+				<li>それ以外の問題は指定の順で選択肢が表示されます。</li>
+			</ul>
+		</article>
+		<h3>問題の投稿</h3>
+		<article>
+			<p>ルームの設定で参加者の問題投稿が許可されている場合は誰でも問題を作成することができます。</p>
+			<p>ただし、問題の投稿後はその問題は主催者に委ねられるので問題を修正することはできません。</p>
+			<p>主催者は投稿された問題を自由に修正することができます。</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">イベントの編集</h2>
+		<article>
+			<p>サイドメニューの「イベントの編集」を選択することでイベントの編集、開始、終了を行う画面が表示されます。</p>
+			<p>イベントが開始されていない場合はイベント内容の入力フォームが表示され、その修正とイベントの開始を行うことができます。</p>
+			<p>イベントが開始されている場合は参加者一覧が表示されイベントの終了を行うことができます。</p>
+		</article>
+		<table class="table">
+			<tr>
+				<th>定員</th>
+				<td>イベントに参加できる人数を設定します。現在は最大50人に制限されています。</td>
+			</tr>
+			<tr>
+				<th>タイトル</th>
+				<td>任意のイベントタイトルを指定します。</td>
+			</tr>
+			<tr>
+				<th>開始日</th>
+				<td>イベントの開始予定日を指定します。</td>
+			</tr>
+			<tr>
+				<th>開始時刻</th>
+				<td>イベントの開始予定時刻を指定します。</td>
+			</tr>
+			<tr>
+				<th>パスコード</th>
+				<td>
+					<p>指定するとイベント参加時にパスコードの入力を求められるようになります。</p>
+					<p>(つまりパスコードを知っている人しかイベントに参加できなくなります。)</p>
+				</td>
+			</tr>
+			<tr>
+				<th>説明</th>
+				<td>任意の説明を記述します。</td>
+			</tr>
+		</table>
+		<article class="alert alert-warning">
+			<ul>
+				<li>イベントの設定項目に必須項目はありません。この画面の表示後に何も入力せずにすぐにイベントを開始することができます。</li>
+				<li>開始日、開始時刻を設定してもその時間に自動的にイベントが開始されるわけではありません。イベントの開始はあくまで主催者が手動で行います。これらの項目は近日開催のイベント一覧の検索のためにのみ使用されます。</li>
+				<li>24時間以上問題が出題されていないイベントは自動的に終了します。</li>
+				<li>過去のイベント情報の変更はできません。</li>
+			</ul>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">イベントへの参加</h2>
+		<article>
+			<p>主催者でないユーザーがルーム内にいる時にイベントが開始されるとイベントへの参加を問い合わせるパネルが表示されます。</p>
+			<p>ここで「参加」をクリックするとイベントに参加できます。</p>
+		</article>
+		<article class="alert alert-warning">
+			<ul>
+				<li>イベント参加のパネルで「参加しない」を選択した場合でも、後から画面右上のユーザーメニューから参加することができます。</li>
+				<li>イベントへの参加は先着順です。定員に達した場合はそれ以降のイベント参加は受け付けられなくなります。</li>
+				<li>一度参加したイベントのキャンセルはできません。参加後一問も回答せずに退室(ブラウザ終了)した場合でも参加扱いとなります。(定員にカウントされます。)</li>
+				<li>イベントに参加していない状態でもルーム内にいれば問題を見ることはできますが回答はできません。</li>
+			</ul>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">問題の解答</h2>
+		<article>
+			<p>主催者が問題を出題するとすぐに参加者の端末で問題が表示されます。正解と思うボタンをクリックしてください。制限時間は10秒です。</p>
+			<p>解答後は選択肢ごとの人数がボタン上に表示され、10秒後には正解と問題の解説が表示されます。</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">ランキング</h2>
+		<article>
+			<p>サイドメニューの「ランキング」またはショートカットバーからランキング画面を開くことができます。</p>
+			<dl>
+				<dt>Now!</dt>
+				<dd>
+					<p>現在開催中のイベントのランキング。一問毎に順位が入れ替わります。</p>
+					<p>(イベント開催中以外は表示されません。)</p>
+				</dd>
+
+				<dt>イベント別</dt>
+				<dd>過去のイベントの優勝者一覧。行をクリックすることでそのイベントのランキングが表示されます。</dd>
+
+				<dt>通算</dt>
+				<dd>イベントを通しての通算ランキング。行をクリックすることでその人の各イベントでの成績が表示されます。</dd>
+			</dl>
+			<p>イベントランキングの算出方法は以下です。</p>
+			<ol>
+				<li>正答数の多い順</li>
+				<li>正答数が同じ場合は、正答した問題の解答にかかったタイムの短い順</li>
+			</ol>
+			<p>イベント終了時にイベントランキングの上位10人にはそれぞれ10ポイントから1ポイントまでのポイントが加算されます。</p>
+			<p>それを踏まえて通算ランキングの算出方法は以下です。</p>
+			<ol>
+				<li>ポイントの多い順</li>
+				<li>ポイントが同じ場合は、正答数の多い順</li>
+				<li>ポイント、正答数が同じ場合は、正答した問題の解答にかかったタイムの短い順</li>
+			</ol>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">マイページ</h2>
+		<article>
+			<p>サイドメニューの「マイページ」を選択することでマイページ画面を開くことができます。</p>
+			<p>マイページでは自分の参加したイベントまたは主催したイベントの問題を振りかえることができます。</p>
+			<dl>
+				<dt>参加ルーム</dt>
+				<dd>
+					<p>イベントに参加したことのあるルームの一覧です。</p>
+					<p>各行をクリックすることで、以下の画面にブレイクダウンしていきます。</p>
+					<ul>
+						<li>そのルームで参加したイベントの一覧と総合順位</li>
+						<li>イベントで出題された問題一覧</li>
+						<li>出題された問題とその解説</li>
+					</ul>
+				</dd>
+
+				<dt>主催ルーム</dt>
+				<dd>
+					<p>自分の主催するルームの一覧です。</p>
+					<p>各行をクリックすることで、以下の画面にブレイクダウンしていきます。</p>
+					<ul>
+						<li>開催したイベントの一覧と参加人数</li>
+						<li>イベントで出題された問題一覧</li>
+						<li>出題された問題とその解説</li>
+					</ul>
+				</dd>
+			</dl>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">チャット</h2>
+		<article>
+			<p>サイドメニューの「チャット」またはショートカットバーからチャット画面を開くことができます。</p>
+			<p>オプションでここでの発言内容を同時にTwitterに投稿することもできます。</p>
+		</article>
+		<article class="alert alert-warning">
+			<p>チャットの内容はどこにも保存されておらず、画面をリロードするだけでも過去の発言は見えなくなります。</p>
+			<p>本格的なコミュニケーション手段というよりもTwitter感覚でお使いください。</p>
+		</article>
+	</secition>
+	<section>
+		<h2 class="alert alert-info">ユーザー設定</h2>
+		<article>
+			<p>ユーザーメニューの「設定」をクリックすることでユーザー設定画面を開くことができます。</p>
+		</article>
+		<table class="table">
+			<tr>
+				<th>ユーザー名</th>
+				<td>ユーザー名を変更します。</td>
+			</tr>
+			<tr>
+				<th>チャットメッセージを通知する</th>
+				<td>チェックするとチャットに発言があった時にポップアップで通知されます。</td>
+			</tr>
+		</table>
+	</secition>
 </div>
