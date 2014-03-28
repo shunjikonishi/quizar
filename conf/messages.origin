@@ -408,3 +408,6 @@ settings[ja]=設定
 
 ui.copy=Copy
 ui.copy[ja]=コピー
+
+ui.websocketNotSupported=This browser doesn't support WebSockets. Please use modern browser.
+ui.websocketNotSupported=このブラウザはWebSocketをサポートしていません。最新のモダンブラウザをご使用ください。

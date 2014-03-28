@@ -1369,16 +1369,16 @@ function Chat($el, context, con) {
 			h = 0
 		$el.children("div").each(function() {
 			var $div = $(this),
-				dh = $div.height();
+				dh = $div.outerHeight();
 			if (!$div.hasClass("tweet-box")) {
 				if (dh > 0) {
 					h += dh;
 				}
 			}
 		});
-		h += $("#toolbar").height();
-		h += $("#tabbar").height();
-		$tweetBox.css("height", wh - h - 20);
+		h += $("#toolbar").outerHeight();
+		h += $("#tabbar").outerHeight();
+		$tweetBox.css("height", wh - h - 24);
 	}
 	var cnt = 0,
 		userId = context.userId,
@@ -3191,11 +3191,13 @@ flect.QuizApp = function(serverParams) {
 				return false;
 			})
 			$("#toolbar-question").click(function() {
-				if (context.isEventAdmin()) {
-					showQuestionList();
-				} else {
-					showQuestion();
+				if (context.isRoomAdmin()) {
+					if (!context.isEventRunning() || context.isEventAdmin()) {
+						showQuestionList();
+					}
+					return false;
 				}
+				showQuestion();
 				return false;
 			})
 			con.addEventListener("chat", function(data) {
@@ -3431,6 +3433,10 @@ flect.QuizApp = function(serverParams) {
 		$content,
 		pushState,
 		users = {};
+	if (!window.WebSocket) {
+		$("#content").prepend("<div class='alert alert-danger'>" + MSG.websocketNotSupported + "</div>");
+		return;
+	}
 	init();
 	debug.log("params", context);
 	var TemplateLogic = {

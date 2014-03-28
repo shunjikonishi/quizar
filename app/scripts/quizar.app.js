@@ -206,11 +206,13 @@ flect.QuizApp = function(serverParams) {
 				return false;
 			})
 			$("#toolbar-question").click(function() {
-				if (context.isEventAdmin()) {
-					showQuestionList();
-				} else {
-					showQuestion();
+				if (context.isRoomAdmin()) {
+					if (!context.isEventRunning() || context.isEventAdmin()) {
+						showQuestionList();
+					}
+					return false;
 				}
+				showQuestion();
 				return false;
 			})
 			con.addEventListener("chat", function(data) {
@@ -446,6 +448,10 @@ flect.QuizApp = function(serverParams) {
 		$content,
 		pushState,
 		users = {};
+	if (!window.WebSocket) {
+		$("#content").prepend("<div class='alert alert-danger'>" + MSG.websocketNotSupported + "</div>");
+		return;
+	}
 	init();
 	debug.log("params", context);
 	var TemplateLogic = {
