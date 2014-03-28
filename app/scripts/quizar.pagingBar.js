@@ -53,12 +53,26 @@ function PagingBar($el, count, func, rowSize) {
 	$btnPrev.click(prev);
 	$btnNext.click(next);
 	buttonControl();
+	$el.parent().swipe({
+		"swipeLeft": function(e) {
+			next();
+			e.stopImmediatePropagation();
+		},
+		"swipeRight": function(e) {
+			prev();
+			e.stopImmediatePropagation();
+		},
+		"tap": function (event, target) {
+			if (SUPPORTS_TOUCH) {
+				$(target).click();
+			}
+		}
+	});
 
 	$.extend(this, {
 		"prev" : prev,
 		"next" : next,
 		"recordCount" : recordCount,
-		"swipeParams" : swipeParams,
 		"release" : release
 	})
 }

@@ -76,7 +76,7 @@ function Home(con, users, userId) {
 					date = new DateTime(room.event.execDate).datetimeStr();
 				}
 				if (room.event.capacity) {
-					capacity = "" + room.event.capacity + MSG.people;
+					capacity = MSG.format(MSG.numberWithPeople, room.event.capacity);
 				}
 			}
 			$tr.attr("data-room", room.id);

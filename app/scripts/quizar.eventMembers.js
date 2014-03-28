@@ -28,7 +28,8 @@ function EventMembers(app, context, con) {
 			"command" : "getEventRanking",
 			"data" : {
 				"eventId" : context.eventId,
-				"limit" : 10
+				"offset" : offset,
+				"limit" : rowSize
 			},
 			"success" : function(data) {
 				var $table = $("#event-members-tbl"),

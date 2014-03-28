@@ -751,12 +751,26 @@ function PagingBar($el, count, func, rowSize) {
 	$btnPrev.click(prev);
 	$btnNext.click(next);
 	buttonControl();
+	$el.parent().swipe({
+		"swipeLeft": function(e) {
+			next();
+			e.stopImmediatePropagation();
+		},
+		"swipeRight": function(e) {
+			prev();
+			e.stopImmediatePropagation();
+		},
+		"tap": function (event, target) {
+			if (SUPPORTS_TOUCH) {
+				$(target).click();
+			}
+		}
+	});
 
 	$.extend(this, {
 		"prev" : prev,
 		"next" : next,
 		"recordCount" : recordCount,
-		"swipeParams" : swipeParams,
 		"release" : release
 	})
 }
@@ -923,7 +937,7 @@ function Home(con, users, userId) {
 					date = new DateTime(room.event.execDate).datetimeStr();
 				}
 				if (room.event.capacity) {
-					capacity = "" + room.event.capacity + MSG.people;
+					capacity = MSG.format(MSG.numberWithPeople, room.event.capacity);
 				}
 			}
 			$tr.attr("data-room", room.id);
@@ -2588,7 +2602,8 @@ function EventMembers(app, context, con) {
 			"command" : "getEventRanking",
 			"data" : {
 				"eventId" : context.eventId,
-				"limit" : 10
+				"offset" : offset,
+				"limit" : rowSize
 			},
 			"success" : function(data) {
 				var $table = $("#event-members-tbl"),
