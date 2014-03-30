@@ -301,10 +301,12 @@ flect.QuizApp = function(serverParams) {
 
 		$("#btn-menu").sidr({
 			"onOpen" : function() {
-				$("#toolbar").css("left", "260px").find(".header-center").hide();
+				$("#toolbar").css("left", "260px");
+				$("#tabbar").css("left", "260px");
 			},
 			"onClose" : function() {
-				$("#toolbar").css("left", "0px").find(".header-center").show();
+				$("#toolbar").css("left", "0px");
+				$("#tabbar").css("left", "0px");
 			}
 		});
 		$("#content").swipe({
