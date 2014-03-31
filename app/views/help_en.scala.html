@@ -1,7 +1,7 @@
 @(sessionInfo: SessionInfo)(implicit lang: Lang)
 <div id="help" class="workspace help">
 	<section>
-		<h1 class="alert alert-info">Welcome to @Messages("application.title")!</h1>
+		<h1 class="alert alert-info-headline">Welcome to @Messages("application.title")!</h1>
 		<article>
 			<p>@Messages("application.title") is a realtime quiz application.</p>
 			<p>For example, you can use this app for studying meeting, or enjoy in any party.</p>
@@ -13,7 +13,7 @@
 		</article>
 	</section>
 	<section>
-		<h2 class="alert alert-info">Usage for quiz master.</h2>
+		<h2 class="alert alert-info subhead">Usage for quiz master.</h2>
 		<article>
 			<p>At first, the quiz master makes a room. The room is the place to publish quiz.</p>
 			<p>You can name the room as you want.(e.g. "Java study", "Hollywood movie quiz")</p>
@@ -31,7 +31,7 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Usage for quiz panelists.</h2>
+		<h2 class="alert alert-info subhead">Usage for quiz panelists.</h2>
 		<article>
 			<p>At first, the quiz panelist enter the room of quiz master.</p>
 			<p>In the room, you can chat with others.</p>
@@ -46,7 +46,7 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Screen shot</h2>
+		<h2 class="alert alert-info subhead">Screen shot</h2>
 		<article>
 			<img src="/assets/images/snapshot1_ja.png" style="width:220px;"/>
 			<img src="/assets/images/snapshot2_ja.png" style="width:220px;"/>
@@ -59,7 +59,7 @@
 		</ol>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Sign in</h2>
+		<h2 class="alert alert-info subhead">Sign in</h2>
 		<article>
 			<p>This app requires Twitter account for sign in.</p>
 			<p>You can sign in with this button of the top page.
@@ -79,7 +79,7 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Home</h2>
+		<h2 class="alert alert-info subhead">Home</h2>
 		<article>
 			<p>Top page of this application. You can show this page by "Home" menu.</p>
 			<p>This page has list of rooms.</p>
@@ -95,38 +95,32 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Making and editing room</h2>
+		<h2 class="alert alert-info subhead">Making and editing room</h2>
 		<article>
 			<p>You can show this page by "Make room" menu.</p>
 		</article>
-		<table class="table">
-			<tr>
-				<th>Room name</th>
-				<td>Set the room name.This field is required.</td>
-			</tr>
-			<tr>
-				<th>Allow user question.</th>
-				<td>If checked, anyone can post the question to room owner.</td>
-			</tr>
-			<tr>
-				<th>Tag</th>
-				<td>Any string.(It is not used currently.)</td>
-			</tr>
-			<tr>
-				<th>Hashtag</th>
-				<td>Hashtag for chat.</td>
-			</tr>
-			<tr>
-				<th>Description</th>
-				<td>Any description.</td>
-			</tr>
-		</table>
+		<dl>
+			<dt>Room name</dt>
+			<dd>Set the room name.This field is required.</dd>
+
+			<dt>Allow user question.</dt>
+			<dd>If checked, anyone can post the question to room owner.</dd>
+
+			<dt>Tag</dt>
+			<dd>Any string.(It is not used currently.)</dd>
+
+			<dt>Hashtag</dt>
+			<dd>Hashtag for chat.</dd>
+
+			<dt>Description</dt>
+			<dd>Any description.</dd>
+		</dl>
 		<article>
 			<p>You can change room settings by "Edit room" menu.</p>
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Make question</h2>
+		<h2 class="alert alert-info subhead">Make question</h2>
 		<article>
 			<p>You can show this page by "Edit and publish questions" menu.</p>
 			<p>Or from shortcut bar of the bottom.</p>
@@ -153,104 +147,87 @@
 				</dd>
 			</dl>
 		</article>
-		<table class="table">
-			<tr>
-				<th>Question</th>
-				<td>Describe the question.</td>
-			</tr>
-			<tr>
-				<th>Choices</th>
-				<td>
-					<p>Choices of the question.</p>
-					<p>You can specify five choices separated by new line.</p>
-				</td>
-			</tr>
-			<tr>
-				<th>Correct choice</th>
-				<td>
-					<p>Specify the correct answer.</p>
-					<ul>
-						<li>First row - First row of choices is correct.</li>
-						<li>Answer the most frequent - The answer which has most frequent answerer is correct.</li>
-						<li>Answer the least frequent - The answer which has least frequent answerer is correct.(expect 0)</li>
-						<li>No answer - This question has no answer.</li>
-					</ul>
-				</td>
-			</tr>
-			<tr>
-				<th>Tag</th>
-				<td>Any string.(It is not used currently.)</td>
-			</tr>
-			<tr>
-				<th>Description</th>
-				<td>Any description.</td>
-			</tr>
-			<tr>
-				<th>Reference link</th>
-				<td>Any link for question.</td>
-			</tr>
-		</table>
+		<dl>
+			<dt>Question</dt>
+			<dd>Describe the question.</dd>
+
+			<dt>Choices</dt>
+			<dd>
+				<p>Choices of the question.</p>
+				<p>You can specify five choices separated by new line.</p>
+			</dd>
+
+			<dt>Correct choice</dt>
+			<dd>
+				<p>Specify the correct answer.</p>
+				<ul>
+					<li>First row - First row of choices is correct.</li>
+					<li>Answer the most frequent - The answer which has most frequent answerer is correct.</li>
+					<li>Answer the least frequent - The answer which has least frequent answerer is correct.(expect 0)</li>
+					<li>No answer - This question has no answer.</li>
+				</ul>
+			</dd>
+
+			<dt>Tag</dt>
+			<dd>Any string.(It is not used currently.)</dd>
+
+			<dt>Description</dt>
+			<dd>Any description.</dd>
+
+			<dt>Reference link</dt>
+			<dd>Any link for question.</dd>
+		</dl>
 		<article class="alert alert-warning">
 			<p>Quiz panelists can lookback question from my page.So if the quiz master set detailed description and reference link, it it useful for quiz panelists.</p>
 		</article>
-		<h3>Publish question</h3>
-		<article>
-			<p>In the event session, you can publish question from this page.</p>
-		</article>
-		<table class="table">
-			<tr>
-				<th>Include ranking</th>
-				<td>If unchecked, this question will be out of the ranking.</td>
-			</tr>
-		</table>
+		<dl>
+			<dt>Publish question</dt>
+			<dd>In the event session, you can publish question from this page.</dd>
+			<dt>Include ranking</dt>
+			<dd>If unchecked, this question will be out of the ranking.</dd>
+		</dl>
 		<article class="alert alert-warning">
 			<ul>
 				<li>The question which has no answer can not include in ranking.</li>
 				<li>If the correct answer is first row, the choices are shuffled.</li>
 			</ul>
 		</article>
-		<h3>Post question</h3>
-		<article>
-			<p>If posting question is allowed by room setting, anyone can make a question and post it to room owner.</p>
-			<p>But after posting question, it is managed by room owner. So you can not modify it after posting.</p>
-			<p>The room owner can freely modify it.</p>
-		</article>
+		<dl>
+			<dt>Post question</dt>
+			<dd>
+				<p>If posting question is allowed by room setting, anyone can make a question and post it to room owner.</p>
+				<p>But after posting question, it is managed by room owner. So you can not modify it after posting.</p>
+				<p>The room owner can freely modify it.</p>
+			</dd>
+		</dl>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Edit event.</h2>
+		<h2 class="alert alert-info subhead">Edit event.</h2>
 		<article>
 			<p>You can show this page by "Edit event" menu.</p>
 			<p>If the event is not started, you can modify event settings and start event.</p>
 			<p>If the event is running, event entry are listed. You can finish event.</p>
 		</article>
-		<table class="table">
-			<tr>
-				<th>Capacity</th>
-				<td>Capacity of the event. Currently the max number of capacity is limited to 50.</td>
-			</tr>
-			<tr>
-				<th>Title</th>
-				<td>Title of the event.</td>
-			</tr>
-			<tr>
-				<th>Start date</th>
-				<td>Specify the start date of the event.</td>
-			</tr>
-			<tr>
-				<th>Start time</th>
-				<td>Specify the start time of the event.</td>
-			</tr>
-			<tr>
-				<th>Passcode</th>
-				<td>
-					<p>If specified, passcode is required to entry event.</p>
-				</td>
-			</tr>
-			<tr>
-				<th>Description</th>
-				<td>Any description.</td>
-			</tr>
-		</table>
+		<dl>
+			<dt>Capacity</dt>
+			<dd>Capacity of the event. Currently the max number of capacity is limited to 50.</dd>
+
+			<dt>Title</dt>
+			<dd>Title of the event.</dd>
+
+			<dt>Start date</dt>
+			<dd>Specify the start date of the event.</dd>
+
+			<dt>Start time</dt>
+			<dd>Specify the start time of the event.</dd>
+
+			<dt>Passcode</dt>
+			<dd>
+				<p>If specified, passcode is required to entry event.</p>
+			</dd>
+			<dt>Description</dt>
+			<dd>Any description.</dd>
+		</dl>
 		<article class="alert alert-warning">
 			<ul>
 				<li>There is no necessary field in event settings. So you can start event without input anything.</li>
@@ -261,7 +238,7 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Entry the event</h2>
+		<h2 class="alert alert-info subhead">Entry the event</h2>
 		<article>
 			<p>When the room owner starts the event, others in the room see the confirm dialog of event entry.</p>
 			<p>You can entry the event by it.</p>
@@ -276,14 +253,14 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Answer the question</h2>
+		<h2 class="alert alert-info subhead">Answer the question</h2>
 		<article>
 			<p>When the room owner publish the question, it shows in others device.The time for choosing answer is 10 seconds.</p>
 			<p>The number of answerer is shown in the button.</p>
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Ranking</h2>
+		<h2 class="alert alert-info subhead">Ranking</h2>
 		<article>
 			<p>You can see this page by "Ranking" menu. Or from shortcut bar of the bottom.</p>
 			<dl>
@@ -314,7 +291,7 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">My page</h2>
+		<h2 class="alert alert-info subhead">My page</h2>
 		<article>
 			<p>You can show this page by "My page" menu.</p>
 			<p>In this page, you can lookback the questions of past events.</p>
@@ -344,7 +321,7 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">Chat</h2>
+		<h2 class="alert alert-info subhead">Chat</h2>
 		<article>
 			<p>You can look this page by "Chat" menu. Or from shortcut bar of the bottom.</p>
 			<p>Optionally, you can tweet it to tweeter.</p>
@@ -354,19 +331,16 @@
 		</article>
 	</secition>
 	<section>
-		<h2 class="alert alert-info">User setting</h2>
+		<h2 class="alert alert-info subhead">User setting</h2>
 		<article>
 			<p>You can look this page by "Setting" menu of user menu.</p>
 		</article>
-		<table class="table">
-			<tr>
-				<th>Username</th>
-				<td>Change username.</td>
-			</tr>
-			<tr>
-				<th>Notify tweet.</th>
-				<td>Show notify dialog, when someone tweet.</td>
-			</tr>
-		</table>
+		<dl>
+			<dt>Username</dt>
+			<dd>Change username.</dd>
+
+			<dt>Notify tweet.</dt>
+			<dd>Show notify dialog, when someone tweet.</dd>
+		</dl>
 	</secition>
 </div>
