@@ -23,7 +23,6 @@ import flect.websocket.CommandInvoker
 import flect.websocket.CommandResponse
 
 import java.util.UUID
-import scalikejdbc.ConnectionPool
 
 object Application extends Controller {
 
@@ -105,11 +104,6 @@ object Application extends Controller {
       } else {
         Ok("Can not clear all sessions in prod mode")
       }
-  }
-
-  def test = Action { implicit request =>
-    val config = Play.current.configuration.getConfig("scalikejdbc.play").getOrElse(play.api.Configuration.empty)
-    Ok("CloseAllOnStop = " + config.getString("closeAllOnStop.enabled").getOrElse("test"))
   }
 
 }
