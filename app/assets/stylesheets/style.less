@@ -219,26 +219,29 @@ textarea.form-control   { height: auto; }
 .dropdown-header        { display: block; line-height: 1.428571429; padding: 3px 20px; color: #999; font-size: 12px; }
 .dropdown-backdrop      { position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 990; }
 .pull-right > .dropdown-menu { right: 0; left: auto; }
-.alert                  { margin-bottom: 20px; padding: 15px; border: 1px solid transparent; border-radius: 4px; }
+.alert                  { margin-top: 10px; margin-bottom: 10px; padding: 15px; border: 1px solid transparent; border-radius: 4px; }
 .alert h4               { margin-top: 0; color: inherit; }
 .alert .alert-link      { font-weight: bold; }
 .alert > p,
 .alert > ul             { margin-bottom: 0; }
+.help .alert > ul       { margin-top: 0; margin-bottom: 0; }
 .alert > p + p          { margin-top: 5px; }
 .alert-dismissable      { padding-right: 35px; }
 .alert-dismissable .close { position: relative; top: -2px; right: -21px; color: inherit; }
 .alert-success          { border-color: #d6e9c6; color: #3c763d; background-color: #dff0d8; }
 .alert-success hr       { border-top-color: #c9e2b3; }
 .alert-success .alert-link { color: #2b542c; }
-.alert-info             { border-color: #bce8f1; color: #31708f; background-color: #d9edf7; }
+.alert-info-headline    { background-color: #5bc0de; color: #fff; }
+.alert-info             { color: #03A4D4; background-color: #DCF6FD; }
 .alert-info hr          { border-top-color: #a6e1ec; }
 .alert-info .alert-link { color: #245269; }
-.alert-warning          { border-color: #faebcc; color: #8a6d3b; background-color: #fcf8e3; }
+.alert-warning          { background-color: #FFF1F1; }
 .alert-warning hr       { border-top-color: #f7e1b5; }
 .alert-warning .alert-link { color: #66512c; }
-.alert-danger           { border-color: #ebccd1; color: #a94442; background-color: #f2dede; }
+.alert-danger           { border-color: #ebccd1; color: #a94442; background-color: #FFF1F1; }
 .alert-danger hr        { border-top-color: #e4b9c0; }
 .alert-danger .alert-link { color: #843534; }
+.subhead                { margin-top: 20px; }
 @-webkit-keyframes progress-bar-stripes { 
                           from { background-position: 40px 0; }
                           to   { background-position: 0 0; } }
@@ -436,12 +439,15 @@ tr.q-published td { color: #fff; background: #5bc0de !important; }
 
 .in-session             { color: #ff3c2d; }
 
-.help ol { list-style: decimal;margin: 10px 30px;}
-.help ul { list-style: disc;margin: 10px 30px;}
+.help ol { list-style: decimal; margin: 10px 30px;}
+.help ul { list-style: disc; margin: 10px 0 10px 30px;}
 
-.help dl { margin: 10px;}
-.help dt { margin-top: 10px; font-weight: bold;}
-.help dd { margin-top: 10px;}
+.help dl { margin: 10px 0; border-left: 1px solid #ccc; border-right: 1px solid #ccc; border-radius: 4px; }
+.help dt { padding: 5px 10px; border-top: 1px solid #ccc; font-weight: bold; background: #fafafa; }
+.help dd { padding: 5px 10px; border-top: 1px dotted #ccc; }
+.help dt:first-child { border-radius: 4px 4px 0 0; }
+.help dl dd:last-child { border-bottom: 1px solid #ccc; border-radius: 0 0 4px 4px; }
+
 
 /* jQuery UI
 -----------------------------------------------------------------------------*/
