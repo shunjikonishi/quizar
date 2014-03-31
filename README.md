@@ -1,4 +1,4 @@
-This is your new Play application
+Quizar
 =====================================
 
-This file will be packaged with your application, when using `play dist`.
+http://www.quizar.info
