@@ -142,7 +142,7 @@ function PublishQuestion(app, context, con) {
 					applyWrong($answerBtn);
 				}
 				if (effect) {
-					app.showEffect(msg, 1);
+					app.showEffect(msg, 3);
 				}
 			}
 			applyCorrect($correctBtns);
