@@ -105,7 +105,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   }
 
   def listRecent(offset: Int, limit: Int): List[RoomInfo] = DB.readOnly { implicit session =>
-    val now = new DateTime()
+    val now = new DateTime().minusHours(1)
     withSQL { 
       select
         .from(QuizRoom as qr)

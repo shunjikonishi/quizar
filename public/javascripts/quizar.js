@@ -1872,10 +1872,10 @@ function MakeQuestion(app, context, con) {
 								$publish.show("slow");
 								enableInput($form.find(":input"), true);
 								enableInput($btnPublish, true);
+								editQuestion = data;
 							} else {
 								app.showQuestionList("left");
 							}
-							editQuestion = data;
 						} else {
 							app.showMessage(MSG.questionPosted);
 							clearField();
@@ -2860,6 +2860,9 @@ function Ranking(app, context, users, con) {
 					if (data.length) {
 						nextData = data;
 					}
+					if (showed) {
+						buildRanking($tableNow, nextData, true);
+					}
 				}
 			})
 		} else {
@@ -2902,15 +2905,18 @@ function Ranking(app, context, users, con) {
 		if (nextData) {
 			buildRanking($tableNow, nextData, true);
 		}
+		showed = true;
 	}
 	function clear() {
 		$tab = null;
 		$tableNow = null;
+		showed = false;
 	}
 	var prevData = null,
 		nextData = null,
 		$tab = null,
-		$tableNow = null;
+		$tableNow = null,
+		showed = false;
 	$.extend(this, {
 		"init" : init,
 		"afterShow" : afterShow,
