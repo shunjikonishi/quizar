@@ -73,10 +73,10 @@ function MakeQuestion(app, context, con) {
 								$publish.show("slow");
 								enableInput($form.find(":input"), true);
 								enableInput($btnPublish, true);
+								editQuestion = data;
 							} else {
 								app.showQuestionList("left");
 							}
-							editQuestion = data;
 						} else {
 							app.showMessage(MSG.questionPosted);
 							clearField();
