@@ -4,10 +4,9 @@ version := "1.0-SNAPSHOT"
 
 resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots"
 
-val scalikejdbcVersion = "1.7.5-SNAPSHOT"
+val scalikejdbcVersion = "1.7.4"
 
 libraryDependencies ++= Seq(
-  jdbc,
   cache,
   "org.scalikejdbc" %% "scalikejdbc" % scalikejdbcVersion,
   "org.scalikejdbc" %% "scalikejdbc-play-plugin" % scalikejdbcVersion,
