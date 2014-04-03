@@ -18,8 +18,11 @@ object WebsocketTest extends Controller {
     val ats = sys.env.get("TWITTER_ACCESS_TOKEN_SECRET")
     (at, ats) match {
       case (Some(x), Some(y)) =>
+        /*
         val twitter = TwitterManager.fromAccessToken(x, y)
         val user = UserInfo.create(UserManager.getUserByTwitter(twitter.verifyCredentials))
+        */
+        val user = UserInfo.create(models.entities.QuizUser.find(1).get)
         Some(user)
       case _ =>
         None
