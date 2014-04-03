@@ -45,6 +45,7 @@ function Chat($el, context, con) {
 			$tweetBox.scrollTop($tweetBox[0].scrollHeight - $tweetBox.height());
 		});
 		cnt++;
+		$len.text(cnt);
 	}
 	function calcHeight() {
 		var wh = $(window).height(),
