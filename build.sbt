@@ -12,7 +12,7 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc-play-plugin" % scalikejdbcVersion,
   "org.scalikejdbc" %% "scalikejdbc-interpolation" % scalikejdbcVersion,
   "postgresql" % "postgresql" % "9.1-901.jdbc4",
-  "net.debasishg" % "redisclient_2.10" % "2.11",
+  "net.debasishg" % "redisclient_2.10" % "2.12",
   "org.twitter4j" % "twitter4j-core" % "4.0.1"
 )
 
