@@ -40,7 +40,16 @@ insert into quiz_user_answer (id, user_id, publish_id, event_id, user_event_id, 
 delete from quiz_user_answer where id > 1000;
 delete from quiz_user_answer where id > 1010;
 
+insert into quiz_room(name, owner, created, updated) values('test1', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test2', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test3', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test4', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test5', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test6', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test7', 1, now(), now());
+insert into quiz_room(name, owner, created, updated) values('test8', 1, now(), now());
 insert into quiz_room(name, owner, created, updated) values('test9', 1, now(), now());
+
 insert into quiz_room(name, owner, created, updated) values('test10', 1, now(), now());
 insert into quiz_room(name, owner, created, updated) values('test11', 1, now(), now());
 insert into quiz_room(name, owner, created, updated) values('test12', 1, now(), now());
