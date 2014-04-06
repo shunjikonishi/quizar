@@ -1,10 +1,12 @@
 package models
 
+import play.api.Logger
 import play.api.libs.json._
 import play.api.libs.iteratee.Iteratee
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+import java.nio.channels.ClosedChannelException
 
 import flect.websocket.CommandInvoker
 import flect.websocket.CommandHandler
@@ -22,7 +24,16 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
       val room = rm.getRoom(roomId)
       val roomAdmin = room.roomInfo.isAdmin(userId)
       val i = Iteratee.foreach[CommandResponse] { res =>
-        filterRedisMessage(res).foreach(s => channel.push(s.toString))
+        filterRedisMessage(res).foreach { s =>
+          try {
+            channel.push(s.toString)
+          } catch {
+            case e: ClosedChannelException => //Ignore
+            case e: Exception =>
+              Logger.error("Error at broadcating redis message.")
+              e.printStackTrace
+          }
+        }
       }
       room.commandOut(i)
 
