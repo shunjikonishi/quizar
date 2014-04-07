@@ -17,6 +17,7 @@ object Global extends GlobalSettings {
 		}
 		RoomManager.closeInactiveEvents
 		Logger.info("Debug enabled: " + Logger.isDebugEnabled)
+		Logger.debug("Info enabled: " + Logger.isInfoEnabled)
 	}
 	
 }
