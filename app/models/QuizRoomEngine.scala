@@ -112,6 +112,8 @@ class QuizRoomEngine(session: SessionInfo) extends CommandInvoker {
         val msg = (c.data \ "msg").as[String]
         val withTwitter = (c.data \ "twitter").as[Boolean]
         val img = session.user.map(_.imageUrl).getOrElse("#")
+Logger.info("!!! tweet !!! " + msg + ", " + Logger.isDebugEnabled)
+Logger.debug("!!! tweet2 !!! " + msg + ", " + Logger.isDebugEnabled)
         room.channel.send(new CommandResponse("chat", 
           JsObject(Seq(
             ("userId", JsNumber(userId)),
