@@ -1,7 +1,8 @@
-import play.api.GlobalSettings;
-import play.api.Application;
-import java.io.File;
-import jp.co.flect.util.ResourceGen;
+import play.api.Logger
+import play.api.GlobalSettings
+import play.api.Application
+import java.io.File
+import jp.co.flect.util.ResourceGen
 import models.RoomManager
 
 object Global extends GlobalSettings {
@@ -15,6 +16,7 @@ object Global extends GlobalSettings {
 			gen.process(origin);
 		}
 		RoomManager.closeInactiveEvents
+		Logger.info("Debug enabled: " + Logger.isDebugEnabled)
 	}
 	
 }
