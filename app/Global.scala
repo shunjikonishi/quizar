@@ -16,6 +16,14 @@ object Global extends GlobalSettings {
 			gen.process(origin);
 		}
 		RoomManager.closeInactiveEvents
+System.out.println("!!!!!!!! Test1 !!!!!!!!! - debug=" + Logger.isDebugEnabled)
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.duration.DurationInt
+Akka.system.scheduler.scheduleOnce(10 seconds) {
+  System.out.println("!!!!!!!! Test2 !!!!!!!!! - debug=" + Logger.isDebugEnabled)
+}
 	}
 	
 }
