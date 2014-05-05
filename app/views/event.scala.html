@@ -22,6 +22,14 @@
 			</div>
 			<div class="option-panel" style="display:none;">
 				<div>
+					<label for="event-answerTime">@Messages("defaultTimeLimit")</label>
+					<select id="event-answerTime" class="form-control auto-collect">
+						<option value="10">@Messages("tenSec")</option>
+						<option value="30">@Messages("thirtySec")</option>
+						<option value="60">@Messages("oneMin")</option>
+					</select>
+				</div>
+				<div>
 					<label for="event-date">@Messages("startDate")</label>
 					<input id="event-date" class="form-control" type="date" min="@(new org.joda.time.DateTime().toString("yyyy-MM-dd"))">
 				</div>

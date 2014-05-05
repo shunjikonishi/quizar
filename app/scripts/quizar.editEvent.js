@@ -37,6 +37,7 @@ function EditEvent(app, context, con) {
 			ret["execDate"] = new Date(date).getTime();
 		}
 		ret.capacity = parseInt(ret.capacity);
+		ret.answerTime = parseInt(ret.answerTime);
 		return ret;
 	}
 	function clearField() {
@@ -45,7 +46,7 @@ function EditEvent(app, context, con) {
 		$form.find(":input.auto-collect").each(function() {
 			var $input = $(this),
 				name = $input.attr("id").substring(6);
-			if (name != "capacity") {
+			if (name != "capacity" && name != "answerTime") {
 				$(this).val("");
 			}
 		});

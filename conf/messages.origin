@@ -193,8 +193,14 @@ includeToRanking[ja]=ランキングに含める
 timeLimit=Time limit
 timeLimit[ja]=制限時間
 
+defaultTimeLimit=Default time limit
+defaultTimeLimit[ja]=デフォルト制限時間
+
 tenSec=10 seconds
 tenSec[ja]=10秒
+
+thirtySec=30 seconds
+thirtySec[ja]=30秒
 
 oneMin=1 minute
 oneMin[ja]=1分
@@ -411,3 +417,4 @@ ui.copy[ja]=コピー
 
 ui.websocketNotSupported=This browser doesn't support WebSockets. Please use modern browser.
 ui.websocketNotSupported[ja]=このブラウザはWebSocketをサポートしていません。最新のモダンブラウザをご使用ください。
+

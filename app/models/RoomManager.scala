@@ -272,7 +272,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
   def getEventWithCount(roomId: Int): List[EventWithCount] = DB readOnly { implicit session =>
     sql"""
       select A.id, A.room_id, A.title, A.status, A.admin, A.exec_date, A.end_date, 
-             A.capacity, A.passcode, A.description,
+             A.capacity, A.answer_time, A.passcode, A.description,
              B.user_count, C.publish_count
         from quiz_event A
   inner join (select event_id, count(*) as user_count from quiz_user_event group by event_id) B ON (A.id = B.event_id)
@@ -289,6 +289,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
         execDate = rs.timestampOpt("exec_date").map(_.toDateTime),
         endDate = rs.timestampOpt("end_date").map(_.toDateTime),
         capacity = rs.int("capacity"),
+        answerTime = rs.int("answer_time"),
         passcode = rs.stringOpt("passcode"),
         description = rs.stringOpt("description")
       )

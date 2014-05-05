@@ -11,6 +11,7 @@ case class QuizPublish(
   correctAnswer: Int, 
   answersIndex: String, 
   includeRanking: Boolean, 
+  answerTime: Int,
   created: DateTime, 
   updated: DateTime) {
 
@@ -25,7 +26,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
 
   override val tableName = "quiz_publish"
 
-  override val columns = Seq("id", "event_id", "question_id", "correct_answer", "answers_index", "include_ranking", "created", "updated")
+  override val columns = Seq("id", "event_id", "question_id", "correct_answer", "answers_index", "include_ranking", "answer_time", "created", "updated")
 
   def apply(qp: ResultName[QuizPublish])(rs: WrappedResultSet): QuizPublish = new QuizPublish(
     id = rs.int(qp.id),
@@ -34,6 +35,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
     correctAnswer = rs.int(qp.correctAnswer),
     answersIndex = rs.string(qp.answersIndex),
     includeRanking = rs.boolean(qp.includeRanking),
+    answerTime = rs.int(qp.answerTime),
     created = rs.timestamp(qp.created).toDateTime,
     updated = rs.timestamp(qp.updated).toDateTime
   )
@@ -74,6 +76,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
     correctAnswer: Int,
     answersIndex: String,
     includeRanking: Boolean,
+    answerTime: Int,
     created: DateTime,
     updated: DateTime)(implicit session: DBSession = autoSession): QuizPublish = {
     val generatedKey = withSQL {
@@ -83,6 +86,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
         column.correctAnswer,
         column.answersIndex,
         column.includeRanking,
+        column.answerTime,
         column.created,
         column.updated
       ).values(
@@ -91,6 +95,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
         correctAnswer,
         answersIndex,
         includeRanking,
+        answerTime,
         created,
         updated
       )
@@ -103,6 +108,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
       correctAnswer = correctAnswer,
       answersIndex = answersIndex,
       includeRanking = includeRanking,
+      answerTime = answerTime,
       created = created,
       updated = updated)
   }
@@ -116,6 +122,7 @@ object QuizPublish extends SQLSyntaxSupport[QuizPublish] {
         column.correctAnswer -> entity.correctAnswer,
         column.answersIndex -> entity.answersIndex,
         column.includeRanking -> entity.includeRanking,
+        column.answerTime -> entity.answerTime,
         column.created -> entity.created,
         column.updated -> entity.updated
       ).where.eq(column.id, entity.id)

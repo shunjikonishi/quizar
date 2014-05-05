@@ -8,7 +8,8 @@ case class PublishInfo(
   questionId: Int, 
   seq: Int,
   question: String,
-  answers: List[String]
+  answers: List[String],
+  answerTime: Int
 ) {
   def toJson = {
     Json.toJson(this)(PublishInfo.format)

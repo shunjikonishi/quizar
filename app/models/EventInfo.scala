@@ -32,6 +32,7 @@ case class EventInfo(
   execDate: Option[DateTime] = None, 
   endDate: Option[DateTime] = None, 
   capacity: Int, 
+  answerTime: Int,
   passcode: Option[String] = None, 
   description: Option[String] = None
 ) {
@@ -57,6 +58,7 @@ object EventInfo {
     execDate=event.execDate,
     endDate=event.endDate,
     capacity=event.capacity,
+    answerTime=event.answerTime,
     passcode=event.passcode,
     description=event.description
   )

@@ -87,12 +87,15 @@ function MakeQuestion(app, context, con) {
 		}
 	}
 	function publish() {
+		var includeRank = $includeRank.is(":checked"),
+			answerTime = parseInt($answerTime.val());
 		con.request({
 			"command" : "publishQuestion",
 			"data" : {
 				"questionId" : editQuestion.id,
 				"eventId" : eventId,
-				"includeRanking" : $includeRank.is(":checked")
+				"includeRanking" : includeRank,
+				"answerTime" : answerTime
 			},
 			"success" : function(data) {
 				if (data != "OK") {
@@ -142,7 +145,8 @@ function MakeQuestion(app, context, con) {
 		})
 		$btnUpdate = $("#make-q-update-btn").click(update);
 		$publish = $("#make-q-publish");
-		$includeRank = $("#make-q-includeRank");
+		$includeRank = $("#make-q-includeRank")
+		$answerTime = $("#make-q-answerTime");
 		if (editQuestion && eventId) {
 			$publish.show();
 		}

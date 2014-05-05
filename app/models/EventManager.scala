@@ -73,6 +73,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
       execDate=event.execDate,
       //endDate=event.endDate,
       capacity=event.capacity,
+      answerTime=event.answerTime,
       passcode=event.passcode,
       description=event.description,
       created=now,
@@ -90,6 +91,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
         execDate=event.execDate,
         //endDate=event.endDate,
         capacity=event.capacity,
+        answerTime=event.answerTime,
         passcode=event.passcode,
         description=event.description,
         updated= new DateTime()
@@ -152,7 +154,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
       updated=now).id
   }
 
-  def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean): PublishInfo = DB.localTx { implicit session =>
+  def publish(eventId: Int, q: QuestionInfo, includeRanking: Boolean, answerTime: Int): PublishInfo = DB.localTx { implicit session =>
     val zipList = q.answerList.zipWithIndex
     val (answers, answersIndex, correctAnswer) = q.answerType match {
       case AnswerType.FirstRow =>
@@ -171,6 +173,7 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
       correctAnswer=correctAnswer,
       answersIndex=answersIndex.mkString(""),
       includeRanking=includeRanking,
+      answerTime=answerTime,
       created=now,
       updated=now)
     SQL("UPDATE QUIZ_QUESTION SET PUBLISH_COUNT = PUBLISH_COUNT + 1, UPDATED = ? " + 
@@ -186,7 +189,8 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
       q.id,
       seq.toInt,
       q.question,
-      answers
+      answers,
+      answerTime
     )
   }
 
@@ -353,9 +357,10 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
     val questionId = (command.data \ "questionId").as[Int]
     val eventId = (command.data \ "eventId").as[Int]
     val includeRanking = (command.data \ "includeRanking").as[Boolean]
+    val answerTime = (command.data \ "answerTime").asOpt[Int].getOrElse(10)
     val ret = getQuestion(questionId).map { q =>
       try {
-        val pub = publish(eventId, q, includeRanking)
+        val pub = publish(eventId, q, includeRanking, answerTime)
         val pq = PublishedQuestion(pub.id, questionId, q.answerType)
         prevPublished = Some(pq)
 

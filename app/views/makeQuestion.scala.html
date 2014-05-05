@@ -47,12 +47,22 @@
 			<button type="button" id="make-q-update-btn" class="btn blue btn-small">@Messages("ui.create")</button>
 		</div>
 		<div id="make-q-publish" class="align-center" style="display:none;">
-			<div class="checkbox">
+			<div class="checkbox" style="display:inline-block;">
 				<label for="make-q-includeRank" class="btn">
 					<input id="make-q-includeRank" type="checkbox" value="true" checked="checked"> @Messages("includeToRanking")
 				</label>
 			</div>
-			<button id="make-q-publish-btn" class="btn blue btn-small" type="button" >@Messages("ui.publish")</button>
+			<div style="display:inline-block;padding:5px;">
+				<label for="make-q-answerTime" style="display:inline-block;">@Messages("timeLimit")</label>
+				<select id="make-q-answerTime" class="form-control" style="width:100px;display:inline-block;">
+					<option value="10">@Messages("tenSec")</option>
+					<option value="30">@Messages("thirtySec")</option>
+					<option value="60">@Messages("oneMin")</option>
+				</select>
+			</div>
+			<div style="margin-top:10px;">
+				<button id="make-q-publish-btn" class="btn blue btn-small" type="button" >@Messages("ui.publish")</button>
+			</div>
 		</div>
 	</div>
 </div>

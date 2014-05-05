@@ -13,6 +13,7 @@ case class QuizEvent(
   execDate: Option[DateTime] = None, 
   endDate: Option[DateTime] = None, 
   capacity: Int, 
+  answerTime: Int,
   passcode: Option[String] = None, 
   description: Option[String] = None, 
   created: DateTime, 
@@ -29,7 +30,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
 
   override val tableName = "quiz_event"
 
-  override val columns = Seq("id", "room_id", "title", "status", "admin", "exec_date", "end_date", "capacity", "passcode", "description", "created", "updated")
+  override val columns = Seq("id", "room_id", "title", "status", "admin", "exec_date", "end_date", "capacity", "answer_time", "passcode", "description", "created", "updated")
 
   def apply(qe: ResultName[QuizEvent])(rs: WrappedResultSet): QuizEvent = new QuizEvent(
     id = rs.int(qe.id),
@@ -40,6 +41,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
     execDate = rs.timestampOpt(qe.execDate).map(_.toDateTime),
     endDate = rs.timestampOpt(qe.endDate).map(_.toDateTime),
     capacity = rs.int(qe.capacity),
+    answerTime = rs.int(qe.answerTime),
     passcode = rs.stringOpt(qe.passcode),
     description = rs.stringOpt(qe.description),
     created = rs.timestamp(qe.created).toDateTime,
@@ -84,6 +86,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
     execDate: Option[DateTime] = None,
     endDate: Option[DateTime] = None,
     capacity: Int,
+    answerTime: Int,
     passcode: Option[String] = None,
     description: Option[String] = None,
     created: DateTime,
@@ -97,6 +100,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
         column.execDate,
         column.endDate,
         column.capacity,
+        column.answerTime,
         column.passcode,
         column.description,
         column.created,
@@ -109,6 +113,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
         execDate,
         endDate,
         capacity,
+        answerTime,
         passcode,
         description,
         created,
@@ -125,6 +130,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
       execDate = execDate,
       endDate = endDate,
       capacity = capacity,
+      answerTime = answerTime,
       passcode = passcode,
       description = description,
       created = created,
@@ -142,6 +148,7 @@ object QuizEvent extends SQLSyntaxSupport[QuizEvent] {
         column.execDate -> entity.execDate,
         column.endDate -> entity.endDate,
         column.capacity -> entity.capacity,
+        column.answerTime -> entity.answerTime,
         column.passcode -> entity.passcode,
         column.description -> entity.description,
         column.created -> entity.created,
