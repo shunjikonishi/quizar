@@ -323,11 +323,13 @@ class EventManager(roomId: Int, broadcast: Option[CommandBroadcast]) {
   val openCommand = CommandHandler { command =>
     val id = (command.data \ "id").as[Int]
     val admin = (command.data \ "admin").as[Int]
+    val answerTime = (command.data \ "answerTime").as[Int]
     val ret = open(id, admin)
     if (ret) {
       broadcast.foreach(_.send(new CommandResponse("startEvent", JsObject(Seq(
         "id" -> JsNumber(id),
-        "admin" -> JsNumber(admin)
+        "admin" -> JsNumber(admin),
+        "answerTime" -> JsNumber(answerTime)
       )))))
     }
     openBySelf = true

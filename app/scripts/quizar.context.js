@@ -8,10 +8,11 @@ function Context(hash) {
 	function isRoomAdmin() { return !!self.roomAdmin;}
 	function isPostQuestionAllowed() { return !!self.userQuiz;}
 	function isDebug() { return !!self.debug;}
-	function openEvent(eventId, admin) {
+	function openEvent(eventId, admin, answerTime) {
 		self.eventId = eventId;
 		self.eventStatus = EventStatus.Running;
 		self.eventAdmin = admin;
+		self.answerTime = answerTime;
 	}
 	function closeEvent() {
 		self.eventId = 0;

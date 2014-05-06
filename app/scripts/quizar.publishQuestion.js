@@ -1,6 +1,5 @@
 function PublishQuestion(app, context, con) {
-	var TIMELIMIT = 10000,
-		BUTTON_COUNT = 5;
+	var BUTTON_COUNT = 5;
 	function setButtonCount(idx, cnt) {
 		$("#answer-" + idx).find(".answer-cnt .count").text(cnt);
 	}
@@ -39,7 +38,7 @@ function PublishQuestion(app, context, con) {
 		}
 		answered = true;
 		applyDisabled($buttons);
-		if (time > TIMELIMIT) {
+		if (time > question.answerTime * 1000) {
 			app.showMessage(MSG.timeLimitExceeded);
 			return;
 		}
@@ -171,8 +170,15 @@ function PublishQuestion(app, context, con) {
 		}
 	}
 	function progress() {
+		function percent() {
+			var now = new Date().getTime(),
+				time = now - startTime,
+				n = Math.abs(time / (question.answerTime * 10));
+			return n > 100 ? 0 : 100 - n;
+
+		}
 		function doProgress() {
-			n--;
+			var n = percent();
 			$progress.css("width", n + "%");
 			if (n < 20) {
 				$progress.removeClass("progress-bar-warning").addClass("progress-bar-danger");
@@ -195,9 +201,8 @@ function PublishQuestion(app, context, con) {
 				}
 			}
 		}
-		var n = 100,
-			n2 = -1,
-			interval = TIMELIMIT / 100,
+		var n2 = -1,
+			interval = question.answerTime * 10,
 			$progress = $("#publish-q-progress"),
 			$progressAnswered = $("#publish-q-progress-answered"),
 			$cur = null,

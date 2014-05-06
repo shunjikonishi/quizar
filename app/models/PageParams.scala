@@ -16,6 +16,7 @@ case class PageParams(
   hashtag: Option[String] = None,
   eventId : Option[Int] = None,
   eventStatus: Option[Int] = None,
+  answerTime: Option[Int] = None,
   userEventId: Option[Int] = None
 ) {
   def withUser(user: UserInfo): PageParams= {
@@ -35,7 +36,8 @@ case class PageParams(
     room.event.map(e => ret.copy(
       eventId=Some(e.id),
       eventStatus=Some(e.status.code),
-      eventAdmin=Some(userId == e.admin)
+      eventAdmin=Some(userId == e.admin),
+      answerTime=Some(e.answerTime)
     )).getOrElse(ret)
   }
 

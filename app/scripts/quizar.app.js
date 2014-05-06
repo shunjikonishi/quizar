@@ -236,9 +236,10 @@ flect.QuizApp = function(serverParams) {
 			});
 			con.addEventListener("startEvent", function(data) {
 				var eventId = data.id,
-					adminId = data.admin;
+					adminId = data.admin,
+					answerTime = data.answerTime;
 				effectDialog.show(MSG.start);
-				context.openEvent(eventId, adminId == context.userId);
+				context.openEvent(eventId, adminId == context.userId, answerTime);
 				if (makeQuestion) {
 					makeQuestion.openEvent(context.eventId);
 				}

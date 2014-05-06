@@ -799,10 +799,11 @@ function Context(hash) {
 	function isRoomAdmin() { return !!self.roomAdmin;}
 	function isPostQuestionAllowed() { return !!self.userQuiz;}
 	function isDebug() { return !!self.debug;}
-	function openEvent(eventId, admin) {
+	function openEvent(eventId, admin, answerTime) {
 		self.eventId = eventId;
 		self.eventStatus = EventStatus.Running;
 		self.eventAdmin = admin;
+		self.answerTime = answerTime;
 	}
 	function closeEvent() {
 		self.eventId = 0;
@@ -1623,7 +1624,8 @@ function QuestionList(app, users, context, con) {
 						"data" : {
 							"questionId" : id,
 							"eventId" : context.eventId,
-							"includeRanking" : answerType != AnswerType.NoAnswer
+							"includeRanking" : answerType != AnswerType.NoAnswer,
+							"answerTime" : context.answerTime
 						},
 						"success" : function(data) {
 							if (data != "OK") {
@@ -1888,12 +1890,15 @@ function MakeQuestion(app, context, con) {
 		}
 	}
 	function publish() {
+		var includeRank = $includeRank.is(":checked"),
+			answerTime = parseInt($answerTime.val());
 		con.request({
 			"command" : "publishQuestion",
 			"data" : {
 				"questionId" : editQuestion.id,
 				"eventId" : eventId,
-				"includeRanking" : $includeRank.is(":checked")
+				"includeRanking" : includeRank,
+				"answerTime" : answerTime
 			},
 			"success" : function(data) {
 				if (data != "OK") {
@@ -1943,7 +1948,11 @@ function MakeQuestion(app, context, con) {
 		})
 		$btnUpdate = $("#make-q-update-btn").click(update);
 		$publish = $("#make-q-publish");
-		$includeRank = $("#make-q-includeRank");
+		$includeRank = $("#make-q-includeRank")
+		$answerTime = $("#make-q-answerTime");
+		if (context.answerTime) {
+			$answerTime.val(context.answerTime);
+		}
 		if (editQuestion && eventId) {
 			$publish.show();
 		}
@@ -2000,8 +2009,7 @@ function MakeQuestion(app, context, con) {
 }
 
 function PublishQuestion(app, context, con) {
-	var TIMELIMIT = 10000,
-		BUTTON_COUNT = 5;
+	var BUTTON_COUNT = 5;
 	function setButtonCount(idx, cnt) {
 		$("#answer-" + idx).find(".answer-cnt .count").text(cnt);
 	}
@@ -2040,7 +2048,7 @@ function PublishQuestion(app, context, con) {
 		}
 		answered = true;
 		applyDisabled($buttons);
-		if (time > TIMELIMIT) {
+		if (time > question.answerTime * 1000) {
 			app.showMessage(MSG.timeLimitExceeded);
 			return;
 		}
@@ -2172,8 +2180,15 @@ function PublishQuestion(app, context, con) {
 		}
 	}
 	function progress() {
+		function percent() {
+			var now = new Date().getTime(),
+				time = now - startTime,
+				n = Math.abs(time / (question.answerTime * 10));
+			return n > 100 ? 0 : 100 - n;
+
+		}
 		function doProgress() {
-			n--;
+			var n = percent();
 			$progress.css("width", n + "%");
 			if (n < 20) {
 				$progress.removeClass("progress-bar-warning").addClass("progress-bar-danger");
@@ -2196,9 +2211,8 @@ function PublishQuestion(app, context, con) {
 				}
 			}
 		}
-		var n = 100,
-			n2 = -1,
-			interval = TIMELIMIT / 100,
+		var n2 = -1,
+			interval = question.answerTime * 10,
 			$progress = $("#publish-q-progress"),
 			$progressAnswered = $("#publish-q-progress-answered"),
 			$cur = null,
@@ -2482,11 +2496,13 @@ function EditEvent(app, context, con) {
 		if (!context.eventId) {
 			updateEvent(true);
 		} else {
+			var answerTime = parseInt($("#event-answerTime").val());
 			con.request({
 				"command" : "openEvent",
 				"data" : {
 					"id" : context.eventId,
-					"admin" : context.userId
+					"admin" : context.userId,
+					"answerTime" : answerTime
 				},
 				"success" : function(data) {
 					if (data) {
@@ -3251,9 +3267,10 @@ flect.QuizApp = function(serverParams) {
 			});
 			con.addEventListener("startEvent", function(data) {
 				var eventId = data.id,
-					adminId = data.admin;
+					adminId = data.admin,
+					answerTime = data.answerTime;
 				effectDialog.show(MSG.start);
-				context.openEvent(eventId, adminId == context.userId);
+				context.openEvent(eventId, adminId == context.userId, answerTime);
 				if (makeQuestion) {
 					makeQuestion.openEvent(context.eventId);
 				}

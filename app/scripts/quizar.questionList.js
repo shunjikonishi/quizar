@@ -59,7 +59,8 @@ function QuestionList(app, users, context, con) {
 						"data" : {
 							"questionId" : id,
 							"eventId" : context.eventId,
-							"includeRanking" : answerType != AnswerType.NoAnswer
+							"includeRanking" : answerType != AnswerType.NoAnswer,
+							"answerTime" : context.answerTime
 						},
 						"success" : function(data) {
 							if (data != "OK") {

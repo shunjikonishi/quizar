@@ -58,11 +58,13 @@ function EditEvent(app, context, con) {
 		if (!context.eventId) {
 			updateEvent(true);
 		} else {
+			var answerTime = parseInt($("#event-answerTime").val());
 			con.request({
 				"command" : "openEvent",
 				"data" : {
 					"id" : context.eventId,
-					"admin" : context.userId
+					"admin" : context.userId,
+					"answerTime" : answerTime
 				},
 				"success" : function(data) {
 					if (data) {

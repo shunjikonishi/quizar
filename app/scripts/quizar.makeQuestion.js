@@ -147,6 +147,9 @@ function MakeQuestion(app, context, con) {
 		$publish = $("#make-q-publish");
 		$includeRank = $("#make-q-includeRank")
 		$answerTime = $("#make-q-answerTime");
+		if (context.answerTime) {
+			$answerTime.val(context.answerTime);
+		}
 		if (editQuestion && eventId) {
 			$publish.show();
 		}
