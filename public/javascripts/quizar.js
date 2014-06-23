@@ -2098,6 +2098,9 @@ function PublishQuestion(app, context, con) {
 		}
 		switch (answerDetail.answerType) {
 			case AnswerType.FirstRow:
+				if (answerDetail.correctAnswer) {
+					return $("#answer-" + answerDetail.correctAnswer);
+				}
 				var text = $.isArray(answerDetail.answers) ?
 					answerDetail.answers[0] : 
 					answerDetail.answers.split("\n")[0];

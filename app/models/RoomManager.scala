@@ -325,7 +325,7 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
       val description = rs.stringOpt("description")
       val relatedUrl = rs.stringOpt("related_url")
       val correctAnswer = rs.int("correct_answer")
-      val answersIndex = rs.string("answers_index").toCharArray.toList.map(_.toInt)
+      val answersIndex = rs.string("answers_index")
       val answerCounts = Map(
         "1" -> rs.int("answer1"),
         "2" -> rs.int("answer2"),
@@ -333,7 +333,10 @@ class RoomManager(redis: RedisService) extends flect.redis.RoomManager[RedisRoom
         "4" -> rs.int("answer4"),
         "5" -> rs.int("answer5")
       )
-      val answerList = answers.zip(answersIndex).sortBy(_._2).map(_._1)
+      val answerList = answers.zipWithIndex.sortBy { case (v, idx) =>
+        val n = "" + (idx + 1)
+        answersIndex.indexOf(n)
+      }.map(_._1)
       LookbackInfo(
         publishId=publishId,
         question=question,
