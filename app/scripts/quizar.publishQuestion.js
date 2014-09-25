@@ -307,7 +307,7 @@ function PublishQuestion(app, context, con) {
 		}
 	}
 	function afterShow() {
-		if (!answerDetail && !lookback) {
+		if (question && !answerDetail && !lookback) {
 			startTime = new Date().getTime();
 			progress();
 		}

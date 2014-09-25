@@ -462,6 +462,11 @@ flect.QuizApp = function(serverParams) {
 		"home" : {
 			"beforeShow" : home.init,
 			"afterHide" : home.clear
+		},
+		"publish-question" : {
+			"name" : "publish-question",
+			"beforeShow" : publishQuestion.init,
+			"afterHide" : publishQuestion.clear
 		}
 	}
 	if (context.isLogined()) {
@@ -483,11 +488,6 @@ flect.QuizApp = function(serverParams) {
 					makeRoom.init($el);
 				},
 				"afterHide" : makeRoom.clear
-			},
-			"publish-question" : {
-				"name" : "publish-question",
-				"beforeShow" : publishQuestion.init,
-				"afterHide" : publishQuestion.clear
 			},
 			"edit-room" : {
 				"name" : "make-room",

@@ -2317,7 +2317,7 @@ function PublishQuestion(app, context, con) {
 		}
 	}
 	function afterShow() {
-		if (!answerDetail && !lookback) {
+		if (question && !answerDetail && !lookback) {
 			startTime = new Date().getTime();
 			progress();
 		}
@@ -3045,6 +3045,7 @@ flect.QuizApp = function(serverParams) {
 			pushState.pushDynamic(id);
 		}
 		$content.children("div").hide();
+console.log("showDynamic", id, params);
 		templateManager.show(params);
 	}
 	function showStatic(id, sidr, func) {
@@ -3496,6 +3497,11 @@ flect.QuizApp = function(serverParams) {
 		"home" : {
 			"beforeShow" : home.init,
 			"afterHide" : home.clear
+		},
+		"publish-question" : {
+			"name" : "publish-question",
+			"beforeShow" : publishQuestion.init,
+			"afterHide" : publishQuestion.clear
 		}
 	}
 	if (context.isLogined()) {
@@ -3517,11 +3523,6 @@ flect.QuizApp = function(serverParams) {
 					makeRoom.init($el);
 				},
 				"afterHide" : makeRoom.clear
-			},
-			"publish-question" : {
-				"name" : "publish-question",
-				"beforeShow" : publishQuestion.init,
-				"afterHide" : publishQuestion.clear
 			},
 			"edit-room" : {
 				"name" : "make-room",
