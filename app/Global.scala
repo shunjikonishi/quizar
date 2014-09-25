@@ -1,11 +1,12 @@
 import play.api.Logger
-import play.api.GlobalSettings
+import play.api.mvc._
 import play.api.Application
 import java.io.File
 import jp.co.flect.util.ResourceGen
+import scala.concurrent.Future
 import models.RoomManager
 
-object Global extends GlobalSettings {
+object Global extends WithFilters(RootDomainFilter) {
 	
 	override def onStart(app: Application) {
 		//Generate messages and messages.ja
@@ -18,4 +19,15 @@ object Global extends GlobalSettings {
 		RoomManager.closeInactiveEvents
 	}
 	
+}
+
+object RootDomainFilter extends Filter {
+  
+  def apply(nextFilter: (RequestHeader) => Future[SimpleResult])(request: RequestHeader): Future[SimpleResult] = {
+    if (request.host == "quizar.info") {
+      Future.successful(Results.Redirect("http://www.quizar.info" + request.uri, 301))
+    } else {
+      nextFilter(request)
+    }
+  }
 }
