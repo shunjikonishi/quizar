@@ -27,7 +27,7 @@ import java.util.UUID
 object Application extends Controller {
 
   def index() = Action { implicit request =>
-    println("*********** " + sys.env.get("DYNO") + " ***********")
+println("**** INDEX(" + java.net.InetAddress.getLocalHost + ") ****")
     val rm = RoomManager
     val sm = SessionManager
     val sessionId = session.get("sessionId").getOrElse(UUID.randomUUID().toString())
